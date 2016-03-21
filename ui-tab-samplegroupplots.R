@@ -36,7 +36,7 @@ tabPanel("Group Plots",
              tabPanel(title="PCA Plot",
                       plotOutput("pca_plot")
              ),#tabPanel
-             tabPanel(title="Sample Correlation Heatmap",
+             tabPanel(title="Sample Distance Heatmap",
                       plotOutput("gene_pheatmap") 
              )#tabPanel
            )#tabsetPanel
