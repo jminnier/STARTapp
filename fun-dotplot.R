@@ -1,14 +1,22 @@
-
-#dotplot_fun(sel_group = c("BE","HE","BP"),sel_gene=c("Pecam1","Gnai3","Chd1"),sel_gene_prot=c("Chd1"))
-#dotplot_fun(sel_group = c("BE","HE","SM","HP","BP"),sel_gene=c("Pecam1","Gnai3","Chd1"),sel_gene_prot=c("Chd1"))
-#
-if(FALSE) {
-  sel_group = c("BE","HE","BP")
-  sel_gene="Pecam1"
-  dotplot_fun(sel_group=sel_group,sel_gene=sel_gene)
-  
-}
-
+## ==================================================================================== ##
+# START Shiny App for analysis and visualization of transcriptome data.
+# Copyright (C) 2014-2016  Jessica Minnier
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
+## ==================================================================================== ##
 
 ##================================================================================##
 ## DOTPLOT FOR RNA-SEQ
@@ -36,16 +44,7 @@ dotplot_dat <- function(data_long,
   geneids_tmp = filter(geneids,unique_id%in%tmpids$unique_id)
   
   subdat_rna$y = subdat_rna[,ytype]
-  #subdat_rna = subdat_rna%>%mutate("y" = 2^(log2y))
-  #subdat_rna$gene.name = factor(as.character(subdat_rna$gene.name),levels= unique(tmpids$gene.name))
-  #subdat_rna = merge(subdat_rna,tmpids,all=T)
-  #put data in long form, change names to generic, allow user to select which column to use as "gene_name" for plotting
-  
-  
-  #make Y
 
-
-  
   subdat_rna$group = factor(subdat_rna$group)
   subdat_rna = subdat_rna%>%filter(!is.na(y))
   subdat_rna = merge(geneids_tmp,subdat_rna)

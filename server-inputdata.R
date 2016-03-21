@@ -1,19 +1,22 @@
-
-if(FALSE) {
-  load("tmpdata.RData")
-  input = list()
-  input$numgeneids = 2
-  sampleid <- colnames(countdata[,-(1:input$numgeneids)])
-  tmpnames <- do.call(rbind,strsplit(sampleid,"_",fixed=TRUE))
-  group_names <- unique(tmpnames[,1])
-  group <- tmpnames[,1]
-  rep_id <- tmpnames[,2]
-  sampledata = data.frame(sampleid,group,rep_id)
-  tmp = list('data'=countdata,'group_names'=group_names,'sampledata'=sampledata)
-  
-  #save(data_analyzed,input,tmp,file="tmpdata.RData")
-}
-
+## ==================================================================================== ##
+# START Shiny App for analysis and visualization of transcriptome data.
+# Copyright (C) 2014-2016  Jessica Minnier
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# 
+# You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
+## ==================================================================================== ##
 
 
 observe({
