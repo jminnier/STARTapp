@@ -81,15 +81,12 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
 
 rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
                             valuename="log2cpm") {
-  
   group1 = group_sel[1]; group2 = group_sel[2]
   
   data_long$value = data_long[,valuename]
   
   pp = data_long%>%filter(group%in%group_sel)
-  pp_sum = pp%>%unite(grp,unique_id,group,sep=":")%>%
-    group_by(grp)%>%summarise("Ave_value"=mean(value))%>%
-    separate(grp,into=c("unique_id","group"),sep = ":")
+  pp_sum = pp%>%group_by(unique_id,group)%>%summarise("Ave_value"=mean(value))
   
   pp_wide = pp_sum%>%spread(key = group,Ave_value)
   pp_wide$id = 1:nrow(pp_wide)
