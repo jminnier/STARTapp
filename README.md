@@ -4,6 +4,9 @@ The START App:
 A Web-Based RNAseq Analysis 
 and Visualization Resource
 
+The app is hosted here:
+<https://kcvi.shinyapps.io/START/>
+
 Jonathan Nelson, Jiri Sklenar, Anthony Barnes, Jessica Minnier
 The Knight Cardiovascular Institute, Oregon Health & Science University, Portland, OR 97239-3098, USA.
 
