@@ -24,6 +24,7 @@
 tabPanel("Input Data", 
          sidebarLayout(
            sidebarPanel(
+             downloadLink("instructionspdf",label="Download Instructions (pdf)"),
              radioButtons('use_example_file','Use example file or upload your own data',
                           c('Example: RNA-seq gene counts'="examplecounts",
                             'RData from previous START upload'="previousrdata",

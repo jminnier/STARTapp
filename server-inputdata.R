@@ -354,4 +354,11 @@ output$example_analysis_file <- downloadHandler(filename="exampleanalysisres_sho
 
 
 
+output$instructionspdf <- downloadHandler(filename="Instructions.pdf",
+                                                content=function(file){
+                                                  file.copy("Instructions.pdf",file)
+                                                })
+
+
+
 

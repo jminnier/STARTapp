@@ -7,6 +7,9 @@ and Visualization Resource
 Jonathan Nelson, Jiri Sklenar, Anthony Barnes, Jessica Minnier
 The Knight Cardiovascular Institute, Oregon Health & Science University, Portland, OR 97239-3098, USA.
 
+# Instructions
+
+Instructions can be found here: <https://github.com/jminnier/STARTapp/blob/master/Instructions.pdf> 
 
 
 # Licensing
