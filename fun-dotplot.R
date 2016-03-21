@@ -68,22 +68,12 @@ dotplot_fun <- function(data_long,
     subdat_all = dotplot_dat(data_long,geneids,sel_group,sel_gene,ytype)
     print(subdat_all)
 
-    ylab = ytype
-        
-#     if(log2y==TRUE) {
-#       subdat_all$y = subdat_all$log2y
-#       ylab = paste0("log2",ytype)
-#     }else{
-#       ylab = ytype
-#     }
-    
     subdat_all$labelgeneid = subdat_all[,match(genelabel,colnames(subdat_all))]
   
     p <- ggplot(subdat_all,aes(x=group,y=y,fill=group)) +geom_boxplot()
-    #+ ylab(ylab)
     p <- p + facet_grid(.~ labelgeneid,scales = "free_y")+
       geom_point(size=3,aes(text = paste("sampleid:", sampleid))) + 
-      stat_summary(fun.y=mean,geom="point",shape=5,size=3,color="black")
+      stat_summary(fun.y=mean,geom="point",shape=5,size=3,fill=1)
     p <- p + scale_fill_discrete(name="group",breaks=sel_group,
                                  labels=sel_group,
                                  guide=guide_legend(keyheight=4,keywidth=2))
@@ -104,7 +94,7 @@ dotplot_fun <- function(data_long,
     
     #print(p)
     g <- ggplotly(p)
-    g %>% layout(yaxis = list(title=ylab))
+    g %>% layout(yaxis = list(title=ytype))
   }
   
   #ggplot(subdat,aes(x=tissue,y=rpkm,color=tissue)) + geom_point()
