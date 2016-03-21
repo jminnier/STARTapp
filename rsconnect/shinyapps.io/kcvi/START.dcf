@@ -2,8 +2,14 @@ name: START
 account: kcvi
 server: shinyapps.io
 appId: 77829
+<<<<<<< HEAD
 bundleId: 399600
 url: https://kcvi.shinyapps.io/START/
 when: 1458529205.02811
+=======
+bundleId: 399583
+url: https://kcvi.shinyapps.io/START/
+when: 1458526411.96629
+>>>>>>> 2f253e3cb0a3d3436486a5920481bb66d97eb430
 asMultiple: FALSE
 asStatic: FALSE
