@@ -23,15 +23,16 @@
 ## Group Plots
 ## ==================================================================================== ##   
 tabPanel("Group Plots",  
-         sidebarLayout(sidebarPanel( 
+         fluidRow(column(4,wellPanel(
            selectizeInput("sampleres_groups", label="Select Groups",
                           choices=NULL,
-                          multiple=TRUE),
-           br(),br(),br(),br(),br(),br(),br(),br(), br(),br(),br(), 
-           img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	 
+                          multiple=TRUE)
+         ),#wellpanel
+         
            
-         ),#sidebarPanel
-         mainPanel(
+           img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+         ),#column
+         column(8,
            tabsetPanel(
              tabPanel(title="PCA Plot",
                       plotOutput("pca_plot")

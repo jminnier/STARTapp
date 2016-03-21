@@ -24,7 +24,7 @@
 ## HEATMAP TAB 
 ## ==================================================================================== ## 	
 tabPanel("Heatmaps",  
-         sidebarLayout(sidebarPanel(
+         fluidRow(column(4,wellPanel(
            actionButton("action_heatmaps","Generate Heatmaps"),  
            h6(textOutput("numheat")),
            radioButtons("heatmapvaluename",label="Select Value to Plot in Heatmap",choices=""),
@@ -34,9 +34,9 @@ tabPanel("Heatmaps",
                               selected=""
            ),
            selectizeInput("sel_test_heatmap",
-                              label=h5("Select Test to Use for Filtering"), 
-                              choices="",
-                              selected=""),	
+                          label=h5("Select Test to Use for Filtering"), 
+                          choices="",
+                          selected=""),	
            h3("Filters"),
            
            checkboxInput("filter_fdr","FDR cutoff",value = FALSE),
@@ -58,27 +58,27 @@ tabPanel("Heatmaps",
                                            selected=NULL,
                                            multiple=TRUE,options = list(maxItems = 2)),
                             sliderInput("fold_change_range",
-                                        label="Choose Log2Fold Change Filter",min= -20, max=20,value=c(-20,20))),
-br(),br(),br(),br(),br(),br(),br(),br(), br(),br(),br(), 
-img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+                                        label="Choose Log2Fold Change Filter",min= -20, max=20,value=c(-20,20)))
          ),#sidebarPanel
-         mainPanel(
-           tabsetPanel(
-             tabPanel(title="HeatMap",
-                      #textOutput("which_genes"),
-                      h4(textOutput("heatmap_rna_title")),
-                      plotOutput("heatmap_rna",height="800px")                        
-             ),
-             tabPanel(title="Interactive HeatMap",
-                      h4(textOutput("heatmap_rna_title_int")),
-                      uiOutput("heatmapggvisUI_rna"),
-                      ggvisOutput("heatmapggvis_rna")
-             ),
-             tabPanel(title="Data Output",
-                      downloadButton('downloadHeatmapData_rna', 
-                                     'Download Heatmap Data as CSV File'),
-                      DT::dataTableOutput("heatdat_rna"))
-           )#tabsetPanel
-         )#mainPanel
-         )#sidebarLayout
-) #tabPanel Heatmap
+         img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+         ),#column
+         column(8,
+                tabsetPanel(
+                  tabPanel(title="HeatMap",
+                           #textOutput("which_genes"),
+                           h4(textOutput("heatmap_rna_title")),
+                           plotOutput("heatmap_rna",height="800px")                        
+                  ),
+                  tabPanel(title="Interactive HeatMap",
+                           h4(textOutput("heatmap_rna_title_int")),
+                           uiOutput("heatmapggvisUI_rna"),
+                           ggvisOutput("heatmapggvis_rna")
+                  ),
+                  tabPanel(title="Data Output",
+                           downloadButton('downloadHeatmapData_rna', 
+                                          'Download Heatmap Data as CSV File'),
+                           DT::dataTableOutput("heatdat_rna"))
+                )#tabsetPanel
+         )#column
+         )#fluidrow
+)#tabpanel

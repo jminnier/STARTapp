@@ -24,7 +24,7 @@
 ## Analysis Plots
 ## ==================================================================================== ##   
 tabPanel("Analysis Plots",  
-         sidebarLayout(sidebarPanel( 
+         fluidRow(column(4,wellPanel(
            conditionalPanel("input.analysisres_tabset=='Volcano Plot'",
                             selectizeInput("analysisres_test", label="Select Test for Volcano Plot",
                                            choices=NULL),
@@ -42,23 +42,23 @@ tabPanel("Analysis Plots",
                                            choices=NULL,
                                            multiple=TRUE,options = list(maxItems = 2)),
                             radioButtons("scattervaluename",label="Select Scatterplot Value",choices="")
-           ),#conditionalpanel
-           br(),br(),br(),br(),br(),br(),br(),br(), br(),br(),br(), 
-           img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
-         ),#sidebarPanel
-         mainPanel(
-           tabsetPanel(id="analysisres_tabset",
-                       tabPanel(title="Volcano Plot",
-                                #h5(textOutput("corPR")),
-                                uiOutput("volcanoplot_2groups_ggvisUI"),
-                                ggvisOutput("volcanoplot_2groups_ggvis")  
-                       ),#tabPanel
-                       tabPanel(title="Scatterplot of Fold Changes",
-                                #h5(textOutput("corPR")),
-                                uiOutput("scatterplot_fc_2groups_ggvisUI"),
-                                ggvisOutput("scatterplot_fc_2groups_ggvis")  
-                       )#tabPanel
-           )#tabsetPanel
-         )#mainPanel
-         )#sidebarLayout
+           )#conditionalpanel
+         ),
+         img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+         ),#column
+         column(8,
+                tabsetPanel(id="analysisres_tabset",
+                            tabPanel(title="Volcano Plot",
+                                     #h5(textOutput("corPR")),
+                                     uiOutput("volcanoplot_2groups_ggvisUI"),
+                                     ggvisOutput("volcanoplot_2groups_ggvis")  
+                            ),#tabPanel
+                            tabPanel(title="Scatterplot of Fold Changes",
+                                     #h5(textOutput("corPR")),
+                                     uiOutput("scatterplot_fc_2groups_ggvisUI"),
+                                     ggvisOutput("scatterplot_fc_2groups_ggvis")  
+                            )#tabPanel
+                )#tabsetPanel
+         )#column
+         )#fluidrow
 ) #END tabPanel
