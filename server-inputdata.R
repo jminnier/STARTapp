@@ -155,7 +155,16 @@ analyzeCountDataReactive <-
                     countdata = countdata[tmpkeep,,drop=FALSE]
                     
                     geneids = geneids%>%unite_("unique_id",colnames(geneids),remove = FALSE)
-                    #add in catch if geneids not unique?
+                    
+                    #if geneids not unique
+                    if(length(unique(geneids$unique_id))<nrow(geneids)) {
+                      geneids = geneids%>%group_by(unique_id)%>%
+                        mutate(rn=row_number(unique_id),new=
+                                 ifelse(rn==1,unique_id,paste(unique_id,rn,sep="_")))%>%
+                        ungroup()%>%mutate(unique_id=new)%>%select(-rn,-new)
+                      
+                    }
+                    
                     #add in catch for if length(tmpkeep) = 0
                     
                     #add filter for max # counts
