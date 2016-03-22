@@ -19,12 +19,6 @@ shiny::runGitHub("STARTapp", "jminnier")
 
 ```
 
-=======
-install.packages('shiny')
-shiny::runGitHub('STARTapp', 'jminnier')
-```
-
->>>>>>> 2e82bfb8f3f0a6197748c670b09be2f4bbb285b2
 Jonathan Nelson, Jiri Sklenar, Anthony Barnes, Jessica Minnier.
 *The Knight Cardiovascular Institute, Oregon Health & Science University, Portland, OR 97239-3098, USA.*
 
