@@ -37,7 +37,7 @@ navbarPage(
   fluid = TRUE,theme = "bootstrap.min.united.css",
   #United theme from http://bootswatch.com/
   #customHeaderPanel(title="START: RNAseq Analysis and Visualization Resource"),#img(src="KCardio_CMYK_4C_pos_small.jpg",height=50,width= 92,align="right")	,
-  title="START: RNAseq Analysis and Visualization Resource", 
+  title="START: Shiny Transcriptome Analysis Resource Tool", 
   ## =========================================================================== ##
   ## DOWNLOAD DATA TABS
   ## =========================================================================== ##
@@ -60,7 +60,7 @@ navbarPage(
   ## ==================================================================================== ##              
   footer=p(hr(),p("ShinyApp created by ", strong("{Jessica Minnier + Jiri Sklenar + Jonathan Nelson}")," of ",align="center",width=4),
            p(("Knight Cardiovascular Institute, Oregon Health & Science University"),align="center",width=4),
-           p(("Copyright (C) 2014-2016, code licenesed under GPLv3"),align="center",width=4),
+           p(("Copyright (C) 2014-2016, code licensed under GPLv3"),align="center",width=4),
            p(("Code available on Github:"),a("https://github.com/jminnier/STARTapp",href="https://github.com/jminnier/STARTapp"),align="center",width=4)
   )
   

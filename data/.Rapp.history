@@ -1,0 +1,11 @@
+load("/Users/minnier/Dropbox/Work/OHSU/KnightCardio/Nelson_Barnes/ShinyApps/2014_RNASeqViewer/ShinySeqVis/data/mousecounts_example_analysis_results.RData")
+ls()
+head(results)
+load("/Users/minnier/Dropbox/Work/OHSU/KnightCardio/Nelson_Barnes/ShinyApps/2014_RNASeqViewer/ShinySeqVis/data/mousecounts_example_analyzed.RData")
+x=load("/Users/minnier/Dropbox/Work/OHSU/KnightCardio/Nelson_Barnes/ShinyApps/2014_RNASeqViewer/ShinySeqVis/data/mousecounts_example_analyzed.RData")
+x
+head(example_data_results)
+load("/Users/minnier/Desktop/STAR_results_2016-03-20-mousecounts.RData")
+x = load("/Users/minnier/Desktop/STAR_results_2016-03-20-mousecounts.RData")
+x
+head(results)
