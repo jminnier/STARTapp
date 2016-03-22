@@ -52,7 +52,8 @@ navbarPage(
   ## ============================================================================ ##
   ## INFO TAB
   ## ============================================================================ ##   
-  tabPanel("Info"),#end definitions of tabs, now footer
+  tabPanel("Info",
+           includeMarkdown("instructions/Instructions.md")),#end definitions of tabs, now footer
   
   ## ==================================================================================== ##
   ## FOOTER
