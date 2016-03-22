@@ -91,7 +91,6 @@ This is a scatter plot of average gene expression in one group against another g
 
 Use the search bar to look up genes in your data set. For selected gene(s) the stripchart (dotplot) and boxplots of the expression values are presented for each group. You may plot one or multiple genes along side each other. Hover over points for more information about the data.
 
- 
 
 ## Heatmap
 

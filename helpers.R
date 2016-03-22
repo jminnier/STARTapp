@@ -37,7 +37,7 @@ library(RColorBrewer)
 library(pheatmap)
 library(shinyBS)
 library(plotly)
-
+library(markdown)
 
 ##================================================================================##
 
