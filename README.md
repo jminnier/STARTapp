@@ -1,13 +1,12 @@
 # START App 
 
-The START App: 
-A Web-Based RNAseq Analysis 
-and Visualization Resource
+The Shiny Transcriptome Analysis Resource Tool (START) App: 
+A Web-Based RNAseq Analysis and Visualization Resource
 
 The app is hosted on Shinyapps.io here:
 <https://kcvi.shinyapps.io/START/>
 
-To run this app locally on your machine, download R or RStudio and run the commands:
+To run this app locally on your machine, download R or RStudio and run the following commands once to set up the environment:
 ```
 
 install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT",
@@ -15,8 +14,13 @@ install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tid
 ## try http:// if https:// URLs are not supported
 source("https://bioconductor.org/biocLite.R")
 biocLite(c("limma","edgeR"))
-shiny::runGitHub("STARTapp", "jminnier")
 
+```
+
+You may now run the shiny app with just one command in R:
+
+```
+shiny::runGitHub("STARTapp", "jminnier")
 ```
 
 Jonathan Nelson, Jiri Sklenar, Anthony Barnes, Jessica Minnier.
@@ -32,7 +36,8 @@ Instructions can be found here: <https://github.com/jminnier/STARTapp/blob/maste
 This shiny code is licensed under the GPLv3. Please see the file LICENSE.txt for
 information.
 
-    START Shiny App for analysis and visualization of transcriptome data.
+    START (Shiny Transcriptome Analysis Resource Tool) App
+    Shiny App for analysis and visualization of transcriptome data.
     Copyright (C) 2014-2016  Jessica Minnier
 
     This program is free software: you can redistribute it and/or modify
