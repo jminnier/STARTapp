@@ -33,11 +33,14 @@ customHeaderPanel <- function(title,windowTitle=title){
 }
 # collects all of the tab UIs
 #shinyUI(
+#
+
 navbarPage(
-  fluid = TRUE,theme = "bootstrap.min.united.css",
+  fluid = TRUE,
+  theme = "bootstrap.min.united.css",
   #United theme from http://bootswatch.com/
   #customHeaderPanel(title="START: RNAseq Analysis and Visualization Resource"),#img(src="KCardio_CMYK_4C_pos_small.jpg",height=50,width= 92,align="right")	,
-  title="START: Shiny Transcriptome Analysis Resource Tool", 
+  title="START: Shiny Transcriptome Analysis Resource Tool",
   ## =========================================================================== ##
   ## DOWNLOAD DATA TABS
   ## =========================================================================== ##
@@ -62,10 +65,11 @@ navbarPage(
            p(("Knight Cardiovascular Institute, Oregon Health & Science University"),align="center",width=4),
            p(("Copyright (C) 2014-2016, code licensed under GPLv3"),align="center",width=4),
            p(("Code available on Github:"),a("https://github.com/jminnier/STARTapp",href="https://github.com/jminnier/STARTapp"),align="center",width=4)
-  )
+  ),
   
   ## ==================================================================================== ##
   ## end
   ## ==================================================================================== ## 
+  tags$head(includeScript("google-analytics.js"))
 ) #end Navbar
 
