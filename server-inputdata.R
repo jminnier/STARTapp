@@ -234,8 +234,8 @@ analyzeCountDataReactive <-
                       v <- voom(dge,design,plot=FALSE)
                       # v <- voom(countdata,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
                       
-                      fit <- lmFit(v,design)
-                      fit <- eBayes(fit)
+                      #fit <- lmFit(v,design)
+                      #fit <- eBayes(fit)
                       
                       expr_data = v$E
                       
