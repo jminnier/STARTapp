@@ -30,7 +30,6 @@ Jonathan Nelson, Jiri Sklenar, Anthony Barnes, Jessica Minnier.
 
 Instructions can be found here: <https://github.com/jminnier/STARTapp/blob/master/instructions/Instructions.pdf> 
 
-
 # Licensing
 
 This shiny code is licensed under the GPLv3. Please see the file LICENSE.txt for
@@ -54,3 +53,17 @@ information.
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
+    
+# Code adapted for use in app:
+
+- Linear regression p-value extraction code from <https://github.com/ohsu-computational-biology/R-utils>
+- `voom' method to allow linear analysis of RNA-seq read counts (Law et al 2014)
+- DESeq2 vignette for improving PCA plots (Love et al 2014)
+
+
+Law, CW, Chen, Y, Shi, W, and Smyth, GK (2014). Voom: precision weights unlock
+linear model analysis tools for RNA-seq read counts. Genome Biology 15, R29.
+
+Love MI, Huber W, and Anders S (2014). Moderated
+  estimation of fold change and dispersion for RNA-Seq data with DESeq2.
+  Genome Biology, 15, 550.
