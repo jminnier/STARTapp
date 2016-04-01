@@ -231,8 +231,11 @@ analyzeCountDataReactive <-
                       dge <- DGEList(counts=countdata) #TMM normalization first
                       dge <- calcNormFactors(dge)
                       log2cpm <- cpm(dge, prior.count=0.25, log=TRUE)
-                      v <- voom(dge,design,plot=FALSE)
+                      # v <- voom(dge,design,plot=FALSE)
+                      v <- voom(dge,design,plot=FALSE,normalize.method = "cyclicloess")
                       # v <- voom(countdata,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
+                      
+                      
                       
                       #fit <- lmFit(v,design)
                       #fit <- eBayes(fit)
