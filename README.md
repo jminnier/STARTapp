@@ -57,7 +57,7 @@ information.
 # Code adapted for use in app:
 
 - Linear regression p-value extraction code from <https://github.com/ohsu-computational-biology/R-utils>
-- `voom' method to allow linear analysis of RNA-seq read counts (Law et al 2014)
+- `voom` method to allow linear analysis of RNA-seq read counts (Law et al 2014)
 - DESeq2 vignette for improving PCA plots (Love et al 2014)
 
 
