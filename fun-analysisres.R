@@ -115,7 +115,8 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   # switch to ggplotly since ggvis was slow
   p <- ggplot(pp_wide,aes(x=g1,y=g2,
                           color=factor(color)))+geom_point()
-  p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))
+  p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))+
+    scale_color_manual(values=c("darkred","darkorange"))
   p <- p + theme_base() + ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
     theme(legend.position="none",plot.margin = unit(c(1,1,1,1), "cm"))
   
