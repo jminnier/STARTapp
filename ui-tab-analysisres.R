@@ -55,8 +55,9 @@ tabPanel("Analysis Plots",
                             ),#tabPanel
                             tabPanel(title="Scatterplot of Fold Changes",
                                      #h5(textOutput("corPR")),
-                                     uiOutput("scatterplot_fc_2groups_ggvisUI"),
-                                     ggvisOutput("scatterplot_fc_2groups_ggvis")  
+                                     # uiOutput("scatterplot_fc_2groups_ggvisUI"),
+                                     # ggvisOutput("scatterplot_fc_2groups_ggvis")  
+                                     plotlyOutput("scatterplot",height=600)
                             )#tabPanel
                 )#tabsetPanel
          )#column

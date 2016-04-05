@@ -74,11 +74,24 @@ observe({
     
     withProgress(message = "Drawing scatterplot, please wait",
                  {
-                   rna_scatterplot(data_long = data_long,
-                                   group_sel = input$analysisres_groups,
-                                   valuename=input$scattervaluename)%>%
-                     bind_shiny("scatterplot_fc_2groups_ggvis","scatterplot_fc_2groups_ggvisUI")
+                   # rna_scatterplot(data_long = data_long,
+                   #                 group_sel = input$analysisres_groups,
+                   #                 valuename=input$scattervaluename)%>%
+                   #   bind_shiny("scatterplot_fc_2groups_ggvis","scatterplot_fc_2groups_ggvisUI")
+                   
+                   
+                   output$scatterplot <- renderPlotly({  rna_scatterplot(data_long = data_long,
+                                                                         group_sel = input$analysisres_groups,
+                                                                         valuename=input$scattervaluename)
+                   })
+                   
                    
                  })#end withProgress
   }
 })
+
+
+
+
+
+

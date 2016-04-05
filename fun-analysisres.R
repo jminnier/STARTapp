@@ -95,22 +95,41 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   pp_wide = pp_wide%>%mutate(diff = g1-g2,color=1*(g1>=g2))
   #  pp_wide = pp_wide%>%filter(value>=valuecut[1],value<=valuecut[2])
   
-  all_values <- function(x){
-    if(is.null(x)) return(NULL)
-    row <- pp_wide[pp_wide$id==x$id,]
-    show <- c("unique_id","g1","g2","diff")
-    showname <- c("Gene ID",
-                  paste0(group1,"_Ave",valuename),paste0(group2,"_Ave",valuename),
-                  "difference")
-    tmpout = paste0(showname,": ",format(row[,show],digits=3),collapse="<br />")
-    tmpout
-  }
-  pp_wide%>%ggvis(~g1,~g2,fill=~factor(color),key := ~id)%>%
-    layer_points()%>%add_axis("x",title=paste0(group1,"_Ave",valuename))%>%
-    add_axis("x",orient = "top",title=paste0("Number of genes: ",nrow(pp_wide)),
-             ticks=0)%>%
-    add_axis("y",title=paste0(group2,"_Ave",valuename))%>%
-    add_tooltip(all_values, "hover")%>%hide_legend("fill")
+  # all_values <- function(x){
+  #   if(is.null(x)) return(NULL)
+  #   row <- pp_wide[pp_wide$id==x$id,]
+  #   show <- c("unique_id","g1","g2","diff")
+  #   showname <- c("Gene ID",
+  #                 paste0(group1,"_Ave",valuename),paste0(group2,"_Ave",valuename),
+  #                 "difference")
+  #   tmpout = paste0(showname,": ",format(row[,show],digits=3),collapse="<br />")
+  #   tmpout
+  # }
+  # pp_wide%>%ggvis(~g1,~g2,fill=~factor(color),key := ~id)%>%
+  #   layer_points()%>%add_axis("x",title=paste0(group1,"_Ave",valuename))%>%
+  #   add_axis("x",orient = "top",title=paste0("Number of genes: ",nrow(pp_wide)),
+  #            ticks=0)%>%
+  #   add_axis("y",title=paste0(group2,"_Ave",valuename))%>%
+  #   add_tooltip(all_values, "hover")%>%hide_legend("fill")
+  
+  # switch to ggplotly since ggvis was slow
+  p <- ggplot(pp_wide,aes(x=g1,y=g2,
+                          color=factor(color)))+geom_point()
+  p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))
+  p <- p + theme_base() + ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
+    theme(legend.position="none",plot.margin = unit(c(1,1,1,1), "cm"))
+  
+  g <- plotly_build(p)
+  
+  g$data[[1]]$text <- paste("Gene ID:",pp_wide$unique_id,"<br>",
+                             paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
+                             paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2),"<br>",
+                             "Difference:",round(pp_wide$diff,3))
+  g$data[[2]]$text <- paste("Gene ID:",pp_wide$unique_id,"<br>",
+                            paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
+                            paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2),"<br>",
+                            "Difference:",round(pp_wide$diff,3))
+  g
   
 }
 
