@@ -9,3 +9,7 @@ load("/Users/minnier/Desktop/STAR_results_2016-03-20-mousecounts.RData")
 x = load("/Users/minnier/Desktop/STAR_results_2016-03-20-mousecounts.RData")
 x
 head(results)
+load("/Users/minnier/Dropbox/Work/OHSU/KnightCardio/Nelson_Barnes/shinyapps/2014_RNASeqViewer/ShinySeqVis/data/START_results_2016-03-19.RData")
+ls()
+head(data_long)
+sampledata
