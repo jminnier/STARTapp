@@ -63,7 +63,7 @@ navbarPage(
   ## ==================================================================================== ##              
   footer=p(hr(),p("ShinyApp created by ", strong("{Jessica Minnier + Jiri Sklenar + Jonathan Nelson}")," of ",align="center",width=4),
            p(("Knight Cardiovascular Institute, Oregon Health & Science University"),align="center",width=4),
-           p(("Copyright (C) 2014-2016, code licensed under GPLv3"),align="center",width=4),
+           p(("Copyright (C) 2016, code licensed under GPLv3"),align="center",width=4),
            p(("Code available on Github:"),a("https://github.com/jminnier/STARTapp",href="https://github.com/jminnier/STARTapp"),align="center",width=4)
   ),
   
