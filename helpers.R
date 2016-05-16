@@ -47,4 +47,16 @@ source("fun-analyzecounts.R")
 source("fun-analysisres.R")
 source("fun-groupplots.R")
 
-
+#troubleshooting
+if(FALSE) {
+  seqdata <- read.csv("data/mousecounts_example.csv",stringsAsFactors = FALSE)
+  load('data/mousecounts_example_analysis_results.RData')
+  load('data/mousecounts_example_analyzed.RData') #example_data_results
+  data_results = results
+  
+  test_sel = "group2/group1"
+  fdrcut = 0.05
+  absFCcut = 1
+  group_sel = c("group1","group2")
+  valuename = "log2cpm"
+}

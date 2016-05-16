@@ -114,7 +114,7 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   
   # switch to ggplotly since ggvis was slow
   p <- ggplot(pp_wide,aes(x=g1,y=g2,
-                          color=factor(color)))+geom_point()
+                          color=factor(color),text=unique_id))+geom_point()
   p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))+
     scale_color_manual(values=c("darkred","darkorange"))
   p <- p + theme_base() + ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
@@ -122,14 +122,19 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   
   g <- plotly_build(p)
   
-  g$data[[1]]$text <- paste("Gene ID:",pp_wide$unique_id,"<br>",
-                             paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
-                             paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2),"<br>",
-                             "Difference:",round(pp_wide$diff,3))
-  g$data[[2]]$text <- paste("Gene ID:",pp_wide$unique_id,"<br>",
-                            paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
-                            paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2),"<br>",
-                            "Difference:",round(pp_wide$diff,3))
+  #Match order of text to proper gene order
+  newtext =  paste("Gene ID:",pp_wide$unique_id,"<br>",
+                   paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
+                   paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2,3),"<br>",
+                   "Difference:",round(pp_wide$diff,3))
+  
+  
+  tmpid = do.call(rbind,strsplit(g$data[[1]]$text,"<br>"))[,4]
+  g$data[[1]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
+  
+  tmpid = do.call(rbind,strsplit(g$data[[2]]$text,"<br>"))[,4]
+  g$data[[2]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
+  
   g
   
 }
