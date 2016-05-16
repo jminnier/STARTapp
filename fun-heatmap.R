@@ -150,20 +150,21 @@ heatmap_render <- function(yname,...)  {
     
     #par(oma=c(0,0,0,5))
     tcols = as.numeric(as.factor(do.call(rbind,strsplit(colnames(heatdat),"_"))[,1]))+1
-    heatmap(heatdat,labRow = rownames(heatdat),scale="row",col=color.palette(100),
-            ColSideColors = rainbow(max(tcols))[tcols],
-            margins=c(5,10))
+    
+    heatdat_rowmean = sweep(heatdat,1,rowMeans(heatdat))
+    # heatmap(heatdat_rowmean,labRow = rownames(heatdat),scale="none",col=color.palette(100),
+    #         ColSideColors = rainbow(max(tcols))[tcols],
+    #         margins=c(5,10))
+    
+    aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",labRow = rownames(heatdat),
+             annCol=data.frame("group"=as.factor(do.call(rbind,strsplit(colnames(heatdat),"_"))[,1])))
     
 
   }
 }
 
-#tmpdat = heatmap_subdat(platform="r",sel_group=c("BE","HE","SM"),maxgenes=50)
-#heatmap_render(platform="r",sel_group=c("HE","SM"),maxgenes=50)
 
-#p = heatmap_ggvis_render(platform="r",sel_group=c("BE","BP"),maxgenes=50)
-
-#heatmap_ggvis_render(data_analyzed,sel_group=c("BE","HP"),maxgenes=20)
+#heatmap_ggvis_render(data_analyzed,sel_group=c("group1","group2"),maxgenes=20)
 #tmpdat = heatmap_subdat(data_analyzed,sel_group=c("BE","HP"),maxgenes=200)
 #Not actually used in app, rendering is done in server.R
 # heatmap_ggvis_render <- function(...) {
@@ -199,16 +200,19 @@ heatmap_ggvis_data <- function(yname,...) {
   tmpdat = heatmap_subdat(yname,...)
   if(is.null(tmpdat)) {return(NULL)}else{  
     heatdat = tmpdat$data
-    data_info = tmpdat$data_info
+    heatdat <- sweep(heatdat, 1L, rowMeans(heatdat, na.rm = TRUE), check.margin = FALSE)
+    
     heatdat1 = as.matrix(heatdat)
     #browser()
     
     
-    x <- heatdat
-    x <- sweep(x, 1L, rowMeans(x, na.rm = TRUE), check.margin = FALSE)
-    sx <- apply(x, 1L, sd, na.rm = TRUE)
-    x <- sweep(x, 1L, sx, "/", check.margin = FALSE)
-    heatdat_scale = x
+    heatdat_scale = heatdat
+    
+    # x <- heatdat
+    # x <- sweep(x, 1L, rowMeans(x, na.rm = TRUE), check.margin = FALSE)
+    # sx <- apply(x, 1L, sd, na.rm = TRUE)
+    # x <- sweep(x, 1L, sx, "/", check.margin = FALSE)
+    # heatdat_scale = x
     
     #order the rows same way heatmap does
     
