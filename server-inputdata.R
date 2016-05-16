@@ -87,7 +87,7 @@ outputOptions(output, 'fileUploaded', suspendWhenHidden=FALSE)
 
 analyzeCountDataReactive <- 
   eventReactive(input$upload_data,
-                ignoreNULL = TRUE, {
+                ignoreNULL = FALSE, {
                   withProgress(message = "Analyzing RNA-seq data, please wait",{
                     
                     #browser()
