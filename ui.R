@@ -37,7 +37,7 @@ customHeaderPanel <- function(title,windowTitle=title){
 
 navbarPage(
   fluid = TRUE,
-  theme = "bootstrap.min.united.css",
+  theme = "bootstrap.min.united.updated.css",
   #United theme from http://bootswatch.com/
   #customHeaderPanel(title="START: RNAseq Analysis and Visualization Resource"),#img(src="KCardio_CMYK_4C_pos_small.jpg",height=50,width= 92,align="right")	,
   title="START: Shiny Transcriptome Analysis Resource Tool",
