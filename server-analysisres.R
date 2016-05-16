@@ -29,14 +29,13 @@ observe({
   tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
   
   updateSelectizeInput(session,'analysisres_test',
-                       choices=tmptests)
+                       choices=tmptests, selected=tmptests[1])
   
   updateSelectizeInput(session,'analysisres_groups',
                        choices=tmpgroups)
   
   updateRadioButtons(session,'scattervaluename',
                      choices=tmpynames)
-  
   
 })
 
@@ -54,12 +53,14 @@ observe({
     
     withProgress(message = "Drawing volcano plot, please wait",
                  {
-                   rna_volcanoplot(data_results = data_results,
-                                   test_sel = input$analysisres_test,
-                                   absFCcut = input$analysisres_fold_change_cut,
-                                   fdrcut = input$analysisres_fdrcut)%>%
-                     bind_shiny("volcanoplot_2groups_ggvis","volcanoplot_2groups_ggvisUI")
                    
+                   if(data_results%>%filter(test==input$analysisres_test)%>%nrow()>0){
+                     rna_volcanoplot(data_results = data_results,
+                                     test_sel = input$analysisres_test,
+                                     absFCcut = input$analysisres_fold_change_cut,
+                                     fdrcut = input$analysisres_fdrcut)%>%
+                       bind_shiny("volcanoplot_2groups_ggvis","volcanoplot_2groups_ggvisUI")
+                   }
                  })#end withProgress
   }
 })

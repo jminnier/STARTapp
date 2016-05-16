@@ -90,6 +90,7 @@ analyzeCountDataReactive <-
                 ignoreNULL = FALSE, {
                   withProgress(message = "Analyzing RNA-seq data, please wait",{
                     
+                    print("analysisCountDataReactive")
                     #browser()
                     
                     #if an example just return previously analyzed results
