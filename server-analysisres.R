@@ -37,6 +37,7 @@ observe({
   updateRadioButtons(session,'scattervaluename',
                      choices=tmpynames)
   
+  
 })
 
 
@@ -68,27 +69,33 @@ observe({
 
 
 observe({
-  if(length(input$analysisres_groups)==2) {
-    data_analyzed = analyzeCountDataReactive()
-    data_long = data_analyzed$data_long
-    geneids = data_analyzed$geneids
-    
-    withProgress(message = "Drawing scatterplot, please wait",
-                 {
-                   # rna_scatterplot(data_long = data_long,
-                   #                 group_sel = input$analysisres_groups,
-                   #                 valuename=input$scattervaluename)%>%
-                   #   bind_shiny("scatterplot_fc_2groups_ggvis","scatterplot_fc_2groups_ggvisUI")
+  
+  #if(length(input$analysisres_groups)==2) {
+  data_analyzed = analyzeCountDataReactive()
+  data_long = data_analyzed$data_long
+  geneids = data_analyzed$geneids
+  
+  withProgress(message = "Drawing scatterplot, please wait",
+               {
+                 # rna_scatterplot(data_long = data_long,
+                 #                 group_sel = input$analysisres_groups,
+                 #                 valuename=input$scattervaluename)%>%
+                 #   bind_shiny("scatterplot_fc_2groups_ggvis","scatterplot_fc_2groups_ggvisUI")
+                 
+                 
+                 output$scatterplot <- renderPlotly({ 
+                   
+                   validate(need(length(input$analysisres_groups)==2,"Please select two groups."))
                    
                    
-                   output$scatterplot <- renderPlotly({  rna_scatterplot(data_long = data_long,
-                                                                         group_sel = input$analysisres_groups,
-                                                                         valuename=input$scattervaluename)
-                   })
-                   
-                   
-                 })#end withProgress
-  }
+                   rna_scatterplot(data_long = data_long,
+                                   group_sel = input$analysisres_groups,
+                                   valuename=input$scattervaluename)
+                 })
+                 
+                 
+               })#end withProgress
+  #}
 })
 
 
