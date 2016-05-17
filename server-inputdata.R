@@ -30,6 +30,12 @@ observe({
     seqdata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, stringsAsFactors = FALSE)
     print('uploaded seqdata')
     
+    if(ncol(seqdata)==1) {
+      updateRadioButtons(session,'sep',selected="\t")
+      seqdata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, stringsAsFactors = FALSE)
+      print('changed to tsv, uploaded seqdata')
+    }
+    
     if(input$inputdat_type=="analyzed") {
       tmpcols = colnames(seqdata)
       updateSelectInput(session,"c_geneid1",choices =tmpcols)
@@ -117,6 +123,20 @@ analyzeCountDataReactive <-
                     
                     alldata <- inputDataReactive()$data
                     
+                    not_numeric <- function(input) {
+                      if(sum(unlist(lapply(input,function(k) class(k)%in%c("numeric","integer"))))==0) {
+                        "Your data does not appear to be formatted correctly (no numeric columns). Please check your input file."
+                      } else if (input == "") { 
+                        FALSE
+                      } else {
+                        NULL
+                      }
+                    }
+                    
+                    
+                    validate(
+                      not_numeric(alldata)
+                    )
                     
                     if(input$inputdat_type=="counts") {
                       numgeneids <- input$numgeneids
@@ -208,6 +228,7 @@ analyzeCountDataReactive <-
                       #analyze data
                       
                       not_counts <- function(input) {
+                        
                         remainder = sum(apply(input,2,function(k) sum(k%%1,na.rm=T)),na.rm=T)
                         if (remainder !=0) {
                           "Your data appears to not be counts, please double check your data"
@@ -367,9 +388,9 @@ output$example_analysis_file <- downloadHandler(filename="exampleanalysisres_sho
 
 
 output$instructionspdf <- downloadHandler(filename="Instructions.pdf",
-                                                content=function(file){
-                                                  file.copy("instructions/Instructions.pdf",file)
-                                                })
+                                          content=function(file){
+                                            file.copy("instructions/Instructions.pdf",file)
+                                          })
 
 
 
