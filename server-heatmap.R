@@ -72,6 +72,7 @@ output$heatmap_rna <- renderPlot({
       heatmap_render(
         data_analyzed=data_analyzed,
         yname = input$heatmapvaluename,
+        orderby = input$heatmap_order,
         FDRcut=input$FDRcut,
         maxgenes=input$maxgenes,
         view_group=input$view_group_heatmap,
@@ -100,6 +101,7 @@ observe({
     mydat = heatmap_ggvis_data(
       data_analyzed = data_analyzed,
       yname = input$heatmapvaluename,
+      orderby = input$heatmap_order,
       FDRcut=input$FDRcut,
       maxgenes=input$maxgenes,
       view_group=input$view_group_heatmap,
@@ -159,6 +161,7 @@ HeatdatReactive_rna <- reactive({
   tmp<- heatmap_data(
     data_analyzed=data_analyzed,
     yname = input$heatmapvaluename,
+    orderby = input$heatmap_order,
     FDRcut=input$FDRcut,
     maxgenes=input$maxgenes,
     view_group=input$view_group_heatmap,

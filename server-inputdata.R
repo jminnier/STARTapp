@@ -312,7 +312,7 @@ analyzeCountDataReactive <-
                       countdata_long = melt(tmpcountdata,variable.name = "sampleid",value.name="count")
                       #countdata_long$log2count = log2(countdata_long$count+.25)
                       
-                      exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name="log2expr_voom")
+                      exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name="log2cpm_voom")
                       data_long = left_join(countdata_long,log2cpm_long)
                       data_long = left_join(data_long,exprdata_long)
                       data_long$group = do.call(rbind,strsplit(as.character(data_long$sampleid),"_",fixed=TRUE))[,1]
