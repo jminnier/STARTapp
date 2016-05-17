@@ -1,6 +1,6 @@
 ## ==================================================================================== ##
 # START Shiny App for analysis and visualization of transcriptome data.
-# Copyright (C) 2014-2016  Jessica Minnier
+# Copyright (C) 2016  Jessica Minnier
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,10 +31,8 @@ seqdatascr[,1:numgeneids] = seqdata[tmpind,1:numgeneids]
 counts = seqdatascr[,-(1:numgeneids)]
 tmpind = which(is.na(counts),arr.ind=T)
 set.seed(100)
-if(length(tmpind)>0){
-  tmprepl = round(runif(nrow(tmpind),min=0,max=10))
-  counts[tmpind] <- tmprepl
-}
+tmprepl = round(runif(nrow(tmpind),min=0,max=10))
+counts[tmpind] <- tmprepl
 seqdatascr = cbind(seqdatascr[,1:numgeneids],counts)
 write.csv(seqdatascr,"data/mousecounts_example.csv",row.names = FALSE)
 
@@ -77,8 +75,8 @@ log2cpm <- cpm(dge, prior.count=0.25, log=TRUE)
 v <- voom(dge,design,plot=FALSE)
 # v <- voom(counts,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
 
-#fit <- lmFit(v,design)
-#fit <- eBayes(fit)
+fit <- lmFit(v,design)
+fit <- eBayes(fit)
 
 expr_data = v$E
 

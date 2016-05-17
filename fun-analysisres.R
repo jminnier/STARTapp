@@ -1,7 +1,7 @@
 
 ## ==================================================================================== ##
 # START Shiny App for analysis and visualization of transcriptome data.
-# Copyright (C) 2014-2016  Jessica Minnier
+# Copyright (C) 2016  Jessica Minnier
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
