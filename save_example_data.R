@@ -70,7 +70,7 @@ rownames(counts) = geneids$unique_id
 design <- model.matrix(~0+sampledata$group) # allow selection of reference group
 colnames(design) = levels(as.factor(sampledata$group))
 
-log2cpm <- cpm(counts, prior.count=0.25, log=TRUE)
+log2cpm <- cpm(counts, prior.count=0.5, log=TRUE)
 
 #voom+limma
 dge <- DGEList(counts=counts) #TMM normalization first
