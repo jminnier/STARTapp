@@ -118,7 +118,7 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))+
     scale_color_manual(values=c("darkred","darkorange"))
   p <- p + theme_base() + ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
-    theme(legend.position="none",plot.margin = unit(c(1,1,1,1), "cm"))
+    theme(legend.position="none",plot.margin = unit(c(2,2,2,2), "cm"))
   
   g <- plotly_build(p)
   
