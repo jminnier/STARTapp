@@ -38,14 +38,14 @@ The names of your expression/counts must be in the format: “group1_1” where 
  
 Raw counts contain read counts for each gene for each sample, along with gene identifiers.
 
-Analysis: When raw counts are uploaded, the data is then analyzed by the app. The app uses the voom method from the ‘limma’ Bioconductor package to transform the raw counts into logged and normalized intensity values. These values are then analyzed via linear regression where gene intensity is regressed on the group factor. P-values from all pairwise regression tests for group effect are computed and Benjamini-Hochberg false discovery rate adjusted p-values are computed for each pairwise comparison. The “log2cpm” values are the expression values from the voom method.
+Analysis: When raw counts are uploaded, the data is then analyzed by the app. The app uses the voom method from the ‘limma’ Bioconductor package to transform the raw counts into logged and normalized intensity values. These values are then analyzed via linear regression where gene intensity is regressed on the group factor. P-values from all pairwise regression tests for group effect are computed and Benjamini-Hochberg false discovery rate adjusted p-values are computed for each pairwise comparison. The “log2cpm” values are the log2-counts-per-million values. The “log2cpm_voom” values are the normalized logcpm values from the voom method.  Both methods use an offset of 0.5, which means 0.5 is added to all count values before normalizing (in the case of voom) and log transforming so that 0 counts have non infinite values.
 
 Example file: https://github.com/jminnier/STARTapp/blob/master/data/examplecounts_short.csv
 
 #### Analyzed Data
 
  
-Analyzed data must contain some kind of expression measure for each sample (i.e. counts, normalized intensities, CPMs), and a set of p-values with corresponding fold changes for those p-values. For instance, if you have a p-value for the comparison of group1 vs group2, you can upload the observed fold change or log2(fold change) between group1 vs group2. If you have a more complex design and do not have fold changes readily available, you may upload the test statistics or other similar measures of effect size as placeholders. The fold changes are mainly used in the volcano plots.
+Analyzed data must contain some kind of expression measure for each sample (i.e. counts, normalized intensities, CPMs), and a set of p-values with corresponding fold changes for those p-values. For instance, if you have a p-value for the comparison of group1 vs group2, you can upload the observed fold change or log2(fold change) between group1 vs group2. If you have a more complex design and do not have fold changes readily available, you may upload the test statistics or other similar measures of effect size as placeholders. The fold changes are mainly used in the volcano plots. We recommend uploading p-values that are adjusted for multiple comparisons (such as q-values from the qvalue package, or adjusted p-values from p.adjust() function in R).
 
 Example file: https://github.com/jminnier/STARTapp/blob/master/data/exampleanalysisres_short.csv
 

@@ -7,7 +7,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 
 
@@ -38,25 +38,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 
 
 
-
-</head>
-
-<body>
-
 <style type="text/css">
-.main-container {
-  max-width: 940px;
-  margin-left: auto;
-  margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
-}
-img {
-  max-width:100%;
-  height: auto;
-}
 h1 {
   font-size: 34px;
 }
@@ -77,6 +59,30 @@ h5 {
 }
 h6 {
   font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type="text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -108,6 +114,7 @@ $(document).ready(function () {
 
 
 
+
 </div>
 
 <div id="TOC">
@@ -123,11 +130,10 @@ $(document).ready(function () {
 </ul></li>
 <li><a href="#analysis-plots">Analysis Plots</a><ul>
 <li><a href="#volcano-plot">Volcano Plot</a></li>
-</ul></li>
 <li><a href="#scatter-plot">Scatter Plot</a></li>
-<li><a href="#gene-expression-boxplot">Gene Expression Boxplot</a><ul>
-<li><a href="#heatmap">Heatmap</a></li>
 </ul></li>
+<li><a href="#gene-expression-boxplot">Gene Expression Boxplot</a></li>
+<li><a href="#heatmap">Heatmap</a></li>
 </ul></li>
 <li><a href="#run-the-app-locally">Run the app locally</a></li>
 <li><a href="#terms-of-use">Terms of Use</a></li>
@@ -159,12 +165,12 @@ $(document).ready(function () {
 <div id="raw-data-gene-counts" class="section level4">
 <h4>Raw Data: Gene Counts</h4>
 <p>Raw counts contain read counts for each gene for each sample, along with gene identifiers.</p>
-<p>Analysis: When raw counts are uploaded, the data is then analyzed by the app. The app uses the voom method from the ‘limma’ Bioconductor package to transform the raw counts into logged and normalized intensity values. These values are then analyzed via linear regression where gene intensity is regressed on the group factor. P-values from all pairwise regression tests for group effect are computed and Benjamini-Hochberg false discovery rate adjusted p-values are computed for each pairwise comparison. The “log2cpm” values are the expression values from the voom method.</p>
+<p>Analysis: When raw counts are uploaded, the data is then analyzed by the app. The app uses the voom method from the ‘limma’ Bioconductor package to transform the raw counts into logged and normalized intensity values. These values are then analyzed via linear regression where gene intensity is regressed on the group factor. P-values from all pairwise regression tests for group effect are computed and Benjamini-Hochberg false discovery rate adjusted p-values are computed for each pairwise comparison. The “log2cpm” values are the log2-counts-per-million values. The “log2cpm_voom” values are the normalized logcpm values from the voom method. Both methods use an offset of 0.5, which means 0.5 is added to all count values before normalizing (in the case of voom) and log transforming so that 0 counts have non infinite values.</p>
 <p>Example file: <a href="https://github.com/jminnier/STARTapp/blob/master/data/examplecounts_short.csv" class="uri">https://github.com/jminnier/STARTapp/blob/master/data/examplecounts_short.csv</a></p>
 </div>
 <div id="analyzed-data" class="section level4">
 <h4>Analyzed Data</h4>
-<p>Analyzed data must contain some kind of expression measure for each sample (i.e. counts, normalized intensities, CPMs), and a set of p-values with corresponding fold changes for those p-values. For instance, if you have a p-value for the comparison of group1 vs group2, you can upload the observed fold change or log2(fold change) between group1 vs group2. If you have a more complex design and do not have fold changes readily available, you may upload the test statistics or other similar measures of effect size as placeholders. The fold changes are mainly used in the volcano plots.</p>
+<p>Analyzed data must contain some kind of expression measure for each sample (i.e. counts, normalized intensities, CPMs), and a set of p-values with corresponding fold changes for those p-values. For instance, if you have a p-value for the comparison of group1 vs group2, you can upload the observed fold change or log2(fold change) between group1 vs group2. If you have a more complex design and do not have fold changes readily available, you may upload the test statistics or other similar measures of effect size as placeholders. The fold changes are mainly used in the volcano plots. We recommend uploading p-values that are adjusted for multiple comparisons (such as q-values from the qvalue package, or adjusted p-values from p.adjust() function in R).</p>
 <p>Example file: <a href="https://github.com/jminnier/STARTapp/blob/master/data/exampleanalysisres_short.csv" class="uri">https://github.com/jminnier/STARTapp/blob/master/data/exampleanalysisres_short.csv</a></p>
 </div>
 <div id="analysis-results-tab-download-.csv-and-rdata-files." class="section level4">
@@ -190,18 +196,18 @@ $(document).ready(function () {
 <h3>Volcano Plot</h3>
 <p>This is a scatter plot log fold changes vs –log10(p-values) so that genes with the largest fold changes and smallest p-values are shown on the extreme top left and top right of the plot. Hover over points to see which gene is represented by each point. (<a href="https://en.wikipedia.org/wiki/Volcano_plot_(statistics)" class="uri">https://en.wikipedia.org/wiki/Volcano_plot_(statistics)</a>)</p>
 </div>
-</div>
-<div id="scatter-plot" class="section level2">
-<h2>Scatter Plot</h2>
+<div id="scatter-plot" class="section level3">
+<h3>Scatter Plot</h3>
 <p>This is a scatter plot of average gene expression in one group against another group. This allows the viewer to observe which genes have the largest differences between two groups. The smallest distances will be along the diagonal line, and points far away from the diagonal show the most differences. Hover over points to see which gene is represented by each point.</p>
+</div>
 </div>
 <div id="gene-expression-boxplot" class="section level2">
 <h2>Gene Expression Boxplot</h2>
 <p>Use the search bar to look up genes in your data set. For selected gene(s) the stripchart (dotplot) and boxplots of the expression values are presented for each group. You may plot one or multiple genes along side each other. Hover over points for more information about the data.</p>
-<div id="heatmap" class="section level3">
-<h3>Heatmap</h3>
-<p>A heatmap of expression values are shown, with genes and samples arranged by unsupervised clustering. You may filter on test results as well as P-value cutoffs. By default the top 100 genes (with lowest P-values) are shown.</p>
 </div>
+<div id="heatmap" class="section level2">
+<h2>Heatmap</h2>
+<p>A heatmap of expression values are shown, with genes and samples arranged by unsupervised clustering. You may filter on test results as well as P-value cutoffs. By default the top 100 genes (with lowest P-values) are shown.</p>
 </div>
 </div>
 <div id="run-the-app-locally" class="section level1">
