@@ -41,7 +41,7 @@ observe({
   updateRadioButtons(session,'sel_gene_header',
                      choices=colnames(tmpgeneids))
   updateRadioButtons(session,"ytype",
-                     choices=tmpynames)
+                     choices=sort(tmpynames,decreasing = TRUE))
 #   
 # 
 #   output$geneurl <- renderText({
@@ -83,7 +83,6 @@ output$dotplot <- renderPlotly({
               #log2y=input$log2cpm_checked,
               ytype=input$ytype)
 }) #renderPlot
-
 
 
 #Based on dotplot filters create data
