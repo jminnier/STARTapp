@@ -30,9 +30,11 @@ tmpind = sample(1:nrow(seqdata))
 seqdatascr[,1:numgeneids] = seqdata[tmpind,1:numgeneids]
 counts = seqdatascr[,-(1:numgeneids)]
 tmpind = which(is.na(counts),arr.ind=T)
-set.seed(100)
-tmprepl = round(runif(nrow(tmpind),min=0,max=10))
-counts[tmpind] <- tmprepl
+if(length(tmpind)>0) {
+  set.seed(100)
+  tmprepl = round(runif(nrow(tmpind),min=0,max=10))
+  counts[tmpind] <- tmprepl
+}
 seqdatascr = cbind(seqdatascr[,1:numgeneids],counts)
 write.csv(seqdatascr,"data/mousecounts_example.csv",row.names = FALSE)
 
@@ -68,15 +70,17 @@ rownames(counts) = geneids$unique_id
 design <- model.matrix(~0+sampledata$group) # allow selection of reference group
 colnames(design) = levels(as.factor(sampledata$group))
 
+log2cpm <- cpm(counts, prior.count=0.25, log=TRUE)
+
 #voom+limma
 dge <- DGEList(counts=counts) #TMM normalization first
 dge <- calcNormFactors(dge)
-log2cpm <- cpm(dge, prior.count=0.25, log=TRUE)
-v <- voom(dge,design,plot=FALSE)
+# v <- voom(dge,design,plot=FALSE)
+v <- voom(dge,design,plot=FALSE,normalize.method = "cyclicloess")
 # v <- voom(counts,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
 
-fit <- lmFit(v,design)
-fit <- eBayes(fit)
+#fit <- lmFit(v,design)
+#fit <- eBayes(fit)
 
 expr_data = v$E
 
@@ -104,16 +108,49 @@ for(ii in 1:length(group_names)) {
 }
 lmobj_res = do.call(rbind,lmobj_res)
 
-tmpcounts = data.frame("unique_id"=geneids$unique_id,counts)
-countdata_long = melt(tmpcounts,variable.name = "sampleid",value.name="count")
+pvals = lmobj_res%>%select(unique_id,test,adj.P.Val)%>%spread(test,adj.P.Val)
+logfcs = lmobj_res%>%select(unique_id,test,logFC)%>%spread(test,logFC)
+
+colnames(pvals)[-1] = paste0("padj_",colnames(pvals)[-1])
+colnames(logfcs)[-1] = paste0("logFC_",colnames(logfcs)[-1])
+tmpdat = cbind(geneids,log2cpm)
+tmpdat = left_join(tmpdat,logfcs)
+tmpdat = left_join(tmpdat,pvals)
+
+data_results_table = tmpdat%>%select(-unique_id) #save this into csv
+
+tmpexprdata = data.frame("unique_id" =geneids$unique_id,expr_data)
+tmpcountdata = data.frame("unique_id"=geneids$unique_id,countdata)
+
 tmplog2cpm = data.frame("unique_id"=geneids$unique_id,log2cpm)
 log2cpm_long = melt(tmplog2cpm,variable.name = "sampleid",value.name="log2cpm")
-data_long = left_join(countdata_long,log2cpm_long)
 
+countdata_long = melt(tmpcountdata,variable.name = "sampleid",value.name="count")
+#countdata_long$log2count = log2(countdata_long$count+.25)
+
+exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name="log2cpm_voom")
+data_long = left_join(countdata_long,log2cpm_long)
+data_long = left_join(data_long,exprdata_long)
 data_long$group = do.call(rbind,strsplit(as.character(data_long$sampleid),"_",fixed=TRUE))[,1]
-#expr_data = tmplog2cpm[,-1]
+
+tmpgeneidnames = colnames(geneids%>%select(-unique_id))
+data_long = data_long%>%select(-one_of(tmpgeneidnames))
+
 
 print('analyze data: done')
+
+
+
+# tmpcounts = data.frame("unique_id"=geneids$unique_id,counts)
+# countdata_long = melt(tmpcounts,variable.name = "sampleid",value.name="count")
+# tmplog2cpm = data.frame("unique_id"=geneids$unique_id,log2cpm)
+# log2cpm_long = melt(tmplog2cpm,variable.name = "sampleid",value.name="log2cpm")
+# data_long = left_join(countdata_long,log2cpm_long)
+# 
+# data_long$group = do.call(rbind,strsplit(as.character(data_long$sampleid),"_",fixed=TRUE))[,1]
+# #expr_data = tmplog2cpm[,-1]
+# 
+# print('analyze data: done')
 
 
 data = countdata
@@ -121,7 +158,7 @@ results = lmobj_res
 
 #after running analysis pipeline, export this code to another example construction file
 save(countdata,group_names,sampledata,results,data_long,geneids,expr_data,
-      file="data/mousecounts_example_analysis_results.RData")
+     file="data/mousecounts_example_analysis_results.RData")
 
 
 

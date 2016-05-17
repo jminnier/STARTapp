@@ -306,13 +306,21 @@ analyzeCountDataReactive <-
                       tmpexprdata = data.frame("unique_id" =geneids$unique_id,expr_data)
                       tmpcountdata = data.frame("unique_id"=geneids$unique_id,countdata)
                       
-                      countdata_long = melt(tmpcountdata,variable.name = "sampleid",value.name="count")
-                      exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name="log2expr_voom")
-                      data_long = left_join(countdata_long,exprdata_long)
-                      data_long$group = do.call(rbind,strsplit(as.character(data_long$sampleid),"_",fixed=TRUE))[,1]
-                      
                       tmplog2cpm = data.frame("unique_id"=geneids$unique_id,log2cpm)
-                      log2cpm_long = melt(tmplog2cpm,variable.name = "sampleid",value.name="log2cpm_edgeR_TMM")
+                      log2cpm_long = melt(tmplog2cpm,variable.name = "sampleid",value.name="log2cpm")
+                      
+                      countdata_long = melt(tmpcountdata,variable.name = "sampleid",value.name="count")
+                      #countdata_long$log2count = log2(countdata_long$count+.25)
+                      
+                      exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name="log2expr_voom")
+                      data_long = left_join(countdata_long,log2cpm_long)
+                      data_long = left_join(data_long,exprdata_long)
+                      data_long$group = do.call(rbind,strsplit(as.character(data_long$sampleid),"_",fixed=TRUE))[,1]
+                      tmpgeneidnames = colnames(geneids%>%select(-unique_id))
+                      if(length(tmpgeneidnames)>0) {
+                        data_long = data_long%>%select(-one_of(tmpgeneidnames))
+                        }
+                      
                       #expr_data = tmplog2cpm[,-1]
                       
                       print('analyze data: done')
