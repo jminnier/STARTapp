@@ -26,12 +26,15 @@
 
 #update list of groups
 observe({
+  print("server-heatmap-update")
+ # browser()
   data_analyzed = analyzeCountDataReactive()
   tmpgroups = data_analyzed$group_names
   tmpdat = data_analyzed$results
   tmptests = unique(as.character(tmpdat$test))
   tmpdatlong = data_analyzed$data_long
-  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group,-count)%>%colnames()
+  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  if("count"%in%tmpynames) tmpynames = tmpynames[match("count",tmpynames)]
   
   updateRadioButtons(session,'heatmapvaluename', choices=sort(tmpynames,decreasing = TRUE))
   updateCheckboxGroupInput(session,'view_group_heatmap',
@@ -46,6 +49,8 @@ observe({
 
 inputHeatmapSubsetReactive <- reactive({
   
+  
+  
   # input$file1 will be NULL initially. After the user selects
   # and uploads a file, it will be a data frame with 'name',
   # 'size', 'type', and 'datapath' columns. The 'datapath'
@@ -55,6 +60,9 @@ inputHeatmapSubsetReactive <- reactive({
   validate(
     need((input$heatmap_subset=="all")|(!is.null(input$heatmap_file)), "Please select a file")
   )
+  
+  print("inputHeatmapSubsetReactive")
+  
   inFile <- input$heatmap_file
   if(!is.null(inFile)) {
     heatmap_geneids <- unlist(read.csv(inFile$datapath, header=FALSE, stringsAsFactors = FALSE))
@@ -95,6 +103,7 @@ inputHeatmapSubsetReactive <- reactive({
 output$heatmap_rna <- renderPlot({
   if(input$action_heatmaps==0) return()
   #input$action_heatmaps
+  print("heatmap_rna_renderPlot")
   
   data_analyzed = analyzeCountDataReactive()
   subsetids = inputHeatmapSubsetReactive()
@@ -126,6 +135,8 @@ output$heatmap_rna <- renderPlot({
 
 observe({
   if(input$action_heatmaps==0) return()
+  
+  print("ggvis heatmap")
   
   data_analyzed = analyzeCountDataReactive()
   subsetids = inputHeatmapSubsetReactive()
@@ -202,6 +213,7 @@ observe({
 HeatdatReactive_rna <- reactive({
   if(input$action_heatmaps==0) return()
   #input$action_heatmaps
+  "HeatdatReactive_rna"
   
   data_analyzed = analyzeCountDataReactive()
   subsetids = inputHeatmapSubsetReactive()
