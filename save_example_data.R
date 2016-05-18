@@ -18,7 +18,7 @@
 # You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
 ## ==================================================================================== ##
 ## 
-source("helpers.r")
+source("helpers.R")
 
 seqdata <- read.csv("../old_data/mousecounts_example0.csv",stringsAsFactors = FALSE)
 numgeneids <- 2

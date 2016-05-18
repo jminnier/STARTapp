@@ -39,13 +39,14 @@ library(shinyBS)
 library(plotly)
 library(markdown)
 library(NMF)
+library(scales)
 
 ##================================================================================##
 
 source("fun-dotplot.R")
-source("fun-heatmap.R")
+source("fun-heatmap.r")
 source("fun-analyzecounts.R")
-source("fun-analysisres.r")
+source("fun-analysisres.R")
 source("fun-groupplots.R")
 
 #troubleshooting

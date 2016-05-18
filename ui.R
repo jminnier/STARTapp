@@ -20,7 +20,7 @@
 ## 
 ## 
 # ui.R
-source("helpers.r")
+source("helpers.R")
 customHeaderPanel <- function(title,windowTitle=title){
   tagList(
     tags$head(

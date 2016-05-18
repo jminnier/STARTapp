@@ -21,7 +21,7 @@
 
 options(shiny.maxRequestSize = 100*1024^2)
 
-source("helpers.r")
+source("helpers.R")
 print(sessionInfo())
 
 shinyServer(function(input, output,session) {
@@ -31,7 +31,7 @@ shinyServer(function(input, output,session) {
   source("server-dotplot.R",local = TRUE)
   source("server-heatmap.R",local = TRUE)
   source("server-samplegroupplots.R",local=TRUE)
-  source("server-analysisres.R",local = TRUE)
+  source("server-analysisres.r",local = TRUE)
   source("server-data.R",local = TRUE)
   
 })
