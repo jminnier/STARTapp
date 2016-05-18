@@ -29,6 +29,8 @@ heatcols = colorRampPalette(heatmap_colors)(500)
 heatmap_subdat <- function(data_analyzed, #  data_analyzed = analyzeCountDataReactive()
                            yname="log2cpm",
                            orderby="significance",
+                           usesubset=FALSE,
+                           subsetids=NULL,
                            FDRcut=0.05,maxgenes=NULL,
                            view_group=NULL,
                            sel_test=NULL,
@@ -48,63 +50,68 @@ heatmap_subdat <- function(data_analyzed, #  data_analyzed = analyzeCountDataRea
   
   if(is.null(view_group)) view_group=data_analyzed$group_names
   
-  if(orderby=="significance") {
-    res = data_results%>%filter(test==sel_test)
-    #Order by FDR
-    if(is.null(res$adj.P.Val)) res$adj.P.Val = res$P.Value
-    tmpout = res[order(res$adj.P.Val),]
+  if((usesubset)&(!is.null(subsetids))) {thesegenes = subsetids}else{
     
-    thesegenes = tmpout$unique_id
-    print(paste("start",length(thesegenes)))
-    
-    if(length(thesegenes)==0) {return(NULL)}
-    
-    ## FILTER GENES by
-    
-    #FDR cut
-    if((filter_fdr)&&(!is.null(FDRcut))) {
-      #print("yes"); print(FDRcut)
-      tmpg = tmpout$unique_id[which(tmpout$adj.P.Val<FDRcut)]
-      thesegenes = intersect(thesegenes,tmpg)
-      print(paste("fdrcut",length(thesegenes)))
-    }
-    
-    if(length(thesegenes)==0) {return(NULL)}
-    
-    #Range of fold change, fold_change_range[1:2], based on two selected groups
-    if((filter_fc)&&(!is.null(fold_change_groups))&&(!is.null(fold_change_range))) {
+    if(orderby=="significance") {
+      res = data_results%>%filter(test==sel_test)
+      #Order by FDR
+      if(is.null(res$adj.P.Val)) res$adj.P.Val = res$P.Value
+      tmpout = res[order(res$adj.P.Val),]
       
-      fcgroup1 = fold_change_groups[1]; fcgroup2 = fold_change_groups[2]
-      res_fc = data_results%>%filter(test==paste0(fcgroup1,"/",fcgroup2))
-      fc <- res_fc$logFC
-      tmpg = res_fc$unique_id[which((fc >= fold_change_range[1])*(fc <= fold_change_range[2])==1)]
-      thesegenes = intersect(thesegenes,tmpg)
-      print(paste("filterfc",length(thesegenes)))
+      thesegenes = tmpout$unique_id
+      print(paste("start",length(thesegenes)))
+      
+      if(length(thesegenes)==0) {return(NULL)}
+      
+      ## FILTER GENES by
+      
+      #FDR cut
+      if((filter_fdr)&&(!is.null(FDRcut))) {
+        #print("yes"); print(FDRcut)
+        tmpg = tmpout$unique_id[which(tmpout$adj.P.Val<FDRcut)]
+        thesegenes = intersect(thesegenes,tmpg)
+        print(paste("fdrcut",length(thesegenes)))
+      }
+      
+      if(length(thesegenes)==0) {return(NULL)}
+      
+      #Range of fold change, fold_change_range[1:2], based on two selected groups
+      if((filter_fc)&&(!is.null(fold_change_groups))&&(!is.null(fold_change_range))) {
+        
+        fcgroup1 = fold_change_groups[1]; fcgroup2 = fold_change_groups[2]
+        res_fc = data_results%>%filter(test==paste0(fcgroup1,"/",fcgroup2))
+        fc <- res_fc$logFC
+        tmpg = res_fc$unique_id[which((fc >= fold_change_range[1])*(fc <= fold_change_range[2])==1)]
+        thesegenes = intersect(thesegenes,tmpg)
+        print(paste("filterfc",length(thesegenes)))
+      }
+      if(length(thesegenes)==0) {return(NULL)}
+      
+      tmp = tmpout%>%filter(unique_id%in%thesegenes)%>%arrange(adj.P.Val)
+      thesegenes = tmp$unique_id
+      
+    }else {
+      
+      #filter by standard deviation (SD of log2cpm is coefficient of variation of unlogged data)
+      tmpdat = data_analyzed$data_long
+      tmpdat = tmpdat%>%filter(group%in%view_group)
+      tmpdat = reshape2::dcast(tmpdat,unique_id~sampleid,value.var=yname)
+      tmpsd = apply(tmpdat[,-1],1,sd)
+      
+      thesegenes = tmpdat$unique_id[order(tmpsd,decreasing=TRUE)]
     }
+    
     if(length(thesegenes)==0) {return(NULL)}
     
-    tmp = tmpout%>%filter(unique_id%in%thesegenes)%>%arrange(adj.P.Val)
-    thesegenes = tmp$unique_id
     
-  }else {
+    if((filter_maxgene)&&(!is.null(maxgenes))) {
+      tmpg = thesegenes[1:min(maxgenes,length(thesegenes))]
+      thesegenes = tmpg
+      print(paste("maxgenes",length(thesegenes)))
+    }
     
-    #filter by standard deviation (SD of log2cpm is coefficient of variation of unlogged data)
-    tmpdat = data_analyzed$data_long
-    tmpdat = tmpdat%>%filter(group%in%view_group)
-    tmpdat = reshape2::dcast(tmpdat,unique_id~sampleid,value.var=yname)
-    tmpsd = apply(tmpdat[,-1],1,sd)
-    
-    thesegenes = tmpdat$unique_id[order(tmpsd,decreasing=TRUE)]
-  }
+  }#end subsetids
   
-  if(length(thesegenes)==0) {return(NULL)}
-  
-  
-  if((filter_maxgene)&&(!is.null(maxgenes))) {
-    tmpg = thesegenes[1:min(maxgenes,length(thesegenes))]
-    thesegenes = tmpg
-    print(paste("maxgenes",length(thesegenes)))
-  }
   
   if(length(thesegenes)==0) {return(NULL)}
   

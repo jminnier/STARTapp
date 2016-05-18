@@ -43,6 +43,39 @@ observe({
   
 })
 
+
+inputHeatmapSubsetReactive <- reactive({
+  
+  # input$file1 will be NULL initially. After the user selects
+  # and uploads a file, it will be a data frame with 'name',
+  # 'size', 'type', and 'datapath' columns. The 'datapath'
+  # column will contain the local filenames where the data can
+  # be found.
+  
+  validate(
+    need((input$heatmap_subset=="all")|(!is.null(input$heatmap_file)), "Please select a file")
+  )
+  inFile <- input$heatmap_file
+  if(!is.null(inFile)) {
+    heatmap_geneids <- unlist(read.csv(inFile$datapath, header=FALSE, stringsAsFactors = FALSE))
+    print('uploaded heatmap gene ids')
+    
+    
+    data_analyzed = analyzeCountDataReactive()
+    tmpgeneids = data_analyzed$geneids
+    tmpmatch = apply(tmpgeneids,2,function(k) match(heatmap_geneids,k,nomatch = 0))
+    subsetids = tmpgeneids$unique_id[unique(c(tmpmatch))]
+    print(subsetids)
+    
+    validate(need(length(subsetids)>0,"No match found."))
+    
+    return(subsetids)
+  }else{return(NULL)}
+  
+  
+  
+})
+
 # output$filter_fc_ui <- renderUI({
 #   data_analyzed = analyzeCountDataReactive()
 #   tmpgroups = data_analyzed$group_names
@@ -64,7 +97,7 @@ output$heatmap_rna <- renderPlot({
   #input$action_heatmaps
   
   data_analyzed = analyzeCountDataReactive()
-  
+  subsetids = inputHeatmapSubsetReactive()
   
   isolate({ #avoid dependency on everything else except action_heatmaps
     print("drawing heatmap rna")
@@ -72,6 +105,8 @@ output$heatmap_rna <- renderPlot({
       heatmap_render(
         data_analyzed=data_analyzed,
         yname = input$heatmapvaluename,
+        usesubset = input$heatmap_subset=="subset",
+        subsetids = subsetids,
         orderby = input$heatmap_order,
         FDRcut=input$FDRcut,
         maxgenes=input$maxgenes,
@@ -93,7 +128,7 @@ observe({
   if(input$action_heatmaps==0) return()
   
   data_analyzed = analyzeCountDataReactive()
-  
+  subsetids = inputHeatmapSubsetReactive()
   
   isolate({
     #input$action_heatmaps
@@ -101,6 +136,8 @@ observe({
     mydat = heatmap_ggvis_data(
       data_analyzed = data_analyzed,
       yname = input$heatmapvaluename,
+      usesubset = input$heatmap_subset=="subset",
+      subsetids = subsetids,
       orderby = input$heatmap_order,
       FDRcut=input$FDRcut,
       maxgenes=input$maxgenes,
@@ -112,8 +149,8 @@ observe({
       filter_fc=input$filter_fc,
       fold_change_range=input$fold_change_range,
       fold_change_groups=input$fold_change_groups)
-    print(mydat)
-    print(unique(mydat$unique_id))
+    #print(mydat)
+    #print(unique(mydat$unique_id))
     
     if(!is.null(mydat)) {
       
@@ -157,10 +194,13 @@ HeatdatReactive_rna <- reactive({
   #input$action_heatmaps
   
   data_analyzed = analyzeCountDataReactive()
+  subsetids = inputHeatmapSubsetReactive()
   
   tmp<- heatmap_data(
     data_analyzed=data_analyzed,
     yname = input$heatmapvaluename,
+    usesubset = input$heatmap_subset=="subset",
+    subsetids = subsetids,
     orderby = input$heatmap_order,
     FDRcut=input$FDRcut,
     maxgenes=input$maxgenes,

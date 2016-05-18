@@ -28,51 +28,66 @@ tabPanel("Heatmaps",
            actionButton("action_heatmaps","Generate Heatmaps"),  
            h6(textOutput("numheat")),
            radioButtons("heatmapvaluename",label="Select Value to Plot in Heatmap",choices=""),
-           radioButtons("heatmap_order",label = "Order genes by",
-                        choices=c("Significance (adjusted p-value)"="significance",
-                                  "Variation (CV or SD)"="variation"),
-                        selected="variation"),
            checkboxGroupInput("view_group_heatmap",
                               label=h5("Select Groups to View"),
                               choices="",
                               selected=""
            ),
-
-
            
-           h3("Filters"),
+           radioButtons("heatmap_subset",label="Use all genes or upload your own subset?",
+                        choices=c("all","subset"),selected="all"),
            
-           conditionalPanel(condition="input.heatmap_order=='significance'",
-             selectizeInput("sel_test_heatmap",
-                            label=h5("Select Test to Use for Filtering"), 
-                            choices="",
-                            selected="")
+           conditionalPanel("input.heatmap_subset=='subset'",
+                            fileInput('heatmap_file', 'Choose File Containing Gene IDs\n(one row per gene)',
+                                      accept=c('text/csv', 
+                                               'text/comma-separated-values,text/plain', 
+                                               '.csv'))
            ),
            
-           conditionalPanel(condition="input.heatmap_order=='significance'",
-             checkboxInput("filter_fdr","FDR cutoff",value = FALSE)),
-             conditionalPanel(condition="input.filter_fdr==true",
-                              numericInput("FDRcut",label="Choose P-value 
-                                         (FDR if analyzed by START) cutoff",
-                                           min=0,max= 1,value=0.05)),
-             
-           conditionalPanel(condition="input.heatmap_order=='significance'",
-                            checkboxInput("filter_fc","Filter by fold change for a pair of groups",
-                                          value=FALSE)),
-             conditionalPanel(condition="input.filter_fc==true",
-                              selectizeInput("fold_change_groups", label="Select 2 Groups",
-                                             choices=NULL,
-                                             selected=NULL,
-                                             multiple=TRUE,options = list(maxItems = 2)),
-                              sliderInput("fold_change_range",
-                                          label="Choose Log2Fold Change Filter",
-                                          min= -20, max=20,value=c(-20,20))),
            
-           checkboxInput("filter_maxgene",
-                         "Show a maximum number of genes (recommended)",value=TRUE),
-           conditionalPanel(condition="input.filter_maxgene==true",    		
-                            numericInput("maxgenes",label="Choose Max # of Genes",
-                                         min=1,max= 5000,value=100,step=1))            
+           conditionalPanel("input.heatmap_subset=='all'",
+                            radioButtons("heatmap_order",label = "Order genes by",
+                                         choices=c("Significance (adjusted p-value)"="significance",
+                                                   "Variation (CV or SD)"="variation"),
+                                         selected="variation")
+                            ,
+                            
+                            
+                            
+                            h3("Filters"),
+                            
+                            conditionalPanel(condition="input.heatmap_order=='significance'",
+                                             selectizeInput("sel_test_heatmap",
+                                                            label=h5("Select Test to Use for Filtering"), 
+                                                            choices="",
+                                                            selected="")
+                            ),
+                            
+                            conditionalPanel(condition="input.heatmap_order=='significance'",
+                                             checkboxInput("filter_fdr","FDR cutoff",value = FALSE)),
+                            conditionalPanel(condition="input.filter_fdr==true",
+                                             numericInput("FDRcut",label="Choose P-value 
+                                         (FDR if analyzed by START) cutoff",
+                                                          min=0,max= 1,value=0.05)),
+                            
+                            conditionalPanel(condition="input.heatmap_order=='significance'",
+                                             checkboxInput("filter_fc","Filter by fold change for a pair of groups",
+                                                           value=FALSE)),
+                            conditionalPanel(condition="input.filter_fc==true",
+                                             selectizeInput("fold_change_groups", label="Select 2 Groups",
+                                                            choices=NULL,
+                                                            selected=NULL,
+                                                            multiple=TRUE,options = list(maxItems = 2)),
+                                             sliderInput("fold_change_range",
+                                                         label="Choose Log2Fold Change Filter",
+                                                         min= -20, max=20,value=c(-20,20))),
+                            
+                            checkboxInput("filter_maxgene",
+                                          "Show a maximum number of genes (recommended)",value=TRUE),
+                            conditionalPanel(condition="input.filter_maxgene==true",    		
+                                             numericInput("maxgenes",label="Choose Max # of Genes",
+                                                          min=1,max= 5000,value=100,step=1)) 
+           )
            
          ),#sidebarPanel
          img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
