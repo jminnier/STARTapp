@@ -35,7 +35,7 @@ observe({
                        choices=tmpgroups)
   
   updateRadioButtons(session,'scattervaluename',
-                     choices=tmpynames)
+                     choices=sort(tmpynames,decreasing = TRUE))
   
   
 })
@@ -52,17 +52,19 @@ observe({
     data_results = data_analyzed$results
     geneids = data_analyzed$geneids
     
+    
+    validate(need(data_results%>%filter(test==input$analysisres_test)%>%nrow()>0,"Test not found."))
+    
     withProgress(message = "Drawing volcano plot, please wait",
                  {
-                   
-                   if(data_results%>%filter(test==input$analysisres_test)%>%nrow()>0){
-                     rna_volcanoplot(data_results = data_results,
-                                     test_sel = input$analysisres_test,
-                                     absFCcut = input$analysisres_fold_change_cut,
-                                     fdrcut = input$analysisres_fdrcut)%>%
-                       bind_shiny("volcanoplot_2groups_ggvis","volcanoplot_2groups_ggvisUI")
-                   }
+                   rna_volcanoplot(data_results = data_results,
+                                   test_sel = input$analysisres_test,
+                                   absFCcut = input$analysisres_fold_change_cut,
+                                   fdrcut = input$analysisres_fdrcut)%>%
+                     bind_shiny("volcanoplot_2groups_ggvis","volcanoplot_2groups_ggvisUI")
                  })#end withProgress
+    
+    
   }
 })
 
@@ -75,26 +77,27 @@ observe({
   data_long = data_analyzed$data_long
   geneids = data_analyzed$geneids
   
-  withProgress(message = "Drawing scatterplot, please wait",
-               {
-                 # rna_scatterplot(data_long = data_long,
-                 #                 group_sel = input$analysisres_groups,
-                 #                 valuename=input$scattervaluename)%>%
-                 #   bind_shiny("scatterplot_fc_2groups_ggvis","scatterplot_fc_2groups_ggvisUI")
-                 
-                 
-                 output$scatterplot <- renderPlotly({ 
-                   
-                   validate(need(length(input$analysisres_groups)==2,"Please select two groups."))
-                   
-                   
-                   rna_scatterplot(data_long = data_long,
-                                   group_sel = input$analysisres_groups,
-                                   valuename=input$scattervaluename)
-                 })
-                 
-                 
-               })#end withProgress
+  
+  
+  # rna_scatterplot(data_long = data_long,
+  #                 group_sel = input$analysisres_groups,
+  #                 valuename=input$scattervaluename)%>%
+  #   bind_shiny("scatterplot_fc_2groups_ggvis","scatterplot_fc_2groups_ggvisUI")
+  output$scatterplot <- renderPlotly({ 
+    validate(need(length(input$analysisres_groups)==2,"Please select two groups."))
+    withProgress(message = "Drawing scatterplot, please wait",{
+      
+      
+      
+      
+      rna_scatterplot(data_long = data_long,
+                      group_sel = input$analysisres_groups,
+                      valuename=input$scattervaluename)
+    })#end withProgress
+  })
+  
+  
+  
   #}
 })
 
