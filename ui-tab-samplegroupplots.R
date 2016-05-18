@@ -27,10 +27,10 @@ tabPanel("Group Plots",
            selectizeInput("sampleres_groups", label="Select Groups",
                           choices=NULL,
                           multiple=TRUE)
-         ),#wellpanel
+         )#,#wellpanel
          
            
-           img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+           #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column
          column(8,
            tabsetPanel(

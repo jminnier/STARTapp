@@ -46,8 +46,8 @@ tabPanel("Gene Expression Boxplots",
                         #c("fitted cpm"="cpm","count"="count")),
 #            radioButtons("log2cpm_checked","Y axis transformation:",
 #                         c("log2"=TRUE,"raw value"=FALSE))
-         ),#br(),br(),br(),br(),br(),br(),br(),br(), 
-         img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+         )#,#br(),br(),br(),br(),br(),br(),br(),br(), 
+         #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ), 
          ## ==================================================================================== ##
          ## GENE DATA: DOT PLOT
@@ -62,9 +62,9 @@ tabPanel("Gene Expression Boxplots",
                            h5("This panel constructs box and whisker plots of log2(CPM) or CPM values with dot plots
                               superimposed to show the raw data. When there are three data points the median and 
                               interquartile ranges are precisely the data values. Medians are denoted by horizontal
-                              lines and averages are denoted by open diamonds."),
-                           br(),br(),br(),br(),br(),br(),br(),br(), br(),br(),br(), 
-                           img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+                              lines and averages are denoted by open diamonds.")#,
+                           #br(),br(),br(),br(),br(),br(),br(),br(), br(),br(),br(), 
+                           #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
                   ),#end tabPanel
                   ## ==================================================================================== ##
                   ## GENE DATA: DOT PLOT DATA

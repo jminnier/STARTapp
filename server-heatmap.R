@@ -173,9 +173,19 @@ observe({
         #lb$input()%>%
         set_options(width=600,height=1000)%>%bind_shiny("heatmapggvis_rna","heatmapggvisUI_rna")
       
-      tmptext = renderText(paste(
-        "The heatmap is filtered based on the smallest p-values
+      if(input$heatmap_subset=="subset") {
+        tmptext = renderText("The heatmap is filtered based on the gene ids you uploaded.")
+      }else{
+        if(input$heatmap_order=="significance") {
+          tmptext = renderText(paste(
+            "The heatmap is filtered based on the smallest p-values
         from the following test:",input$sel_test_heatmap))
+        }else{ 
+          tmptext = renderText(paste(
+            "The heatmap is filtered based on the largest standard deviation of the expression value selected."))
+        }
+      }
+      
       output$heatmap_rna_title = tmptext
       output$heatmap_rna_title_int = tmptext
     }else{
@@ -241,7 +251,7 @@ output$downloadHeatmapData_rna <- downloadHandler(
   filename = c('heatmap_data_rna.csv'),
   content = function(file) {
     write.csv(HeatdatReactive_rna(), file, row.names=FALSE)}
-  )
+)
 
 #   fixedGenesReactive <- reactive({
 #     if(input$fix_genes) {tmp = isolate(HeatdatReactive_rna()); return(tmp$gene.id)}else{return(NULL)}

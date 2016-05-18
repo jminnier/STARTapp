@@ -43,8 +43,8 @@ tabPanel("Analysis Plots",
                                            multiple=TRUE,options = list(maxItems = 2)),
                             radioButtons("scattervaluename",label="Select Scatterplot Value",choices="")
            )#conditionalpanel
-         ),
-         img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+         )#,
+         #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column
          column(8,
                 tabsetPanel(id="analysisres_tabset",

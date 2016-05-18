@@ -89,8 +89,8 @@ tabPanel("Heatmaps",
                                                           min=1,max= 5000,value=100,step=1)) 
            )
            
-         ),#sidebarPanel
-         img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+         )#,#sidebarPanel
+         #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column
          column(8,
                 tabsetPanel(

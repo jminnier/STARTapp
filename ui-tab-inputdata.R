@@ -76,14 +76,14 @@ tabPanel("Input Data",
                             )
            ),
            conditionalPanel("output.fileUploaded",actionButton("upload_data","Submit Data"))
-         ),
+         )#,
          # add reference group selection
          # add instructions
          # missing value character?
          # allow to input counts and analyze via standard limma, OR
          # input counts, fitted logcpm, and p-values? if multiple comparisons
          # p-values would be complicated
-         img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
+         #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column
          column(8,
                 bsCollapse(id="input_collapse_panel",open="data_panel",multiple = FALSE,
