@@ -21,7 +21,7 @@
 
 options(shiny.maxRequestSize = 100*1024^2)
 
-source("helpers.R")
+source("helpers.r")
 print(sessionInfo())
 
 shinyServer(function(input, output,session) {

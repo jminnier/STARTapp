@@ -45,7 +45,7 @@ library(NMF)
 source("fun-dotplot.R")
 source("fun-heatmap.R")
 source("fun-analyzecounts.R")
-source("fun-analysisres.R")
+source("fun-analysisres.r")
 source("fun-groupplots.R")
 
 #troubleshooting
