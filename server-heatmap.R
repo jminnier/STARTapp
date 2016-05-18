@@ -174,7 +174,7 @@ observe({
         set_options(width=600,height=1000)%>%bind_shiny("heatmapggvis_rna","heatmapggvisUI_rna")
       
       if(input$heatmap_subset=="subset") {
-        tmptext = renderText("The heatmap is filtered based on the gene ids you uploaded.")
+        tmptext = renderText("The heatmap is filtered based on the uploaded gene ids.")
       }else{
         if(input$heatmap_order=="significance") {
           tmptext = renderText(paste(
