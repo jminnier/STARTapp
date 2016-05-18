@@ -97,7 +97,7 @@ analyzeCountDataReactive <-
                   withProgress(message = "Analyzing RNA-seq data, please wait",{
                     
                     print("analysisCountDataReactive")
-                    #browser()
+
                     
                     #if an example just return previously analyzed results
                     if(input$use_example_file=="examplecounts") {
@@ -172,6 +172,7 @@ analyzeCountDataReactive <-
                     tmpkeep = which(apply(is.na(geneids),1,mean)<1) #remove rows with no gene identifiers
                     print(paste0("Num genes kept after removing empty geneids: ",length(tmpkeep)," of ", nrow(geneids)))
                     
+                    
                     geneids = geneids[tmpkeep,,drop=FALSE]
                     countdata = countdata[tmpkeep,,drop=FALSE]
                     
@@ -195,6 +196,7 @@ analyzeCountDataReactive <-
                     rownames(countdata) = geneids$unique_id
                     
                     if(input$inputdat_type=="analyzed") {
+                      
                       
                       expr_data <- alldata[tmpkeep,tmpexprcols,drop=FALSE]
                       rownames(expr_data) = geneids$unique_id
@@ -355,6 +357,7 @@ observeEvent(inputDataReactive(),({
 )
 
 output$analysisoutput <- DT::renderDataTable({
+  print("output$analysisoutput")
   getresults <- analyzeCountDataReactive()
   res = getresults$results
   DT::datatable(res)

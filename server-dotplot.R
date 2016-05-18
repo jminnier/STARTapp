@@ -26,6 +26,9 @@
 # loads list of genes on the server side
 #observeEvent(input$upload_data,ignoreNULL = TRUE, {
 observe({
+  
+  print("server-dotplot-update")
+  
   data_analyzed = analyzeCountDataReactive()
   tmpgeneids = data_analyzed$geneids
   data_analyzedgenes = as.character(unlist(tmpgeneids))
@@ -70,7 +73,9 @@ observe({
 
 #Show dotplot	
 output$dotplot <- renderPlotly({
-  #browser()
+  
+  print("drawing dotplot")
+  
   validate(need(length(input$sel_gene)>0,"Please select a gene."))
   validate(need(length(input$sel_group)>0,"Please select group(s)."))
   
@@ -88,6 +93,7 @@ output$dotplot <- renderPlotly({
 #Based on dotplot filters create data
 
 DataDotplotReactive <- reactive({
+  print("DataDotplotReactive")
   data_analyzed = analyzeCountDataReactive()
   
   subdat = dotplot_dat(data_long = data_analyzed$data_long,geneids = data_analyzed$geneids,

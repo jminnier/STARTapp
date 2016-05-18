@@ -21,6 +21,7 @@
 ## 
 #update list of groups
 observe({
+  print("server-samplegroupplots-update")
   data_analyzed = analyzeCountDataReactive()
   tmpgroups = data_analyzed$group_names
   updateSelectizeInput(session,'sampleres_groups',
@@ -36,6 +37,7 @@ observe({
 observe({
   
   output$gene_pheatmap <- renderPlot({
+    print("render gene_pheatmap")
     data_analyzed = analyzeCountDataReactive()
     data_results = data_analyzed$results
     geneids = data_analyzed$geneids
@@ -51,6 +53,7 @@ observe({
   })
   
   output$pca_plot <- renderPlot({
+    print("render PCA plot")
     
     data_analyzed = analyzeCountDataReactive()
     data_results = data_analyzed$results

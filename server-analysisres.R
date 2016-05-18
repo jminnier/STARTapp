@@ -21,6 +21,9 @@
 ## 
 ## #update list of groups
 observe({
+  
+  print("server-analysisres-update")
+  
   data_analyzed = analyzeCountDataReactive()
   tmpdat = data_analyzed$results
   tmpgroups = data_analyzed$group_names
@@ -48,6 +51,8 @@ observe({
 observe({
   if(input$analysisres_test!="") {
     
+    print("drawing volcano plot")
+    
     data_analyzed = analyzeCountDataReactive()
     data_results = data_analyzed$results
     geneids = data_analyzed$geneids
@@ -71,6 +76,8 @@ observe({
 
 
 observe({
+  
+  print("drawing scatterplot")
   
   #if(length(input$analysisres_groups)==2) {
   data_analyzed = analyzeCountDataReactive()
