@@ -77,7 +77,7 @@ dotplot_fun <- function(data_long,
   if((ll==0)||(length(sel_group)==0)) {return(NULL)}else{
     sel_group = sort(sel_group)
     subdat_all = dotplot_dat(data_long,geneids,sel_group,sel_gene,ytype)
-    print(subdat_all)
+    #print(subdat_all)
     
     subdat_all$labelgeneid = subdat_all[,match(genelabel,colnames(subdat_all))]
 

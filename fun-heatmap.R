@@ -26,7 +26,7 @@ heatcols = colorRampPalette(heatmap_colors)(500)
 
 
 #Returns data for a heatmap
-heatmap_subdat <- function(data_analyzed, #  data_analyzed = analyzeCountDataReactive()
+heatmap_subdat <- function(data_analyzed,
                            yname="log2cpm",
                            orderby="significance",
                            usesubset=FALSE,

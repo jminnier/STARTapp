@@ -10,7 +10,7 @@ To run this app locally on your machine, download R or RStudio and run the follo
 ```
 
 install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT",
-                   "RColorBrewer","pheatmap","shinyBS","plotly","markdown","NMF"))
+                   "RColorBrewer","pheatmap","shinyBS","plotly","markdown","NMF","scales"))
 ## try http:// if https:// URLs are not supported
 source("https://bioconductor.org/biocLite.R")
 biocLite(c("limma","edgeR"))
