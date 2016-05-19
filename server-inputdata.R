@@ -97,7 +97,7 @@ analyzeCountDataReactive <-
                   withProgress(message = "Analyzing RNA-seq data, please wait",{
                     
                     print("analysisCountDataReactive")
-
+                    
                     
                     #if an example just return previously analyzed results
                     if(input$use_example_file=="examplecounts") {
@@ -229,42 +229,61 @@ analyzeCountDataReactive <-
                       
                       #analyze data
                       
-                      not_counts <- function(input) {
-                        
+                      # not_counts <- function(input) {
+                      #   remainder = sum(apply(input,2,function(k) sum(k%%1,na.rm=T)),na.rm=T)
+                      #   if (remainder !=0) {
+                      #     "Your data appears to not be counts, please double check your data"
+                      #   } else if (input == "") { 
+                      #     FALSE
+                      #   } else {
+                      #     NULL
+                      #   }
+                      # }
+                      
+                      data_not_counts <- function(input) {
                         remainder = sum(apply(input,2,function(k) sum(k%%1,na.rm=T)),na.rm=T)
-                        if (remainder !=0) {
-                          "Your data appears to not be counts, please double check your data"
-                        } else if (input == "") { 
-                          FALSE
+                        if (remainder ==0) {
+                          TRUE
                         } else {
-                          NULL
+                          FALSE
                         }
                       }
                       
+                      #do not perform voom on non-counts and assumpe log2 uploaded intensities
+                      dovoom= data_not_counts(countdata)
                       
-                      validate(
-                        not_counts(countdata)
-                      )
+                      # if(not_counts(countdata)){print("Warning: You are uploading data that does not appear to be counts, the analysis pipeline will not be valid!")}
+                      # validate(
+                      #   not_counts(countdata)
+                      # )
                       
                       print("analyze data: counts")
                       
                       design <- model.matrix(~0+sampledata$group) # allow selection of reference group
                       colnames(design) = levels(as.factor(sampledata$group))
                       
-                      #voom+limma
-                      dge <- DGEList(counts=countdata) #TMM normalization first
-                      dge <- calcNormFactors(dge)
-                      log2cpm <- cpm(dge, prior.count=0.5, log=TRUE)
-                      # v <- voom(dge,design,plot=FALSE)
-                      v <- voom(dge,design,plot=FALSE,normalize.method = "cyclicloess")
-                      # v <- voom(countdata,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
-                      
-                      
-                      
-                      #fit <- lmFit(v,design)
-                      #fit <- eBayes(fit)
-                      
-                      expr_data = v$E
+                      if(dovoom) {
+                        #voom+limma
+                        dge <- DGEList(counts=countdata) #TMM normalization first
+                        dge <- calcNormFactors(dge)
+                        log2cpm <- cpm(dge, prior.count=0.5, log=TRUE)
+                        # v <- voom(dge,design,plot=FALSE)
+                        v <- voom(dge,design,plot=FALSE,normalize.method = "cyclicloess")
+                        # v <- voom(countdata,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
+                        
+                        
+                        
+                        #fit <- lmFit(v,design)
+                        #fit <- eBayes(fit)
+                        
+                        expr_data = v$E
+                      }else{
+                        print("not doing voom")
+                        countdata2 = countdata
+                        if(max(countdata)>1000) countdata2 = log2(countdata)
+                        log2cpm = countdata2
+                        expr_data = countdata2
+                        }
                       
                       tmpgroup = sampledata$group
                       #contrasts(tmpgroup)
@@ -288,7 +307,6 @@ analyzeCountDataReactive <-
                         tmpout$test = with(tmpout, paste(numer_group,denom_group,sep="/"))
                         tmpout = tmpout[,c("unique_id","test","denom_group","numer_group",
                                            "logFC","P.Value","adj.P.Val")]
-                        
                         
                         lmobj_res[[ii]] = tmpout
                       }
@@ -321,7 +339,7 @@ analyzeCountDataReactive <-
                       tmpgeneidnames = colnames(geneids%>%select(-unique_id))
                       if(length(tmpgeneidnames)>0) {
                         data_long = data_long%>%select(-one_of(tmpgeneidnames))
-                        }
+                      }
                       
                       #expr_data = tmplog2cpm[,-1]
                       

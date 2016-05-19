@@ -113,7 +113,9 @@ dotplot_fun <- function(data_long,
   #                          labels = trans_format("log2", math_format(2^.x)))
   # }
   #   #
-    if(min(data_long[,ytype])>=0) {p <- p+scale_y_continuous(trans = log2_trans(),breaks=2^(0:100))}
+    
+    #hack to check if counts are not logged first need to fix this better
+    if(max(data_long[,ytype])>=500) {p <- p+scale_y_continuous(trans = log2_trans(),breaks=2^(0:100))}
       
 
     #print(p)
