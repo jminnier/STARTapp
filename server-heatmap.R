@@ -34,7 +34,7 @@ observe({
   tmptests = unique(as.character(tmpdat$test))
   tmpdatlong = data_analyzed$data_long
   tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
-  if("count"%in%tmpynames) tmpynames = tmpynames[match("count",tmpynames)]
+  if("count"%in%tmpynames) tmpynames = tmpynames[-match("count",tmpynames)]
   
   updateRadioButtons(session,'heatmapvaluename', choices=sort(tmpynames,decreasing = TRUE))
   updateCheckboxGroupInput(session,'view_group_heatmap',
