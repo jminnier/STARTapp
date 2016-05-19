@@ -56,7 +56,8 @@ heatmap_subdat <- function(data_analyzed,
       res = data_results%>%filter(test==sel_test)
       #Order by FDR
       if(is.null(res$adj.P.Val)) res$adj.P.Val = res$P.Value
-      tmpout = res[order(res$adj.P.Val),]
+      #tmpout = res[order(res$adj.P.Val),]
+      tmpout = res%>%arrange(adj.P.Val,P.Value,abs(logFC))
       
       thesegenes = tmpout$unique_id
       print(paste("start",length(thesegenes)))
@@ -158,8 +159,9 @@ heatmap_render <- function(yname,...)  {
   if(is.null(tmpdat)) {frame()}else{
     heatdat = as.matrix(tmpdat$data)
     myheatmap_colors = heatmap_colors
-    if(min(heatdat)>0) {myheatmap_colors = heatmap_colors[2:3]}
-    if(max(heatdat)<0) {myheatmap_colors = heatmap_colors[1:2]}
+    heatdat_rowmean = sweep(heatdat,1,rowMeans(heatdat))
+    if(min(heatdat_rowmean)>0) {myheatmap_colors = heatmap_colors[2:3]}
+    if(max(heatdat_rowmean)<0) {myheatmap_colors = heatmap_colors[1:2]}
     color.palette  <- colorRampPalette(myheatmap_colors)
     
     #http://stackoverflow.com/questions/15351575/moving-color-key-in-r-heatmap-2-function-of-gplots-package
@@ -179,12 +181,12 @@ heatmap_render <- function(yname,...)  {
     #par(oma=c(0,0,0,5))
     tcols = as.numeric(as.factor(do.call(rbind,strsplit(colnames(heatdat),"_"))[,1]))+1
     
-    heatdat_rowmean = sweep(heatdat,1,rowMeans(heatdat))
+
     # heatmap(heatdat_rowmean,labRow = rownames(heatdat),scale="none",col=color.palette(100),
     #         ColSideColors = rainbow(max(tcols))[tcols],
     #         margins=c(5,10))
     
-    aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",labRow = rownames(heatdat),
+    aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",labRow = rownames(heatdat),revC=TRUE,
              annCol=data.frame("group"=as.factor(do.call(rbind,strsplit(colnames(heatdat),"_"))[,1])))
     
     
@@ -250,7 +252,7 @@ heatmap_ggvis_data <- function(yname,...) {
     ddr <- reorder(ddr, Rowv)
     rowInd <- order.dendrogram(ddr)
     myorder = rowInd
-    myorder = myorder[length(myorder):1]
+    #myorder = myorder[length(myorder):1]
     heatdat <- heatdat[myorder,]
     heatdat_scale <- heatdat_scale[myorder,]
     

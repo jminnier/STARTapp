@@ -133,8 +133,10 @@ output$heatmap_rna <- renderPlot({
 
 
 
-observe({
+observeEvent(  input$action_heatmaps,{
   if(input$action_heatmaps==0) return()
+  
+
   
   print("ggvis heatmap")
   
@@ -213,7 +215,7 @@ observe({
 HeatdatReactive_rna <- reactive({
   if(input$action_heatmaps==0) return()
   #input$action_heatmaps
-  "HeatdatReactive_rna"
+  print("HeatdatReactive_rna")
   
   data_analyzed = analyzeCountDataReactive()
   subsetids = inputHeatmapSubsetReactive()
