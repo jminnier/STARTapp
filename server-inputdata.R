@@ -240,7 +240,7 @@ analyzeCountDataReactive <-
                       #   }
                       # }
                       
-                      data_not_counts <- function(input) {
+                      datacounts <- function(input) {
                         remainder = sum(apply(input,2,function(k) sum(k%%1,na.rm=T)),na.rm=T)
                         if (remainder ==0) {
                           TRUE
@@ -250,7 +250,7 @@ analyzeCountDataReactive <-
                       }
                       
                       #do not perform voom on non-counts and assumpe log2 uploaded intensities
-                      dovoom= data_not_counts(countdata)
+                      dovoom= datacounts(countdata)
                       
                       # if(not_counts(countdata)){print("Warning: You are uploading data that does not appear to be counts, the analysis pipeline will not be valid!")}
                       # validate(
@@ -280,7 +280,7 @@ analyzeCountDataReactive <-
                       }else{
                         print("not doing voom")
                         countdata2 = countdata
-                        if(max(countdata)>1000) countdata2 = log2(countdata)
+                        if(max(countdata)>1000) countdata2 = log2(countdata+0.5)
                         log2cpm = countdata2
                         expr_data = countdata2
                         }
