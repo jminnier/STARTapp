@@ -258,6 +258,7 @@ output$numheat <- renderText({
 output$heatdat_rna <- DT::renderDataTable({
   if(input$action_heatmaps==0) return()
   tmpdat = HeatdatReactive_rna()
+  tmpdat[,sapply(tmpdat,is.numeric)] <- signif(tmpdat[,sapply(tmpdat,is.numeric)],3)
   DT::datatable(tmpdat)
 },options=list(sDom="ilftpr"))
 

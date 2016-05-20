@@ -378,6 +378,7 @@ output$analysisoutput <- DT::renderDataTable({
   print("output$analysisoutput")
   getresults <- analyzeCountDataReactive()
   res = getresults$results
+  res[,sapply(res,is.numeric)] <- signif(res[,sapply(res,is.numeric)],3)
   DT::datatable(res)
 })
 
