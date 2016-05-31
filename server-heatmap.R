@@ -133,83 +133,118 @@ output$heatmap_rna <- renderPlot({
 
 
 
-observeEvent(  input$action_heatmaps,{
+output$heatmapplotly <- renderPlotly({
   if(input$action_heatmaps==0) return()
-  
-
-  
-  print("ggvis heatmap")
+  #input$action_heatmaps
+  print("heatmapplotly")
   
   data_analyzed = analyzeCountDataReactive()
   subsetids = inputHeatmapSubsetReactive()
   
-  isolate({
-    #input$action_heatmaps
-    #browser()
-    mydat = heatmap_ggvis_data(
-      data_analyzed = data_analyzed,
-      yname = input$heatmapvaluename,
-      usesubset = input$heatmap_subset=="subset",
-      subsetids = subsetids,
-      orderby = input$heatmap_order,
-      FDRcut=input$FDRcut,
-      maxgenes=input$maxgenes,
-      view_group=input$view_group_heatmap,
-      sel_test=input$sel_test_heatmap,
-      filter_fdr=input$filter_fdr,
-      filter_maxgene=input$filter_maxgene,
-      # filter_cpm=input$filter_cpm,
-      filter_fc=input$filter_fc,
-      fold_change_range=input$fold_change_range,
-      fold_change_groups=input$fold_change_groups)
-    #print(mydat)
-    #print(unique(mydat$unique_id))
-    
-    if(!is.null(mydat)) {
-      
-      yname = input$heatmapvaluename
-      all_values2 <- function(x) {
-        if(is.null(x)) return(NULL)
-        thisrow <- mydat[mydat$id == x$id,]
-        thisrow <- thisrow[,c("unique_id","sample",yname,paste0(yname,"_scaled"))]
-        thisrow[,yname] <- round(thisrow[,yname],3)
-        paste0(names(thisrow), ": ", format(thisrow), collapse = "<br />")
-      }
-      
-      #browser()
-      mydat%>%
-        ggvis(~sample, ~unique_id, fill:=~defcolor,stroke:=~defcolor, key:=~id)%>%
-        layer_rects(width = band(), height = band()) %>%
-        scale_nominal("x", padding = 0, points = FALSE) %>%
-        scale_nominal("y", padding = 0, points = FALSE) %>%
-        add_tooltip(html=all_values2,on = "hover") %>%
-        #lb$input()%>%
-        set_options(width=600,height=1000)%>%bind_shiny("heatmapggvis_rna","heatmapggvisUI_rna")
-      
-      if(input$heatmap_subset=="subset") {
-        tmptext = renderText("The heatmap is filtered based on the uploaded gene ids.")
-      }else{
-        if(input$heatmap_order=="significance") {
-          tmptext = renderText(paste(
-            "The heatmap is filtered based on the smallest p-values
-        from the following test:",input$sel_test_heatmap))
-        }else{ 
-          tmptext = renderText(paste(
-            "The heatmap is filtered based on the largest standard deviation of the expression value selected."))
-        }
-      }
-      
-      output$heatmap_rna_title = tmptext
-      output$heatmap_rna_title_int = tmptext
-    }else{
-      tmptext = renderText("These inputs do not produce data.")
-      output$heatmap_rna_title = tmptext
-      output$heatmap_rna_title_int = tmptext
-    }
-    
-  })
+  isolate({ #avoid dependency on everything else except action_heatmaps
+    print("drawing heatmap plotly")
+    withProgress(message = "Drawing interactive heatmap, please wait",{
+      heatmap_render(
+        data_analyzed=data_analyzed,
+        yname = input$heatmapvaluename,
+        interactive = TRUE,
+        usesubset = input$heatmap_subset=="subset",
+        subsetids = subsetids,
+        orderby = input$heatmap_order,
+        FDRcut=input$FDRcut,
+        maxgenes=input$maxgenes,
+        view_group=input$view_group_heatmap,
+        sel_test=input$sel_test_heatmap,
+        filter_fdr=input$filter_fdr,
+        filter_maxgene=input$filter_maxgene,
+        # filter_cpm=input$filter_cpm,
+        filter_fc=input$filter_fc,
+        fold_change_range=input$fold_change_range,
+        fold_change_groups=input$fold_change_groups)
+    })
+  })#isolate
 })
 
+
+# 
+# observeEvent(  input$action_heatmaps,{
+#   if(input$action_heatmaps==0) return()
+#   
+# 
+#   
+#   print("ggvis heatmap")
+#   
+#   data_analyzed = analyzeCountDataReactive()
+#   subsetids = inputHeatmapSubsetReactive()
+#   
+#   isolate({
+#     #input$action_heatmaps
+#     #browser()
+#     mydat = heatmap_ggvis_data(
+#       data_analyzed = data_analyzed,
+#       yname = input$heatmapvaluename,
+#       usesubset = input$heatmap_subset=="subset",
+#       subsetids = subsetids,
+#       orderby = input$heatmap_order,
+#       FDRcut=input$FDRcut,
+#       maxgenes=input$maxgenes,
+#       view_group=input$view_group_heatmap,
+#       sel_test=input$sel_test_heatmap,
+#       filter_fdr=input$filter_fdr,
+#       filter_maxgene=input$filter_maxgene,
+#       # filter_cpm=input$filter_cpm,
+#       filter_fc=input$filter_fc,
+#       fold_change_range=input$fold_change_range,
+#       fold_change_groups=input$fold_change_groups)
+#     #print(mydat)
+#     #print(unique(mydat$unique_id))
+#     
+#     
+#     if(!is.null(mydat)) {
+#       
+#       yname = input$heatmapvaluename
+#       all_values2 <- function(x) {
+#         if(is.null(x)) return(NULL)
+#         thisrow <- mydat[mydat$id == x$id,]
+#         thisrow <- thisrow[,c("unique_id","sample",yname,paste0(yname,"_scaled"))]
+#         thisrow[,yname] <- round(thisrow[,yname],3)
+#         paste0(names(thisrow), ": ", format(thisrow), collapse = "<br />")
+#       }
+#       
+#       #browser()
+#       mydat%>%
+#         ggvis(~sample, ~unique_id, fill:=~defcolor,stroke:=~defcolor, key:=~id)%>%
+#         layer_rects(width = band(), height = band()) %>%
+#         scale_nominal("x", padding = 0, points = FALSE) %>%
+#         scale_nominal("y", padding = 0, points = FALSE) %>%
+#         add_tooltip(html=all_values2,on = "hover") %>%
+#         #lb$input()%>%
+#         set_options(width=600,height=1000)%>%bind_shiny("heatmapggvis_rna","heatmapggvisUI_rna")
+#       
+#       if(input$heatmap_subset=="subset") {
+#         tmptext = renderText("The heatmap is filtered based on the uploaded gene ids.")
+#       }else{
+#         if(input$heatmap_order=="significance") {
+#           tmptext = renderText(paste(
+#             "The heatmap is filtered based on the smallest p-values
+#         from the following test:",input$sel_test_heatmap))
+#         }else{ 
+#           tmptext = renderText(paste(
+#             "The heatmap is filtered based on the largest standard deviation of the expression value selected."))
+#         }
+#       }
+#       
+#       output$heatmap_rna_title = tmptext
+#       output$heatmap_rna_title_int = tmptext
+#     }else{
+#       tmptext = renderText("These inputs do not produce data.")
+#       output$heatmap_rna_title = tmptext
+#       output$heatmap_rna_title_int = tmptext
+#     }
+#     
+#   })
+# })
+# 
 
 
 HeatdatReactive_rna <- reactive({

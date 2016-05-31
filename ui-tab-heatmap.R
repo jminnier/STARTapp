@@ -99,10 +99,14 @@ tabPanel("Heatmaps",
                            h4(textOutput("heatmap_rna_title")),
                            plotOutput("heatmap_rna",height="800px")                        
                   ),
+                  # tabPanel(title="Interactive HeatMap",
+                  #          h4(textOutput("heatmap_rna_title_int")),
+                  #          uiOutput("heatmapggvisUI_rna"),
+                  #          ggvisOutput("heatmapggvis_rna")
+                  # ),
                   tabPanel(title="Interactive HeatMap",
-                           h4(textOutput("heatmap_rna_title_int")),
-                           uiOutput("heatmapggvisUI_rna"),
-                           ggvisOutput("heatmapggvis_rna")
+                           #h4(textOutput("heatmap_rna_title_int")),
+                           plotlyOutput("heatmapplotly",height="800")
                   ),
                   tabPanel(title="Data Output",
                            downloadButton('downloadHeatmapData_rna', 

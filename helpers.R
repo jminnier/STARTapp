@@ -40,6 +40,7 @@ library(plotly)
 library(markdown)
 library(NMF)
 library(scales)
+library(heatmaply)
 
 ##================================================================================##
 
@@ -78,4 +79,15 @@ if(FALSE) {
   fold_change_groups=NULL
   group_filter_range =NULL
   fixed_genes_list=NULL
+  orderby="variance"
+  
+  tmpdat = heatmap_subdat(data_analyzed,yname,orderby="variance",maxgenes=100)
+  heatmap_render(data_analyzed,yname,orderby="variance",maxgenes=100)
+  
+  mydat = heatmap_ggvis_data(
+    data_analyzed = data_analyzed,
+    yname = yname,
+    orderby = "variance",
+    maxgenes=100)
+
 }

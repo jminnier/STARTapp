@@ -44,7 +44,6 @@ heatmap_subdat <- function(data_analyzed,
                            group_filter_range =NULL,
                            fixed_genes_list=NULL) {
   
-  
   data_results = data_analyzed$results
   data_results$unique_id = as.character(data_results$unique_id)
   
@@ -152,7 +151,7 @@ heatmap_data <- function(...) {
   }
 }
 
-heatmap_render <- function(yname,...)  {
+heatmap_render <- function(yname,interactive=FALSE,...)  {
   #possible inputs
   tmpdat <- heatmap_subdat(yname,...)
   
@@ -186,10 +185,12 @@ heatmap_render <- function(yname,...)  {
     #         ColSideColors = rainbow(max(tcols))[tcols],
     #         margins=c(5,10))
     
-    aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",labRow = rownames(heatdat),revC=TRUE,
+    if(interactive) {
+      heatmaply(heatdat_rowmean,colors=color.palette(100))%>% layout(margin = list(l = 300, b = 100))
+    }else{
+      aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",labRow = rownames(heatdat),revC=TRUE,
              annCol=data.frame("group"=as.factor(do.call(rbind,strsplit(colnames(heatdat),"_"))[,1])))
-    
-    
+    }
   }
 }
 
