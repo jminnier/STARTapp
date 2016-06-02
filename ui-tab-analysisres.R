@@ -50,8 +50,9 @@ tabPanel("Analysis Plots",
                 tabsetPanel(id="analysisres_tabset",
                             tabPanel(title="Volcano Plot",
                                      #h5(textOutput("corPR")),
-                                     uiOutput("volcanoplot_2groups_ggvisUI"),
-                                     ggvisOutput("volcanoplot_2groups_ggvis")  
+                                     #uiOutput("volcanoplot_2groups_ggvisUI"),
+                                     #ggvisOutput("volcanoplot_2groups_ggvis")  
+                                     plotlyOutput("volcanoplot",height=600)
                             ),#tabPanel
                             tabPanel(title="Scatterplot of Fold Changes",
                                      #h5(textOutput("corPR")),

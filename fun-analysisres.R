@@ -23,11 +23,66 @@
 ## ==================================================================================== ##  	
 
 
-#change rna_volcanoplot to have an input function that depends on type of variables and then a plotting function
-
-
+# change rna_volcanoplot to have an input function that depends on type of variables and then a plotting function
+# need to be more careful about what p-value (adjusted or raw) is used for colors
 rna_volcanoplot <- function(data_results, geneids=NULL, 
                             test_sel=NULL,absFCcut=0,fdrcut=0.05) {
+  print(dim(data_results))
+  
+  #group1 = group_sel[1]; group2 = group_sel[2]
+  
+  #res = data_results%>%filter(test==paste0(group1,"/",group2))
+  if(test_sel%in%data_results$test) {
+  res = data_results%>%filter(test==test_sel)
+  }else{res = data_results}
+  
+  usepadj=TRUE
+  pvalname = "adj-pval"
+  if(is.null(res$adj.P.Val)) {
+    res$adj.P.Val = res$P.Value
+    usepadj = FALSE 
+    pvalname = "pval"
+  }
+  
+  
+  
+  res$color="None"
+  res$color[which(res$adj.P.Val<fdrcut)] = paste0(pvalname,"<",fdrcut, " & abs(logfc)<",absFCcut)
+  res$color[which(abs(res$logFC)>absFCcut)] = paste0(pvalname,">",fdrcut, " & abs(logfc)<",absFCcut)
+  res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<.05)==1)] = paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
+  res$color = factor(res$color,levels = c("None",paste0("adj-pval<",fdrcut, " & abs(logfc)<",absFCcut),
+                                          paste0(pvalname,">",fdrcut, " & abs(logfc)<",absFCcut),
+                                          paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
+                                          ))
+
+  
+  
+  p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+geom_point()+
+    scale_color_manual(values=c("black","red","orange","green"),name="Significance")
+  p <- p + theme_base() + theme(plot.margin = unit(c(2,2,2,2), "cm"))
+  
+  g <- plotly_build(p)
+
+  
+  #Match order of text to proper gene order
+  newtext =  paste("Gene ID:",res$unique_id,"<br>",
+                   "Comparison",res$test,"<br>",
+                   "logFC",signif(res$logFC,3),"<br>",
+                   "P.Value",signif(res$P.Value,3),"<br>",
+                   "adj.P.Val",signif(res$adj.P.Val,3))
+
+  for(ii in 1:length(g$data)) {
+    tmpid = do.call(rbind,strsplit(g$data[[ii]]$text,"<br>"))[,4]
+    g$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
+  }
+  
+  g
+
+}
+
+# switched from ggvis to plotly, this function is not currently used
+rna_volcanoplot_ggvis <- function(data_results, geneids=NULL, 
+                                  test_sel=NULL,absFCcut=0,fdrcut=0.05) {
   print(dim(data_results))
   
   #group1 = group_sel[1]; group2 = group_sel[2]
@@ -49,12 +104,13 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
   res$color = factor(res$color,levels = c("None",paste0("adj-pval<",fdrcut),paste0("abs(logfc)>",absFCcut),paste0("adj-pval<",fdrcut," & abs(logfc)>",absFCcut)))
   res$id = 1:nrow(res)
   
+  
   all_values <- function(x){
     if(is.null(x)) return(NULL)
     row <- res[res$id==x$id,]
     if(usepadj) {
-    show <- c("unique_id","test","logFC","P.Value","adj.P.Val")
-    showname <- c("Gene ID","Comparison","logFC","raw p-value","BH FDR adjusted p-value")
+      show <- c("unique_id","test","logFC","P.Value","adj.P.Val")
+      showname <- c("Gene ID","Comparison","logFC","raw p-value","BH FDR adjusted p-value")
     }else{
       show <- c("unique_id","test","logFC","P.Value")
       showname <- c("Gene ID","Comparison","logFC","p-value")
