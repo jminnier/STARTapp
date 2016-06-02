@@ -18,8 +18,11 @@
 # 
 # You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
 ## ==================================================================================== ##
+
+
+
 ## ==================================================================================== ##
-## Scatter plot of log2 fold changes
+## Volcano Plot
 ## ==================================================================================== ##  	
 
 
@@ -84,11 +87,6 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
 rna_volcanoplot_ggvis <- function(data_results, geneids=NULL, 
                                   test_sel=NULL,absFCcut=0,fdrcut=0.05) {
   print(dim(data_results))
-  
-  #group1 = group_sel[1]; group2 = group_sel[2]
-  
-  #res = data_results%>%filter(test==paste0(group1,"/",group2))
-  
   res = data_results%>%filter(test==test_sel)
   
   usepadj=TRUE
