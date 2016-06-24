@@ -24,7 +24,7 @@ observe({
   
   print("server-analysisres-update")
   
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   tmpdat = data_analyzed$results
   tmpgroups = data_analyzed$group_names
   tmptests = unique(as.character(tmpdat$test))
@@ -52,7 +52,7 @@ observe({
   
   print("drawing volcano plot")
   
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   data_results = data_analyzed$results
   geneids = data_analyzed$geneids
   
@@ -85,7 +85,7 @@ observe({
   print("drawing scatterplot")
   
   #if(length(input$analysisres_groups)==2) {
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   data_long = data_analyzed$data_long
   geneids = data_analyzed$geneids
   

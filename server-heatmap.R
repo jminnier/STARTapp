@@ -28,7 +28,7 @@
 observe({
   print("server-heatmap-update")
  # browser()
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   tmpgroups = data_analyzed$group_names
   tmpdat = data_analyzed$results
   tmptests = unique(as.character(tmpdat$test))
@@ -69,7 +69,7 @@ inputHeatmapSubsetReactive <- reactive({
     print('uploaded heatmap gene ids')
     
     
-    data_analyzed = analyzeCountDataReactive()
+    data_analyzed = analyzeDataReactive()
     tmpgeneids = data_analyzed$geneids
     tmpmatch = apply(tmpgeneids,2,function(k) match(heatmap_geneids,k,nomatch = 0))
     subsetids = tmpgeneids$unique_id[unique(c(tmpmatch))]
@@ -85,7 +85,7 @@ inputHeatmapSubsetReactive <- reactive({
 })
 
 # output$filter_fc_ui <- renderUI({
-#   data_analyzed = analyzeCountDataReactive()
+#   data_analyzed = analyzeDataReactive()
 #   tmpgroups = data_analyzed$group_names
 # 
 #   
@@ -105,7 +105,7 @@ output$heatmap_rna <- renderPlot({
   #input$action_heatmaps
   print("heatmap_rna_renderPlot")
   
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   subsetids = inputHeatmapSubsetReactive()
   
   isolate({ #avoid dependency on everything else except action_heatmaps
@@ -138,7 +138,7 @@ output$heatmapplotly <- renderPlotly({
   #input$action_heatmaps
   print("heatmapplotly")
   
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   subsetids = inputHeatmapSubsetReactive()
   
   isolate({ #avoid dependency on everything else except action_heatmaps
@@ -174,7 +174,7 @@ output$heatmapplotly <- renderPlotly({
 #   
 #   print("ggvis heatmap")
 #   
-#   data_analyzed = analyzeCountDataReactive()
+#   data_analyzed = analyzeDataReactive()
 #   subsetids = inputHeatmapSubsetReactive()
 #   
 #   isolate({
@@ -252,7 +252,7 @@ HeatdatReactive_rna <- reactive({
   #input$action_heatmaps
   print("HeatdatReactive_rna")
   
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   subsetids = inputHeatmapSubsetReactive()
   
   tmp<- heatmap_data(

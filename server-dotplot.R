@@ -29,7 +29,7 @@ observe({
   
   print("server-dotplot-update")
   
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   tmpgeneids = data_analyzed$geneids
   data_analyzedgenes = as.character(unlist(tmpgeneids))
   tmpgroups = data_analyzed$group_names
@@ -79,7 +79,7 @@ output$dotplot <- renderPlotly({
   validate(need(length(input$sel_gene)>0,"Please select a gene."))
   validate(need(length(input$sel_group)>0,"Please select group(s)."))
   
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   data_long = data_analyzed$data_long
   geneids = data_analyzed$geneids
   dotplot_fun(data_long = data_long,geneids = geneids,
@@ -94,7 +94,7 @@ output$dotplot <- renderPlotly({
 
 DataDotplotReactive <- reactive({
   print("DataDotplotReactive")
-  data_analyzed = analyzeCountDataReactive()
+  data_analyzed = analyzeDataReactive()
   
   subdat = dotplot_dat(data_long = data_analyzed$data_long,geneids = data_analyzed$geneids,
                        sel_group=input$sel_group,sel_gene=input$sel_gene,

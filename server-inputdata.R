@@ -91,7 +91,8 @@ output$fileUploaded <- reactive({
 })
 outputOptions(output, 'fileUploaded', suspendWhenHidden=FALSE)
 
-analyzeCountDataReactive <- 
+# after the data is uploaded or example data is selected, analyze the data
+analyzeDataReactive <- 
   eventReactive(input$upload_data,
                 ignoreNULL = FALSE, {
                   withProgress(message = "Analyzing RNA-seq data, please wait",{
@@ -376,7 +377,7 @@ observeEvent(inputDataReactive(),({
 
 output$analysisoutput <- DT::renderDataTable({
   print("output$analysisoutput")
-  getresults <- analyzeCountDataReactive()
+  getresults <- analyzeDataReactive()
   res = getresults$results
   res[,sapply(res,is.numeric)] <- signif(res[,sapply(res,is.numeric)],3)
   DT::datatable(res)
@@ -385,11 +386,11 @@ output$analysisoutput <- DT::renderDataTable({
 
 output$downloadResults_CSV <- downloadHandler(filename = paste0("START_results_",Sys.Date(),".csv"),
                                               content = function(file) {
-                                                write.csv(analyzeCountDataReactive()$data_results_table, file, row.names=FALSE)})
+                                                write.csv(analyzeDataReactive()$data_results_table, file, row.names=FALSE)})
 
 output$downloadResults_RData <- downloadHandler(filename= paste0("START_results_",Sys.Date(),".RData"),
                                                 content=function(file){
-                                                  tmp = analyzeCountDataReactive()
+                                                  tmp = analyzeDataReactive()
                                                   
                                                   group_names = tmp$group_names
                                                   sampledata = tmp$sampledata
