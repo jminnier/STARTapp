@@ -31,7 +31,7 @@ shinyServer(function(input, output,session) {
   source("server-dotplot.R",local = TRUE)
   source("server-heatmap.R",local = TRUE)
   source("server-samplegroupplots.R",local=TRUE)
-  source("server-analysisres.r",local = TRUE)
+  source("server-analysisres.R",local = TRUE)
   source("server-data.R",local = TRUE)
   
 })
