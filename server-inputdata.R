@@ -268,12 +268,14 @@ analyzeDataReactive <-
                         dge <- DGEList(counts=countdata) #TMM normalization first
                         dge <- calcNormFactors(dge)
                         log2cpm <- cpm(dge, prior.count=0.5, log=TRUE)
-                        # v <- voom(dge,design,plot=FALSE)
-                        v <- voom(dge,design,plot=FALSE,normalize.method = "cyclicloess")
+                        if(max(colSums(design)==1)) {
+                          # if only one replicate for each group
+                          v <- voom(dge,normalize.method = "cyclicloess")
+                        }else{
+                          v <- voom(dge,design,plot=FALSE,normalize.method = "cyclicloess")
+                        }
+                        
                         # v <- voom(countdata,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
-                        
-                        
-                        
                         #fit <- lmFit(v,design)
                         #fit <- eBayes(fit)
                         
@@ -284,7 +286,7 @@ analyzeDataReactive <-
                         if(max(countdata)>1000) countdata2 = log2(countdata+0.5)
                         log2cpm = countdata2
                         expr_data = countdata2
-                        }
+                      }
                       
                       tmpgroup = sampledata$group
                       #contrasts(tmpgroup)
