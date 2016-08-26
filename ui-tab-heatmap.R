@@ -83,10 +83,19 @@ tabPanel("Heatmaps",
                                                          min= -20, max=20,value=c(-20,20))),
                             
                             checkboxInput("filter_maxgene",
-                                          "Show a maximum number of genes (recommended)",value=TRUE),
+                                          "Show a maximum number of genes",value=TRUE),
                             conditionalPanel(condition="input.filter_maxgene==true",    		
                                              numericInput("maxgenes",label="Choose Max # of Genes",
-                                                          min=1,max= 5000,value=100,step=1)) 
+                                                          min=1,max= 5000,value=100,step=1)),
+                            conditionalPanel(condition="input.filter_maxgene==false",
+                                             radioButtons("filter_maxgene5000",
+                                                           "WARNING: >5000 genes may cause memory limits to be reached and app may crash. Run app on local computer if heatmap of large number of genes required.",
+                                                           choices=c(
+                                                             "Restrict to 5000 genes for online viewing."="genes5000",
+                                                             "Do not restrict to 5000. Show all genes (may cause web app to crash)."="genesall"),
+                                                          selected="genes5000"
+                                             )
+                            )
            )
            
          )#,#sidebarPanel

@@ -132,19 +132,18 @@ output$heatmap_rna <- renderPlot({
 })
 
 
-
 output$heatmapplotly <- renderPlotly({
   if(input$action_heatmaps==0) return()
   #input$action_heatmaps
   print("heatmapplotly")
-  
+
   data_analyzed = analyzeDataReactive()
   subsetids = inputHeatmapSubsetReactive()
   
   isolate({ #avoid dependency on everything else except action_heatmaps
     print("drawing heatmap plotly")
     withProgress(message = "Drawing interactive heatmap, please wait",{
-      heatmap_render(
+        heatmap_render(
         data_analyzed=data_analyzed,
         yname = input$heatmapvaluename,
         interactive = TRUE,
@@ -161,9 +160,10 @@ output$heatmapplotly <- renderPlotly({
         filter_fc=input$filter_fc,
         fold_change_range=input$fold_change_range,
         fold_change_groups=input$fold_change_groups)
-    })
+  })
   })#isolate
 })
+
 
 
 # 
@@ -278,6 +278,7 @@ HeatdatReactive_rna <- reactive({
       input$cpm_range_HP,
       input$cpm_range_SM),
     fixed_genes_list=NULL)
+  print("HeatdatReactive_rna_finished")
   return(tmp)
 })
 
