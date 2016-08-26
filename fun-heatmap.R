@@ -37,6 +37,7 @@ heatmap_subdat <- function(data_analyzed,
                            filter_by_go=FALSE,
                            filter_fdr=FALSE,
                            filter_maxgene=TRUE,
+                           filter_maxgene5000="genes5000",
                            filter_cpm=FALSE,
                            filter_fc=FALSE,
                            fold_change_range=NULL,
@@ -103,6 +104,10 @@ heatmap_subdat <- function(data_analyzed,
     
     if(length(thesegenes)==0) {return(NULL)}
     
+    if((!filter_maxgene)&(filter_maxgene5000=="genes5000")) {
+      maxgenes=5000; filter_maxgene=TRUE
+      print("filter5000")
+      }
     
     if((filter_maxgene)&&(!is.null(maxgenes))) {
       tmpg = thesegenes[1:min(maxgenes,length(thesegenes))]
