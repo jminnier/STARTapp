@@ -126,7 +126,8 @@ analyzeDataReactive <-
                     
                     not_numeric <- function(input) {
                       if(sum(unlist(lapply(input,function(k) class(k)%in%c("numeric","integer"))))==0) {
-                        "Your data does not appear to be formatted correctly (no numeric columns). Please check your input file."
+                        "Your data does not appear to be formatted correctly (no numeric columns). 
+                        Please check your input file."
                       } else if (input == "") { 
                         FALSE
                       } else {
