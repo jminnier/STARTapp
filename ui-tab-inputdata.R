@@ -29,7 +29,8 @@ tabPanel("Input Data",
                           'RData from previous START upload'="previousrdata",
                           'Upload Data'="upload")),
            conditionalPanel(condition="input.use_example_file=='previousrdata'",
-                            fileInput('rdatafile','Upload Previously Downloaded RData File')
+                            fileInput('rdatafile','Upload Previously Downloaded RData File'),
+                            conditionalPanel("output.fileUploaded",h4(strong("Check data contents then click:")))
            ),
            conditionalPanel(condition="input.use_example_file=='upload'",
                             radioButtons("inputdat_type","Input Data Type:",
