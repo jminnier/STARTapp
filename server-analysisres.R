@@ -36,6 +36,10 @@ observe({
   
   updateSelectizeInput(session,'analysisres_groups',
                        choices=tmpgroups)
+  if(length(tmpgroups)==2) {
+    updateSelectizeInput(session,'analysisres_groups',
+                         choices=tmpgroups,selected = tmpgroups)
+  }
   
   updateRadioButtons(session,'scattervaluename',
                      choices=sort(tmpynames,decreasing = TRUE))
