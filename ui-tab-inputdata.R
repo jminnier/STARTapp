@@ -76,7 +76,8 @@ tabPanel("Input Data",
                                              selectInput("c_pval2",label="Last column # with p-values",choices=NULL)
                             )
            ),
-           conditionalPanel("output.fileUploaded",actionButton("upload_data","Submit Data"))
+           conditionalPanel("output.fileUploaded",actionButton("upload_data","Submit Data",
+                                                               style="color: #fff; background-color: #CD0000; border-color: #9E0000"))
          )#,
          # add reference group selection
          # add instructions
