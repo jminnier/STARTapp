@@ -28,19 +28,25 @@
 
 # change rna_volcanoplot to have an input function that depends on type of variables and then a plotting function
 # need to be more careful about what p-value (adjusted or raw) is used for colors
+# add option to label a set of genes (top 5, or name them)
 rna_volcanoplot <- function(data_results, geneids=NULL, 
                             test_sel=NULL,absFCcut=0,fdrcut=0.05) {
-  print(dim(data_results))
-  #group1 = group_sel[1]; group2 = group_sel[2]
   
   validate(need(mean(is.na(data_results$P.Value))<1,message = "All p-values are NA. 
                 Check to make sure you have replicates or >1 groups for statistical analysis."))
   
   
+  validate(need(test_sel%in%data_results$test,message = "Incompatable test selection. Check group names of file."))
+  
   #res = data_results%>%filter(test==paste0(group1,"/",group2))
-  if(test_sel%in%data_results$test) {
+  #if(test_sel%in%data_results$test) {
   res = data_results%>%filter(test==test_sel)
-  }else{res = data_results}
+  #}else{res = data_results}
+  
+  res = res%>%filter(!is.na(res$P.Value))
+  
+  validate(need(mean(is.na(res$P.Value))<1,message = "All p-values for this test are NA. 
+                Check to make sure you have replicates or >1 groups for statistical analysis."))
   
   usepadj=TRUE
   pvalname = "adj-pval"
@@ -50,25 +56,35 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
     pvalname = "pval"
   }
   
-  
-  
   res$color="None"
-  res$color[which(res$adj.P.Val<fdrcut)] = paste0(pvalname,"<",fdrcut, " & abs(logfc)<",absFCcut)
-  res$color[which(abs(res$logFC)>absFCcut)] = paste0(pvalname,">",fdrcut, " & abs(logfc)<",absFCcut)
-  res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<.05)==1)] = paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
-  res$color = factor(res$color,levels = c("None",paste0("adj-pval<",fdrcut, " & abs(logfc)<",absFCcut),
-                                          paste0(pvalname,">",fdrcut, " & abs(logfc)<",absFCcut),
-                                          paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
-                                          ))
-
+  res$color[which((abs(res$logFC)>absFCcut)*(res$P.Value<fdrcut)==1)] = paste0("pval","<",fdrcut," & abs(logfc)>",absFCcut)
+  res$color[which((abs(res$logFC)<absFCcut)*(res$P.Value<fdrcut)==1)] =  paste0("pval","<",fdrcut, " & abs(logfc)<",absFCcut)
+  res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<fdrcut)==1)] = paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
+  res$color[which((abs(res$logFC)<absFCcut)*(res$adj.P.Val<fdrcut)==1)] = paste0(pvalname,"<",fdrcut, " & abs(logfc)<",absFCcut)
+  #res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val>fdrcut)==1)] = paste0(pvalname,">",fdrcut, " & abs(logfc)>",absFCcut)
+  res$color = factor(res$color,levels = unique(c("None",
+                                                 paste0("pval","<",fdrcut, " & abs(logfc)<",absFCcut), # only exists if pval != pvalname 
+                                                 paste0(pvalname,"<",fdrcut," & abs(logfc)<",absFCcut), 
+                                                 paste0("pval","<",fdrcut, " & abs(logfc)>",absFCcut), # only exists if pval != pvalname 
+                                                 paste0(pvalname,"<",fdrcut, " & abs(logfc)>",absFCcut)
+  )))
   
   
-  p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+geom_point()+
-    scale_color_manual(values=c("black","red","orange","green"),name="Significance")
+  p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+geom_point()
+  
+  if(length(levels(res$color))>3) {
+    p <- p + scale_color_manual(values=c("grey40","grey60","green3","grey70","red2"),
+                       limits=levels(res$color),
+                       name="Significance")
+  }else{
+    p <- p +  scale_color_manual(values=c("grey40","green3","red2"),
+                                 limits=levels(res$color),
+                                 name="Significance")
+  }
   p <- p + theme_base() + theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
   g <- plotly_build(p)
-
+  
   
   #Match order of text to proper gene order
   newtext =  paste("Gene ID:",res$unique_id,"<br>",
@@ -76,14 +92,14 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
                    "logFC",signif(res$logFC,3),"<br>",
                    "P.Value",signif(res$P.Value,3),"<br>",
                    "adj.P.Val",signif(res$adj.P.Val,3))
-
+  
   for(ii in 1:length(g$data)) {
     tmpid = do.call(rbind,strsplit(g$data[[ii]]$text,"<br>"))[,4]
     g$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
   }
   
   g
-
+  
 }
 
 # switched from ggvis to plotly, this function is not currently used
