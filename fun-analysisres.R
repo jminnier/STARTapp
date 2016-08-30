@@ -33,7 +33,8 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
   print(dim(data_results))
   #group1 = group_sel[1]; group2 = group_sel[2]
   
-  validate(need(mean(is.na(data_results$P.Value))<1,message = "All p-values are NA. Check to make sure you have replicates for statistical analysis."))
+  validate(need(mean(is.na(data_results$P.Value))<1,message = "All p-values are NA. 
+                Check to make sure you have replicates or >1 groups for statistical analysis."))
   
   
   #res = data_results%>%filter(test==paste0(group1,"/",group2))

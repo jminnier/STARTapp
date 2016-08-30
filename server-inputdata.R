@@ -99,7 +99,6 @@ analyzeDataReactive <-
                     
                     print("analysisCountDataReactive")
                     
-                    
                     #if an example just return previously analyzed results
                     if(input$use_example_file=="examplecounts") {
                       
@@ -140,7 +139,6 @@ analyzeDataReactive <-
                       not_numeric(alldata)
                     )
                     
-                    
                     # remove empty columns
                     alldata = alldata[,colMeans(is.na(alldata))<1]
                     
@@ -180,6 +178,7 @@ analyzeDataReactive <-
                     geneids = geneids[tmpkeep,,drop=FALSE]
                     countdata = countdata[tmpkeep,,drop=FALSE]
                     
+                    validate(need(nrow(countdata)>0,message = "Your data is empty. Please check file format."))
                     
                     
                     geneids = geneids%>%unite_("unique_id",colnames(geneids),remove = FALSE)
@@ -265,8 +264,14 @@ analyzeDataReactive <-
                       
                       print("analyze data: counts")
                       
-                      design <- model.matrix(~0+sampledata$group) # allow selection of reference group
-                      colnames(design) = levels(as.factor(sampledata$group))
+                      # Only one group
+                      if(nlevels(sampledata$group)<2) {
+                        design <- matrix(1,nrow=nrow(sampledata),ncol=1)
+                        colnames(design) = "(Intercept)"
+                      }else{
+                        design <- model.matrix(~0+sampledata$group) # allow selection of reference group
+                        colnames(design) = levels(as.factor(sampledata$group))
+                      }
                       
                       if(dovoom) {
                         #voom+limma
@@ -295,30 +300,37 @@ analyzeDataReactive <-
                       
                       tmpgroup = sampledata$group
                       #contrasts(tmpgroup)
-                      
-                      lmobj_res = list()
-                      for(ii in 1:length(group_names)) {
-                        grp = relevel(tmpgroup,ref= group_names[ii] )
-                        lm.obj = lm(t(expr_data) ~ grp)
-                        beta.lm = t(lm.obj$coefficients)
-                        pval.lm = t(lm.pval(lm.obj)$pval)
-                        pval.adj.lm = apply(pval.lm,2,p.adjust,method="BH")
-                        
-                        colnames(beta.lm) = colnames(pval.lm) = colnames(pval.adj.lm) = 
-                          gsub("grp","",colnames(beta.lm))
-                        
-                        tmpout = cbind(melt(beta.lm[,-1,drop=FALSE]),
-                                       melt(pval.lm[,-1,drop=FALSE])$value,
-                                       melt(pval.adj.lm[,-1,drop=FALSE])$value)
-                        colnames(tmpout) = c("unique_id","numer_group","logFC","P.Value","adj.P.Val")
-                        tmpout$denom_group = group_names[ii]
-                        tmpout$test = with(tmpout, paste(numer_group,denom_group,sep="/"))
-                        tmpout = tmpout[,c("unique_id","test","denom_group","numer_group",
-                                           "logFC","P.Value","adj.P.Val")]
-                        
-                        lmobj_res[[ii]] = tmpout
+                      if(length(group_names)==1) { #If only one group no tests allowed
+                        lmobj_res = data.frame(matrix(NA,nrow=nrow(expr_data),ncol=6))
+                        colnames(lmobj_res) = c("test","dneom_group","numer_group","logFC","P.Value","adj.P.Val")
+                        lmobj_res = cbind("unique_id"=geneids$unique_id,lmobj_res)
+                        lmobj_res$numer_group = group_names[1]
+                        lmobj_res$test = "None"
+                      }else{
+                        lmobj_res = list()
+                        for(ii in 1:length(group_names)) {
+                          grp = relevel(tmpgroup,ref= group_names[ii] )
+                          lm.obj = lm(t(expr_data) ~ grp)
+                          beta.lm = t(lm.obj$coefficients)
+                          pval.lm = t(lm.pval(lm.obj)$pval)
+                          pval.adj.lm = apply(pval.lm,2,p.adjust,method="BH")
+                          
+                          colnames(beta.lm) = colnames(pval.lm) = colnames(pval.adj.lm) = 
+                            gsub("grp","",colnames(beta.lm))
+                          
+                          tmpout = cbind(melt(beta.lm[,-1,drop=FALSE]),
+                                         melt(pval.lm[,-1,drop=FALSE])$value,
+                                         melt(pval.adj.lm[,-1,drop=FALSE])$value)
+                          colnames(tmpout) = c("unique_id","numer_group","logFC","P.Value","adj.P.Val")
+                          tmpout$denom_group = group_names[ii]
+                          tmpout$test = with(tmpout, paste(numer_group,denom_group,sep="/"))
+                          tmpout = tmpout[,c("unique_id","test","denom_group","numer_group",
+                                             "logFC","P.Value","adj.P.Val")]
+                          
+                          lmobj_res[[ii]] = tmpout
+                        }
+                        lmobj_res = do.call(rbind,lmobj_res)
                       }
-                      lmobj_res = do.call(rbind,lmobj_res)
                       
                       pvals = lmobj_res%>%select(unique_id,test,adj.P.Val)%>%spread(test,adj.P.Val)
                       logfcs = lmobj_res%>%select(unique_id,test,logFC)%>%spread(test,logFC)
