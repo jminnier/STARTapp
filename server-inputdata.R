@@ -151,7 +151,8 @@ analyzeDataReactive <-
                       tmpexprcols = setdiff(1:ncol(alldata),tmpgenecols)
                       
                       validate(need(length(tmpexprcols)>0,
-                                    message = "Your last column has characters. Check that your count data is numeric."))
+                                    message = "Your last column has characters. Check that your count data is numeric and 
+                                    that your gene ids are in the first columns only."))
                       
                       tmpfccols = NULL
                       tmppvalcols = NULL
