@@ -27,12 +27,12 @@ observe({
   inFile <- input$datafile
   if(!is.null(inFile)) {
     
-    seqdata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, stringsAsFactors = FALSE)
+    seqdata <- read_delim(inFile$datapath, delim=input$sep)
     print('uploaded seqdata')
     
     if(ncol(seqdata)==1) {
       updateRadioButtons(session,'sep',selected="\t")
-      seqdata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, stringsAsFactors = FALSE)
+      seqdata <- read_delim(inFile$datapath, delim=input$sep)
       print('changed to tsv, uploaded seqdata')
     }
     
@@ -69,7 +69,7 @@ inputDataReactive <- reactive({
   
   if (is.null(inFile)) {
     if(input$use_example_file=="examplecounts") {
-      seqdata <- read.csv("data/mousecounts_example.csv",stringsAsFactors = FALSE)
+      seqdata <- read_csv("data/mousecounts_example.csv")
       
       print("uploaded mousecounts data")
       
@@ -79,7 +79,7 @@ inputDataReactive <- reactive({
       return(list("data"=data_results_table)) # this is so something shows in data upload window
     }else{return(NULL)}
   }else { # if uploading data
-    seqdata <- read.csv(inFile$datapath, header=TRUE, sep=input$sep, stringsAsFactors = FALSE)
+    seqdata <- read_delim(inFile$datapath, delim=input$sep)
   }
   
   return(list('data'=seqdata))
@@ -140,6 +140,10 @@ analyzeDataReactive <-
                       not_numeric(alldata)
                     )
                     
+                    
+                    # remove empty columns
+                    alldata = alldata[,colMeans(is.na(alldata))<1]
+                    
                     if(input$inputdat_type=="counts") {
                       numgeneids <- input$numgeneids
                       #catch incorrect gene id error, only works if geneids are 1:numgeneids and no other columns are characters
@@ -160,7 +164,6 @@ analyzeDataReactive <-
                                       "Number of fold change columns needs to be same number as p-value columns (and in the same order)."))
                     }
                     
-                    
                     #split expression names into groups
                     sampleid <- colnames(alldata[,tmpexprcols])
                     tmpnames <- do.call(rbind,strsplit(sampleid,"_",fixed=TRUE))
@@ -171,12 +174,13 @@ analyzeDataReactive <-
                     
                     countdata <- alldata[,tmpexprcols,drop=FALSE]
                     geneids <- alldata[,tmpgenecols,drop=FALSE]
+                    
                     tmpkeep = which(apply(is.na(geneids),1,mean)<1) #remove rows with no gene identifiers
                     print(paste0("Num genes kept after removing empty geneids: ",length(tmpkeep)," of ", nrow(geneids)))
-                    
-                    
                     geneids = geneids[tmpkeep,,drop=FALSE]
                     countdata = countdata[tmpkeep,,drop=FALSE]
+                    
+                    
                     
                     geneids = geneids%>%unite_("unique_id",colnames(geneids),remove = FALSE)
                     

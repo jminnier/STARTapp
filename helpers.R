@@ -41,6 +41,7 @@ library(markdown)
 library(NMF)
 library(scales)
 library(heatmaply)
+library(readr)
 
 ##================================================================================##
 
