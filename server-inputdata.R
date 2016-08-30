@@ -149,6 +149,10 @@ analyzeDataReactive <-
                       
                       tmpgenecols = 1:numgeneids
                       tmpexprcols = setdiff(1:ncol(alldata),tmpgenecols)
+                      
+                      validate(need(length(tmpexprcols)>0,
+                                    message = "Your last column has characters. Check that your count data is numeric."))
+                      
                       tmpfccols = NULL
                       tmppvalcols = NULL
                     }
@@ -175,10 +179,11 @@ analyzeDataReactive <-
                     
                     tmpkeep = which(apply(is.na(geneids),1,mean)<1) #remove rows with no gene identifiers
                     print(paste0("Num genes kept after removing empty geneids: ",length(tmpkeep)," of ", nrow(geneids)))
+                    
+                    validate(need(length(tmpkeep)>0,message = "Your data is empty. Please check file format."))
+                    
                     geneids = geneids[tmpkeep,,drop=FALSE]
                     countdata = countdata[tmpkeep,,drop=FALSE]
-                    
-                    validate(need(nrow(countdata)>0,message = "Your data is empty. Please check file format."))
                     
                     
                     geneids = geneids%>%unite_("unique_id",colnames(geneids),remove = FALSE)
@@ -193,6 +198,7 @@ analyzeDataReactive <-
                     }
                     
                     #add in catch for if length(tmpkeep) = 0
+                    
                     
                     #add filter for max # counts
                     
