@@ -147,9 +147,10 @@ analyzeDataReactive <-
                       numgeneids <- 0
                       #catch incorrect gene id error, only works if geneids are 1:numgeneids and no other columns are characters
                       numgeneids = max(numgeneids,max(which(sapply(alldata,class)=="character")))
-                      validate(need(numgeneids>0),
+                      validate(need(numgeneids>0,
                                message = "You have no columns with characters, check that you have at least one column of gene ids in your file.")
-                      
+                      )
+                               
                       tmpgenecols = 1:numgeneids
                       tmpexprcols = setdiff(1:ncol(alldata),tmpgenecols)
                       
