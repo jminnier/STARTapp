@@ -155,7 +155,7 @@ heatmap_data <- function(...) {
   }
 }
 
-heatmap_render <- function(yname,interactive=FALSE,...)  {
+heatmap_render <- function(yname,interactive=FALSE,heatmap_rowlabels=TRUE,...)  {
   #possible inputs
   tmpdat <- heatmap_subdat(yname,...)
   
@@ -189,10 +189,16 @@ heatmap_render <- function(yname,interactive=FALSE,...)  {
     #         ColSideColors = rainbow(max(tcols))[tcols],
     #         margins=c(5,10))
     
+    acexRow = min(0.2 + 1/log10(nrow(heatdat_rowmean)), 1.2) # default aheatmap cexRow
+    lmargin = 300
+    if(!heatmap_rowlabels) {acexRow = 0; lmargin = 0}
+    
     if(interactive) {
-      heatmaply(heatdat_rowmean,colors=color.palette(100))%>% layout(margin = list(l = 300, b = 100))
+      heatmaply(heatdat_rowmean,colors=color.palette(100))%>% layout(margin = list(l = lmargin, b = 100))
     }else{
-      aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",labRow = rownames(heatdat),revC=TRUE,
+      aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",
+               cexRow=acexRow,
+               revC=TRUE,
              annCol=data.frame("group"=as.factor(do.call(rbind,strsplit(colnames(heatdat),"_"))[,1])))
     }
   }

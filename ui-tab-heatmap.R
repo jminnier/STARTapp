@@ -86,20 +86,26 @@ tabPanel("Heatmaps",
                                           "Show a maximum number of genes (WARNING: Selecting >5000 genes may be slow to load. If app crashes memory limits have been reached and you should run from local computer via github.)",value=TRUE),
                             conditionalPanel(condition="input.filter_maxgene==true",    		
                                              numericInput("maxgenes",label="Choose Max # of Genes",
-                                                          min=1,max= 10000,value=100,step=1))
+                                                          min=1,max= 10000,value=100,step=1)),
                             
-#                             #conditionalPanel(condition="output.numgenes>9000",
-#                             conditionalPanel(condition="input.filter_maxgene==false",    
-#                                              radioButtons("filter_maxgeneN",
-#                                                           "WARNING: >10000 genes may be slow to 
-# load and may cause memory limits to be reached and app may crash. 
-# Run app on local computer if heatmap of large number of genes and samples required.",
-#                                                           choices=c(
-#                                                             "Restrict to 10k genes for online viewing."="genesN",
-#                                                             "Do not restrict to 10k. Show all genes (may cause web app to crash)."="genesall"),
-#                                                           selected="genesN"
-#                                              )
-#                             )
+                            #                             #conditionalPanel(condition="output.numgenes>9000",
+                            #                             conditionalPanel(condition="input.filter_maxgene==false",    
+                            #                                              radioButtons("filter_maxgeneN",
+                            #                                                           "WARNING: >10000 genes may be slow to 
+                            # load and may cause memory limits to be reached and app may crash. 
+                            # Run app on local computer if heatmap of large number of genes and samples required.",
+                            #                                                           choices=c(
+                            #                                                             "Restrict to 10k genes for online viewing."="genesN",
+                            #                                                             "Do not restrict to 10k. Show all genes (may cause web app to crash)."="genesall"),
+                            #                                                           selected="genesN"
+                            #                                              )
+                            #                             )
+                            
+                            h3("Visualization Settings"),
+                            
+                            checkboxInput("heatmap_rowlabels",
+                                          "Show gene (row) labels",value = TRUE
+                                          )
            )
            
          )#,#sidebarPanel

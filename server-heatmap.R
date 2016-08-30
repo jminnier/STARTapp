@@ -127,7 +127,8 @@ output$heatmap_rna <- renderPlot({
         # filter_cpm=input$filter_cpm,
         filter_fc=input$filter_fc,
         fold_change_range=input$fold_change_range,
-        fold_change_groups=input$fold_change_groups)
+        fold_change_groups=input$fold_change_groups,
+        heatmap_rowlabels=input$heatmap_rowlabels)
     })
   })#isolate
 })
@@ -161,7 +162,8 @@ output$heatmapplotly <- renderPlotly({
         # filter_cpm=input$filter_cpm,
         filter_fc=input$filter_fc,
         fold_change_range=input$fold_change_range,
-        fold_change_groups=input$fold_change_groups)
+        fold_change_groups=input$fold_change_groups,
+        heatmap_rowlabels=input$heatmap_rowlabels)
   })
   })#isolate
 })
