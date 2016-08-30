@@ -53,9 +53,9 @@ tabPanel("Input Data",
                                              img(src="examplecounts.png",width="100%"),
                                              p("File must have a header row. First column(s) must be gene identifiers. Column names of 
                                                  count data must include group names and replicate number in this format:
-                                Group1_1, Group1_2, Group2_1, Group2_2..."),
-                                             numericInput("numgeneids",label="Number of columns with gene identifiers",
-                                                          min=1,max= 50,value=1,step=1)
+                                Group1_1, Group1_2, Group2_1, Group2_2...")#,
+                                             # numericInput("numgeneids",label="Number of columns with gene identifiers",
+                                             #              min=1,max= 50,value=1,step=1)
                             ),
                             conditionalPanel(condition="input.inputdat_type=='analyzed'",
                                              downloadLink("example_analysis_file",label="Download Example Analysis Results File"),

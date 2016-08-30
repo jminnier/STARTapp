@@ -143,16 +143,19 @@ analyzeDataReactive <-
                     alldata = alldata[,colMeans(is.na(alldata))<1]
                     
                     if(input$inputdat_type=="counts") {
-                      numgeneids <- input$numgeneids
+                      #numgeneids <- input$numgeneids
+                      numgeneids <- 0
                       #catch incorrect gene id error, only works if geneids are 1:numgeneids and no other columns are characters
                       numgeneids = max(numgeneids,max(which(sapply(alldata,class)=="character")))
+                      validate(need(numgeneids>0),
+                               message = "You have no columns with characters, check that you have at least one column of gene ids in your file.")
                       
                       tmpgenecols = 1:numgeneids
                       tmpexprcols = setdiff(1:ncol(alldata),tmpgenecols)
                       
                       validate(need(length(tmpexprcols)>0,
                                     message = "Your last column has characters. Check that your count data is numeric and 
-                                    that your gene ids are in the first columns only."))
+                                    that your gene ids are in the first (left) columns only."))
                       
                       tmpfccols = NULL
                       tmppvalcols = NULL
