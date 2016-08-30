@@ -31,45 +31,52 @@ customHeaderPanel <- function(title,windowTitle=title){
     )
   )
 }
+
 # collects all of the tab UIs
 #shinyUI(
 #
 
-navbarPage(
-  fluid = TRUE,
-  theme = "bootstrap.min.united.updated.css",
-  #United theme from http://bootswatch.com/
-  #customHeaderPanel(title="START: RNAseq Analysis and Visualization Resource"),#img(src="KCardio_CMYK_4C_pos_small.jpg",height=50,width= 92,align="right")	,
-  title="START: Shiny Transcriptome Analysis Resource Tool",
-  ## =========================================================================== ##
-  ## DOWNLOAD DATA TABS
-  ## =========================================================================== ##
-  source("ui-tab-inputdata.R",local=TRUE)$value,
-  ## =========================================================================== ##
-  ## Visualization TABS
-  ## =========================================================================== ##
-  source("ui-tab-samplegroupplots.R",local=TRUE)$value,
-  source("ui-tab-analysisres.R",local=TRUE)$value,
-  source("ui-tab-dotplot.R",local=TRUE)$value,
-  source("ui-tab-heatmap.R",local=TRUE)$value,
-  ## ============================================================================ ##
-  ## INFO TAB
-  ## ============================================================================ ##   
-  tabPanel("Info",
-           includeMarkdown("instructions/Instructions.md")),#end definitions of tabs, now footer
-  
-  ## ==================================================================================== ##
-  ## FOOTER
-  ## ==================================================================================== ##              
-  footer=p(hr(),p("ShinyApp created by ", strong("{Jessica Minnier + Jiri Sklenar + Jonathan Nelson}")," of ",align="center",width=4),
-           p(("Knight Cardiovascular Institute, Oregon Health & Science University"),align="center",width=4),
-           p(("Copyright (C) 2016, code licensed under GPLv3"),align="center",width=4),
-           p(("Code available on Github:"),a("https://github.com/jminnier/STARTapp",href="https://github.com/jminnier/STARTapp"),align="center",width=4)
+tagList(
+  tags$head(
+    tags$style(HTML(" .shiny-output-error-validation {color: darkred; } "))
   ),
+  navbarPage(
+    
+    theme = "bootstrap.min.united.updated.css",
+    #United theme from http://bootswatch.com/
+    #customHeaderPanel(title="START: RNAseq Analysis and Visualization Resource"),#img(src="KCardio_CMYK_4C_pos_small.jpg",height=50,width= 92,align="right")	,
+    title = "START: Shiny Transcriptome Analysis Resource Tool",
+    ## =========================================================================== ##
+    ## DOWNLOAD DATA TABS
+    ## =========================================================================== ##
+    source("ui-tab-inputdata.R",local=TRUE)$value,
+    ## =========================================================================== ##
+    ## Visualization TABS
+    ## =========================================================================== ##
+    source("ui-tab-samplegroupplots.R",local=TRUE)$value,
+    source("ui-tab-analysisres.R",local=TRUE)$value,
+    source("ui-tab-dotplot.R",local=TRUE)$value,
+    source("ui-tab-heatmap.R",local=TRUE)$value,
+    ## ============================================================================ ##
+    ## INFO TAB
+    ## ============================================================================ ##   
+    tabPanel("Info",
+             includeMarkdown("instructions/Instructions.md")),#end definitions of tabs, now footer
+    
+    ## ==================================================================================== ##
+    ## FOOTER
+    ## ==================================================================================== ##              
+    footer=p(hr(),p("ShinyApp created by ", strong("{Jessica Minnier + Jiri Sklenar + Jonathan Nelson}")," of ",align="center",width=4),
+             p(("Knight Cardiovascular Institute, Oregon Health & Science University"),align="center",width=4),
+             p(("Copyright (C) 2016, code licensed under GPLv3"),align="center",width=4),
+             p(("Code available on Github:"),a("https://github.com/jminnier/STARTapp",href="https://github.com/jminnier/STARTapp"),align="center",width=4)
+    ),
+    
+    ## ==================================================================================== ##
+    ## end
+    ## ==================================================================================== ## 
+    tags$head(includeScript("google-analytics.js"))
+  ) #end navbarpage
+) #end taglist
   
-  ## ==================================================================================== ##
-  ## end
-  ## ==================================================================================== ## 
-  tags$head(includeScript("google-analytics.js"))
-) #end Navbar
-
+  
