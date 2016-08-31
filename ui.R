@@ -38,7 +38,8 @@ customHeaderPanel <- function(title,windowTitle=title){
 
 tagList(
   tags$head(
-    tags$style(HTML(" .shiny-output-error-validation {color: darkred; } "))
+    tags$style(HTML(" .shiny-output-error-validation {color: darkred; } ")),
+    tags$style(".mybuttonclass{background-color:#CD0000;} .mybuttonclass{color: #fff;} .mybuttonclass{border-color: #9E0000;}")
   ),
   navbarPage(
     
@@ -46,6 +47,7 @@ tagList(
     #United theme from http://bootswatch.com/
     #customHeaderPanel(title="START: RNAseq Analysis and Visualization Resource"),#img(src="KCardio_CMYK_4C_pos_small.jpg",height=50,width= 92,align="right")	,
     title = "START: Shiny Transcriptome Analysis Resource Tool",
+    source("ui-tab-landing.R",local=TRUE)$value,
     ## =========================================================================== ##
     ## DOWNLOAD DATA TABS
     ## =========================================================================== ##
@@ -57,11 +59,11 @@ tagList(
     source("ui-tab-analysisres.R",local=TRUE)$value,
     source("ui-tab-dotplot.R",local=TRUE)$value,
     source("ui-tab-heatmap.R",local=TRUE)$value,
+    source("ui-tab-help.R",local=TRUE)$value,
+    #end definitions of tabs, now footer
     ## ============================================================================ ##
     ## INFO TAB
     ## ============================================================================ ##   
-    tabPanel("Info",
-             includeMarkdown("instructions/Instructions.md")),#end definitions of tabs, now footer
     
     ## ==================================================================================== ##
     ## FOOTER
@@ -78,5 +80,4 @@ tagList(
     tags$head(includeScript("google-analytics.js"))
   ) #end navbarpage
 ) #end taglist
-  
-  
+

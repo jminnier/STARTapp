@@ -10,8 +10,7 @@ The app is hosted on shinyapps: https://kcvi.shinyapps.io/START/
 
 Code can be found on github: https://github.com/jminnier/STARTapp
 
-
-# Input Data 
+## Input Data
 
 Either select the example data set or upload your own data file. After uploading a file and selecting the appropriate options, you must click the “Submit Data” button to populate the app’s visualizations with your data.
 
@@ -25,7 +24,7 @@ You may upload an .RData file that you previously downloaded from the START app.
 
 ### Upload Data
 
-You may upload your data in two formats, raw counts, or analyzed data.
+You may upload your data in two formats, counts, or analyzed data.
 
 You must include at least one gene identifier or name.
 
@@ -35,8 +34,7 @@ The names of your expression/counts must be in the format: “group1_1” where 
 
 #### Raw Data: Gene Counts
 
- 
-Raw counts contain read counts for each gene for each sample, along with gene identifiers.
+Count data contains read counts for each gene for each sample, along with gene identifiers.
 
 Analysis: When raw counts are uploaded, the data is then analyzed by the app. The app uses the voom method from the ‘limma’ Bioconductor package to transform the raw counts into logged and normalized intensity values. These values are then analyzed via linear regression where gene intensity is regressed on the group factor. P-values from all pairwise regression tests for group effect are computed and Benjamini-Hochberg false discovery rate adjusted p-values are computed for each pairwise comparison. The “log2cpm” values are the log2-counts-per-million values. The “log2cpm_voom” values are the normalized logcpm values from the voom method.  Both methods use an offset of 0.5, which means 0.5 is added to all count values before normalizing (in the case of voom) and log transforming so that 0 counts have non infinite values.
 
