@@ -20,13 +20,14 @@
 
 
 observe({
-  
+  # Check if example selected, or if not then ask to upload a file.
   validate(
-    need((input$use_example_file!="upload")|((!is.null(input$rdatafile))|(!is.null(input$datafile))), "Please select a file")
+    need((input$data_file_type=="examplecounts")|((!is.null(input$rdatafile))|(!is.null(input$datafile))), 
+         message = "Please select a file")
   )
   inFile <- input$datafile
   if(!is.null(inFile)) {
-    
+    # update options for various analyzed data columns
     if(input$inputdat_type=="analyzed") {
       tmpcols = colnames(seqdata)
       updateSelectInput(session,"c_geneid1",choices =tmpcols)
@@ -51,20 +52,19 @@ inputDataReactive <- reactive({
   # column will contain the local filenames where the data can
   # be found.
   print("inputting data")
-  
+  # Check if example selected, or if not then ask to upload a file.
   validate(
-    need((input$use_example_file=="examplecounts")|(!is.null(input$rdatafile))|(!is.null(input$datafile)), "Please select a file")
+    need((input$data_file_type=="examplecounts")|((!is.null(input$rdatafile))|(!is.null(input$datafile))), 
+         message = "Please select a file")
   )
   inFile <- input$datafile
   
-  
   if (is.null(inFile)) {
-    if(input$use_example_file=="examplecounts") {
+    if(input$data_file_type=="examplecounts") {
+      # upload example data
       seqdata <- read_csv("data/mousecounts_example.csv")
-      
       print("uploaded mousecounts data")
-      
-    }else if(input$use_example_file=="previousrdata"){
+    }else if(input$data_file_type=="previousrdata"){
       inRfile <- input$rdatafile
       load(inRfile$datapath,envir=environment())
       return(list("data"=data_results_table)) # this is so something shows in data upload window
@@ -72,15 +72,17 @@ inputDataReactive <- reactive({
   }else { # if uploading data
     seqdata <- read_csv(inFile$datapath)
     print('uploaded seqdata')
-    if(ncol(seqdata)==1) {
+    if(ncol(seqdata)==1) { # if file appears not to work as csv try tsv
       seqdata <- read_tsv(inFile$datapath)
       print('changed to tsv, uploaded seqdata')
     }
+    validate(need(ncol(seqdata)>1,
+                  message="File appears to be one column. Check that it is a comma-separated (.csv) file."))
   }
   return(list('data'=seqdata))
 })
 
-
+# check if a file has been uploaded and create output variable to report this
 output$fileUploaded <- reactive({
   return(!is.null(inputDataReactive()))
 })
@@ -95,8 +97,7 @@ analyzeDataReactive <-
                     print("analysisCountDataReactive")
                     
                     #if an example just return previously analyzed results
-                    if(input$use_example_file=="examplecounts") {
-                      
+                    if(input$data_file_type=="examplecounts") {
                       load('data/mousecounts_example_analysis_results.RData')
                       load('data/mousecounts_example_analyzed.RData') #example_data_results
                       return(list('group_names'=group_names,'sampledata'=sampledata,
@@ -106,7 +107,7 @@ analyzeDataReactive <-
                     
                     #if uploading own data:
                     
-                    if(input$use_example_file=="previousrdata"){
+                    if(input$data_file_type=="previousrdata"){
                       inRfile <- input$rdatafile
                       load(inRfile$datapath,envir=environment())
                       
@@ -118,6 +119,7 @@ analyzeDataReactive <-
                     
                     alldata <- inputDataReactive()$data
                     
+                    # Check for numeric columns
                     not_numeric <- function(input) {
                       if(sum(unlist(lapply(input,function(k) class(k)%in%c("numeric","integer"))))==0) {
                         "Your data does not appear to be formatted correctly (no numeric columns). 
@@ -129,7 +131,6 @@ analyzeDataReactive <-
                       }
                     }
                     
-                    
                     validate(
                       not_numeric(alldata)
                     )
@@ -138,14 +139,14 @@ analyzeDataReactive <-
                     alldata = alldata[,colMeans(is.na(alldata))<1]
                     
                     if(input$inputdat_type=="counts") {
-                      #numgeneids <- input$numgeneids
                       numgeneids <- 0
+                      
                       #catch incorrect gene id error, only works if geneids are 1:numgeneids and no other columns are characters
                       numgeneids = max(numgeneids,max(which(sapply(alldata,class)=="character")))
                       validate(need(numgeneids>0,
-                               message = "You have no columns with characters, check that you have at least one column of gene ids in your file.")
+                                    message = "You have no columns with characters, check that you have at least one column of gene ids in your file.")
                       )
-                               
+                      
                       tmpgenecols = 1:numgeneids
                       tmpexprcols = setdiff(1:ncol(alldata),tmpgenecols)
                       
@@ -178,14 +179,15 @@ analyzeDataReactive <-
                     geneids <- alldata[,tmpgenecols,drop=FALSE]
                     
                     tmpkeep = which(apply(is.na(geneids),1,mean)<1) #remove rows with no gene identifiers
-                    print(paste0("Num genes kept after removing empty geneids: ",length(tmpkeep)," of ", nrow(geneids)))
+                    print(paste0("Num genes kept after removing empty geneids: ",
+                                 length(tmpkeep)," of ", nrow(geneids)))
                     
-                    validate(need(length(tmpkeep)>0,message = "Your data is empty. Please check file format."))
+                    validate(need(length(tmpkeep)>0,message = "Your data is empty. Please check file format is .csv. You may need a non-empty gene identifier column."))
                     
                     geneids = geneids[tmpkeep,,drop=FALSE]
                     countdata = countdata[tmpkeep,,drop=FALSE]
                     
-                    
+                    # Create unique identifier
                     geneids = geneids%>%unite_("unique_id",colnames(geneids),remove = FALSE)
                     
                     #if geneids not unique
@@ -194,15 +196,11 @@ analyzeDataReactive <-
                         mutate(rn=row_number(unique_id),new=
                                  ifelse(rn==1,unique_id,paste(unique_id,rn,sep="_")))%>%
                         ungroup()%>%mutate(unique_id=new)%>%select(-rn,-new)
-                      
                     }
-                    
-                    #add in catch for if length(tmpkeep) = 0
-                    
                     
                     #add filter for max # counts
                     
-                    #handle NAs 
+                    #handle NAs, update this later
                     countdata[which(is.na(countdata),arr.ind=T)] <- 0 #allow choice of this or removal
                     rownames(countdata) = geneids$unique_id
                     
@@ -251,6 +249,7 @@ analyzeDataReactive <-
                       #   }
                       # }
                       
+                      # Check if data appears to be integer counts. If not, skip voom.
                       datacounts <- function(input) {
                         remainder = sum(apply(input,2,function(k) sum(k%%1,na.rm=T)),na.rm=T)
                         if (remainder ==0) {
@@ -299,6 +298,7 @@ analyzeDataReactive <-
                       }else{
                         print("not doing voom")
                         countdata2 = countdata
+                        # crude check for logged data, unlikely to have a logged value >1000
                         if(max(countdata)>1000) countdata2 = log2(countdata+0.5)
                         log2cpm = countdata2
                         expr_data = countdata2
@@ -306,7 +306,7 @@ analyzeDataReactive <-
                       
                       tmpgroup = sampledata$group
                       #contrasts(tmpgroup)
-                      if(length(group_names)==1) { #If only one group no tests allowed
+                      if(length(group_names)==1) { #If only one group no tests
                         lmobj_res = data.frame(matrix(NA,nrow=nrow(expr_data),ncol=6))
                         colnames(lmobj_res) = c("test","dneom_group","numer_group","logFC","P.Value","adj.P.Val")
                         lmobj_res = cbind("unique_id"=geneids$unique_id,lmobj_res)
@@ -338,6 +338,7 @@ analyzeDataReactive <-
                         lmobj_res = do.call(rbind,lmobj_res)
                       }
                       
+                      # matrix of pvalues with each column a type of test, same for logfc
                       pvals = lmobj_res%>%select(unique_id,test,adj.P.Val)%>%spread(test,adj.P.Val)
                       logfcs = lmobj_res%>%select(unique_id,test,logFC)%>%spread(test,logFC)
                       
@@ -390,13 +391,15 @@ output$countdataDT <- renderDataTable({
 })
 
 observeEvent(input$upload_data, ({
-  updateCollapse(session,id =  "input_collapse_panel", open="analysis_panel",style = list("analysis_panel" = "success",
-                                                                                          "data_panel"="primary"))
+  updateCollapse(session,id =  "input_collapse_panel", open="analysis_panel",
+                 style = list("analysis_panel" = "success",
+                              "data_panel"="primary"))
 }))
 
 observeEvent(inputDataReactive(),({
-  updateCollapse(session,id =  "input_collapse_panel", open="data_panel",style = list("analysis_panel" = "default",
-                                                                                      "data_panel"="success"))
+  updateCollapse(session,id =  "input_collapse_panel", open="data_panel",
+                 style = list("analysis_panel" = "default",
+                              "data_panel"="success"))
 })
 )
 
