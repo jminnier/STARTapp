@@ -24,43 +24,40 @@
 tabPanel("Input Data", 
          fluidRow(column(4,wellPanel(
            downloadLink("instructionspdf",label="Download Instructions (pdf)"),
-           radioButtons('use_example_file','Use example file or upload your own data',
-                        c('Example: RNA-seq gene counts'="examplecounts",
-                          'RData from previous START upload'="previousrdata",
-                          'Upload Data'="upload")),
-           conditionalPanel(condition="input.use_example_file=='previousrdata'",
+           radioButtons('data_file_type','Use example file or upload your own data',
+                        c('Upload Data'="upload",
+                          'START RData file'="previousrdata",
+                          'Example Data'="examplecounts"
+                        ),selected = "examplecounts"),
+           conditionalPanel(condition="input.data_file_type=='previousrdata'",
                             fileInput('rdatafile','Upload Previously Downloaded RData File'),
                             conditionalPanel("output.fileUploaded",h4(strong("Check data contents then click:")))
            ),
-           conditionalPanel(condition="input.use_example_file=='upload'",
+           conditionalPanel(condition="input.data_file_type=='upload'",
                             radioButtons("inputdat_type","Input Data Type:",
-                                         c("Count data: Gene Counts"="counts",
+                                         c("Expression data: Gene Counts or log-expression"="counts",
                                            #"Microarray expression data"="microarray",
                                            "Analyzed data: Expression Values, p-values, fold changes"="analyzed")),
-                            # radioButtons('sep', 'Separator',
-                            #              c(Comma=',',
-                            #                Tab='\t'),
-                            #              ',',inline = TRUE),
-                            tags$hr(),
-                            
                             conditionalPanel(condition="input.inputdat_type=='counts'",
                                              downloadLink("example_counts_file",label="Download Example Count File"),
                                              p(""),
                                              img(src="examplecounts.png",width="100%"),
-                                             p("File must have a header row. First column(s) must be gene identifiers. 
-Column names of 
-                                                 count data must include group names and replicate number in this format:
-                                Group1_1, Group1_2, Group2_1, Group2_2...")#,
-                                             # numericInput("numgeneids",label="Number of columns with gene identifiers",
-                                             #              min=1,max= 50,value=1,step=1)
+                                             tags$ul(
+                                               tags$li("File must have a header row."), 
+                                               tags$li("First/Left-hand column(s) must be gene identifiers."), 
+                                               tags$li("Format expression column names as GROUPNAME_REPLICATE#: Group1_1, Group1_2, Group2_1, Group2_2...")
+                                             )
                             ),
                             conditionalPanel(condition="input.inputdat_type=='analyzed'",
                                              downloadLink("example_analysis_file",label="Download Example Analysis Results File"),
                                              p(""),
                                              img(src="exampleanalysisdata.png",width="100%"),
-                                             #a("<img src=`exampleanalysisdata.tiff` width=100%>"),href="www.google.com",target="_blank"),
-                                             p("File must have a header row. Column names of expression values must be in the format
-                                Group1_1, Group1_2, Group2_1, Group2_2... Number/order of fold changes must match p-values.")),
+                                             tags$ul(
+                                               tags$li("File must have a header row."), 
+                                               tags$li("Format expression column names as GROUPNAME_REPLICATE#: Group1_1, Group1_2, Group2_1, Group2_2..."),
+                                               tags$li("Number & order of fold changes must MATCH p-value number & order.")
+                                             )
+                            ),
                             fileInput('datafile', 'Choose File Containing Data (.CSV)',
                                       accept=c('text/csv', 
                                                'text/comma-separated-values,text/plain', 
@@ -78,8 +75,9 @@ Column names of
                                              selectInput("c_pval2",label="Last column # with p-values",choices=NULL)
                             )
            ),
-           conditionalPanel("output.fileUploaded",actionButton("upload_data","Submit Data",
-                                                               style="color: #fff; background-color: #CD0000; border-color: #9E0000"))
+           conditionalPanel("output.fileUploaded",
+                            actionButton("upload_data","Submit Data",
+                                         style="color: #fff; background-color: #CD0000; border-color: #9E0000"))
          )#,
          # add reference group selection
          # add instructions
@@ -96,8 +94,11 @@ Column names of
                            ),
                            bsCollapsePanel(title="Analysis Results: Ready to View Other Tabs",value="analysis_panel",
                                            downloadButton('downloadResults_CSV','Save Results as CSV File'),
-                                           downloadButton('downloadResults_RData','Save Results as RData File for Future Upload'),
-                                           dataTableOutput('analysisoutput')
+                                           downloadButton('downloadResults_RData',
+                                                          'Save Results as START RData File for Future Upload',
+                                                          class="mybuttonclass"),
+                                           dataTableOutput('analysisoutput'),
+                                           tags$head(tags$style(".mybuttonclass{background-color:#CD0000;} .mybuttonclass{color: #fff;} .mybuttonclass{border-color: #9E0000;}"))
                            )
                 )#bscollapse
          )#column
