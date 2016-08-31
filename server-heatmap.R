@@ -110,7 +110,12 @@ output$heatmap_rna <- renderPlot({
   
   isolate({ #avoid dependency on everything else except action_heatmaps
     print("drawing heatmap rna")
-    withProgress(message = "Drawing heatmap, please wait",{
+    
+    tmp = HeatdatReactive_rna()
+    #return(as.character(nrow(tmp)))
+    tmpnum = ifelse(is.null(tmp),0,nrow(tmp))
+    
+    withProgress(message = paste("Drawing heatmap for", tmpnum, "genes, please wait."),{
       heatmap_render(
         data_analyzed=data_analyzed,
         yname = input$heatmapvaluename,
