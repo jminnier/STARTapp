@@ -27,15 +27,6 @@ observe({
   inFile <- input$datafile
   if(!is.null(inFile)) {
     
-    seqdata <- read_delim(inFile$datapath, delim=input$sep)
-    print('uploaded seqdata')
-    
-    if(ncol(seqdata)==1) {
-      updateRadioButtons(session,'sep',selected="\t")
-      seqdata <- read_delim(inFile$datapath, delim=input$sep)
-      print('changed to tsv, uploaded seqdata')
-    }
-    
     if(input$inputdat_type=="analyzed") {
       tmpcols = colnames(seqdata)
       updateSelectInput(session,"c_geneid1",choices =tmpcols)
@@ -79,9 +70,13 @@ inputDataReactive <- reactive({
       return(list("data"=data_results_table)) # this is so something shows in data upload window
     }else{return(NULL)}
   }else { # if uploading data
-    seqdata <- read_delim(inFile$datapath, delim=input$sep)
+    seqdata <- read_csv(inFile$datapath)
+    print('uploaded seqdata')
+    if(ncol(seqdata)==1) {
+      seqdata <- read_tsv(inFile$datapath)
+      print('changed to tsv, uploaded seqdata')
+    }
   }
-  
   return(list('data'=seqdata))
 })
 
