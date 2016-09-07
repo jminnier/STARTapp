@@ -9,9 +9,9 @@ output: html_document
 
 #### <a name="features"></a> Features
 
-<img src="explot_pca.png" alt="PCA Plot" style="width: 25%"/>
-<img src="explot_boxplot.png" alt="Box Plot" style="width: 25%"/>
-<img src="explot_heatmap.png" alt="Heatmap" style="width: 25%"/>
+<img src="explot_pca.png" alt="PCA Plot" style="width: 20%"/>
+<img src="explot_boxplot.png" alt="Box Plot" style="width: 20%"/>
+<img src="explot_heatmap.png" alt="Heatmap" style="width: 20%"/>
 <img src="explot_volcano.png" alt="Volcano Plot" style="width: 25%"/>
 
 *Visualize your data:*
@@ -49,9 +49,9 @@ to download an .RData file to upload your data to START with one click.
 Next time use the "Input Data" tab --> "START RData file" option.
 
 
-#### <a name="help"></a>Help
+#### <a name="help"></a>Help & Info
 
-Additional help information is provided under the "Help" tab.
+Additional help information is provided under the "Info" tab.
 
 #### App Info
 The START app has been developed by Jessica Minnier, Jiri Sklenar, Anthony Paul Barnes, and Jonathan Nelson
