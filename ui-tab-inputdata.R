@@ -30,7 +30,7 @@ tabPanel("Input Data",
                           'Example Data'="examplecounts"
                         ),selected = "examplecounts"),
            conditionalPanel(condition="input.data_file_type=='previousrdata'",
-                            fileInput('rdatafile','Upload Previously Downloaded RData File'),
+                            fileInput('rdatafile','Upload START Generated RData File'),
                             conditionalPanel("output.fileUploaded",h4(strong("Check data contents then click:")))
            ),
            conditionalPanel(condition="input.data_file_type=='upload'",
