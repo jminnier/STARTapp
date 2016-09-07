@@ -1,4 +1,4 @@
-tabPanel("Help",
+tabPanel("Info",
          fluidRow(
            column(4,wellPanel(
              h4("Help"),
