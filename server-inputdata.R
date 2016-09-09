@@ -29,6 +29,8 @@ observe({
   if(!is.null(inFile)) {
     # update options for various analyzed data columns
     if(input$inputdat_type=="analyzed") {
+      print("updating analyzed data choices")
+      seqdata <- inputDataReactive()$data
       tmpcols = colnames(seqdata)
       updateSelectInput(session,"c_geneid1",choices =tmpcols)
       updateSelectInput(session,"c_geneid2",choices =tmpcols)
