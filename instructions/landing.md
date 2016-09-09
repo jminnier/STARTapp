@@ -49,9 +49,9 @@ to download an .RData file to upload your data to START with one click.
 Next time use the "Input Data" tab --> "START RData file" option.
 
 
-#### <a name="help"></a>Help & Info
+#### <a name="help"></a> More Help and Info
 
-Additional help information is provided under the "Info" tab.
+Additional help information and more detailed instructions are provided under the "Instructions" tab.
 
 #### App Info
 The START app has been developed by Jessica Minnier, Jiri Sklenar, Anthony Paul Barnes, and Jonathan Nelson

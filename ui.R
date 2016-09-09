@@ -60,6 +60,7 @@ tagList(
     source("ui-tab-dotplot.R",local=TRUE)$value,
     source("ui-tab-heatmap.R",local=TRUE)$value,
     source("ui-tab-help.R",local=TRUE)$value,
+    source("ui-tab-terms.R",local=TRUE)$value,
     #end definitions of tabs, now footer
     ## ============================================================================ ##
     ## INFO TAB
