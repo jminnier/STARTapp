@@ -57,8 +57,17 @@ heatmap_subdat <- function(data_analyzed,
       #Order by FDR
       if(is.null(res$adj.P.Val)) res$adj.P.Val = res$P.Value
       #tmpout = res[order(res$adj.P.Val),]
-      tmpout = res%>%arrange(adj.P.Val,P.Value,abs(logFC))
+
       
+      if(length(na.omit(res$P.Value))==0) {
+        print("All p-values are NA (not valid, or missing). Sorting by Fold Change.")
+        
+        validate(need(
+          length(na.omit(res$logFC))>0,
+          message="No valid p-values or fold changes to use for sorting."
+        ))
+      }
+      tmpout = res%>%arrange(adj.P.Val,P.Value,abs(logFC))
       thesegenes = tmpout$unique_id
       print(paste("start",length(thesegenes)))
       
@@ -155,14 +164,16 @@ heatmap_data <- function(...) {
   }
 }
 
-heatmap_render <- function(yname,interactive=FALSE,heatmap_rowlabels=TRUE,...)  {
+heatmap_render <- function(yname,interactive=FALSE,heatmap_rowlabels=TRUE,rowcenter=TRUE,...)  {
   #possible inputs
   tmpdat <- heatmap_subdat(yname,...)
   
   if(is.null(tmpdat)) {frame()}else{
     heatdat = as.matrix(tmpdat$data)
     myheatmap_colors = heatmap_colors
-    heatdat_rowmean = sweep(heatdat,1,rowMeans(heatdat))
+    if(rowcenter){
+      heatdat_rowmean = sweep(heatdat,1,rowMeans(heatdat))
+    }else{heatdat_rowmean = heatdat}
     if(min(heatdat_rowmean)>0) {myheatmap_colors = heatmap_colors[2:3]}
     if(max(heatdat_rowmean)<0) {myheatmap_colors = heatmap_colors[1:2]}
     color.palette  <- colorRampPalette(myheatmap_colors)
@@ -194,6 +205,9 @@ heatmap_render <- function(yname,interactive=FALSE,heatmap_rowlabels=TRUE,...)  
     if(!heatmap_rowlabels) {acexRow = 0; lmargin = 0}
     
     if(interactive) {
+      print(paste("unique/nrow",nrow(unique(heatdat_rowmean))/nrow(heatdat_rowmean)))
+      validate(need(nrow(unique(heatdat_rowmean))==nrow(heatdat_rowmean),
+                    message="Selected data does not have enough unique values."))
       heatmaply(heatdat_rowmean,colors=color.palette(100))%>% layout(margin = list(l = lmargin, b = 100))
     }else{
       aheatmap(heatdat_rowmean,col=color.palette(100),scale = "none",

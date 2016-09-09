@@ -105,7 +105,9 @@ tabPanel("Heatmaps",
                             
                             checkboxInput("heatmap_rowlabels",
                                           "Show gene (row) labels",value = TRUE
-                                          )
+                                          ),
+                            checkboxInput("heatmap_rowcenter",
+                                          "Center each row",value=TRUE)
            )
            
          )#,#sidebarPanel
