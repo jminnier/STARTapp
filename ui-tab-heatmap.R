@@ -86,7 +86,7 @@ tabPanel("Heatmaps",
                                           "Show a maximum number of genes (WARNING: Selecting >5000 genes may be slow to load. If app crashes memory limits have been reached and you should run from local computer via github.)",value=TRUE),
                             conditionalPanel(condition="input.filter_maxgene==true",    		
                                              numericInput("maxgenes",label="Choose Max # of Genes",
-                                                          min=1,max= 10000,value=100,step=1)),
+                                                          min=1,max= 10000,value=100,step=1))
                             
                             #                             #conditionalPanel(condition="output.numgenes>9000",
                             #                             conditionalPanel(condition="input.filter_maxgene==false",    
@@ -100,15 +100,15 @@ tabPanel("Heatmaps",
                             #                                                           selected="genesN"
                             #                                              )
                             #                             )
-                            
-                            h3("Visualization Settings"),
-                            
-                            checkboxInput("heatmap_rowlabels",
-                                          "Show gene (row) labels",value = TRUE
-                                          ),
-                            checkboxInput("heatmap_rowcenter",
-                                          "Center each row",value=TRUE)
-           )
+           ), #conditional panel
+           h3("Visualization Settings"),
+           
+           checkboxInput("heatmap_rowlabels",
+                         "Show gene (row) labels",value = TRUE
+           ),
+           checkboxInput("heatmap_rowcenter",
+                         "Center each row",value=TRUE)
+           
            
          )#,#sidebarPanel
          #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
