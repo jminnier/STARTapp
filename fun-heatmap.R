@@ -71,7 +71,10 @@ heatmap_subdat <- function(data_analyzed,
       thesegenes = tmpout$unique_id
       print(paste("start",length(thesegenes)))
       
-      if(length(thesegenes)==0) {return(NULL)}
+      validate(need(length(thesegenes)>0,message="No genes pass this filter."))
+      if(length(thesegenes)==0) {
+        return(NULL)
+        }
       
       ## FILTER GENES by
       
@@ -83,6 +86,7 @@ heatmap_subdat <- function(data_analyzed,
         print(paste("fdrcut",length(thesegenes)))
       }
       
+      validate(need(length(thesegenes)>0,message="No genes pass this filter."))
       if(length(thesegenes)==0) {return(NULL)}
       
       #Range of fold change, fold_change_range[1:2], based on two selected groups
@@ -95,6 +99,7 @@ heatmap_subdat <- function(data_analyzed,
         thesegenes = intersect(thesegenes,tmpg)
         print(paste("filterfc",length(thesegenes)))
       }
+      validate(need(length(thesegenes)>0,message="No genes pass this filter."))
       if(length(thesegenes)==0) {return(NULL)}
       
       tmp = tmpout%>%filter(unique_id%in%thesegenes)%>%arrange(adj.P.Val)
@@ -111,17 +116,26 @@ heatmap_subdat <- function(data_analyzed,
       thesegenes = tmpdat$unique_id[order(tmpsd,decreasing=TRUE)]
     }
     
+    validate(need(length(thesegenes)>0,message="No genes pass this filter."))
     if(length(thesegenes)==0) {return(NULL)}
+    
     
     # if((!filter_maxgene)&(filter_maxgeneN=="genesN")) {
     #   maxgenes=10000; filter_maxgene=TRUE
     #   }
     
+    
+    
     if((filter_maxgene)&&(!is.null(maxgenes))) {
+      validate(need(maxgenes>0, message="No genes pass this filter."))
       tmpg = thesegenes[1:min(maxgenes,length(thesegenes))]
       thesegenes = tmpg
       print(paste("maxgenes",length(thesegenes)))
     }
+    
+    validate(need(length(thesegenes)>0,message="No genes pass this filter."))
+    if(length(thesegenes)==0) {return(NULL)}
+    
     
   }#end subsetids
   
@@ -203,6 +217,8 @@ heatmap_render <- function(yname,interactive=FALSE,heatmap_rowlabels=TRUE,rowcen
     acexRow = min(0.2 + 1/log10(nrow(heatdat_rowmean)), 1.2) # default aheatmap cexRow
     lmargin = 300
     if(!heatmap_rowlabels) {acexRow = 0; lmargin = 0}
+    
+    validate(need(nrow(heatdat_rowmean)>0,message="No genes pass this filter."))
     
     if(interactive) {
       print(paste("unique/nrow",nrow(unique(heatdat_rowmean))/nrow(heatdat_rowmean)))

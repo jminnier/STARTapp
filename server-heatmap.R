@@ -144,14 +144,14 @@ output$heatmapplotly <- renderPlotly({
   if(input$action_heatmaps==0) return()
   #input$action_heatmaps
   print("heatmapplotly")
-
+  
   data_analyzed = analyzeDataReactive()
   subsetids = inputHeatmapSubsetReactive()
   
   isolate({ #avoid dependency on everything else except action_heatmaps
     print("drawing heatmap plotly")
     withProgress(message = "Drawing interactive heatmap, please wait",{
-        heatmap_render(
+      myplotly <- heatmap_render(
         data_analyzed=data_analyzed,
         yname = input$heatmapvaluename,
         interactive = TRUE,
@@ -171,7 +171,9 @@ output$heatmapplotly <- renderPlotly({
         fold_change_range=input$fold_change_range,
         fold_change_groups=input$fold_change_groups,
         heatmap_rowlabels=input$heatmap_rowlabels)
-  })
+      validate(need(!is.null(myplotly),message="These filters result in 0 genes."))
+      myplotly
+    })
   })#isolate
 })
 
