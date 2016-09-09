@@ -60,28 +60,31 @@ inputDataReactive <- reactive({
          message = "Please select a file")
   )
   inFile <- input$datafile
+  inRFile <- input$rdatafile
+ # browser()
   
-  if (is.null(inFile)) {
-    if(input$data_file_type=="examplecounts") {
-      # upload example data
-      seqdata <- read_csv("data/mousecounts_example.csv")
-      print("uploaded mousecounts data")
-    }else if(input$data_file_type=="previousrdata"){
-      inRfile <- input$rdatafile
-      load(inRfile$datapath,envir=environment())
+  if(input$data_file_type=="examplecounts") {
+    # upload example data
+    seqdata <- read_csv("data/mousecounts_example.csv")
+    print("uploaded mousecounts data")
+    return(list('data'=seqdata))
+  }else if(input$data_file_type=="previousrdata"){
+    if (!is.null(inRFile)) {
+      load(inRFile$datapath,envir=environment())
       return(list("data"=data_results_table)) # this is so something shows in data upload window
     }else{return(NULL)}
   }else { # if uploading data
-    seqdata <- read_csv(inFile$datapath)
-    print('uploaded seqdata')
-    if(ncol(seqdata)==1) { # if file appears not to work as csv try tsv
-      seqdata <- read_tsv(inFile$datapath)
-      print('changed to tsv, uploaded seqdata')
-    }
-    validate(need(ncol(seqdata)>1,
-                  message="File appears to be one column. Check that it is a comma-separated (.csv) file."))
+    if (!is.null(inFile)) {
+      seqdata <- read_csv(inFile$datapath)
+      print('uploaded seqdata')
+      if(ncol(seqdata)==1) { # if file appears not to work as csv try tsv
+        seqdata <- read_tsv(inFile$datapath)
+        print('changed to tsv, uploaded seqdata')
+      }
+      validate(need(ncol(seqdata)>1,
+                    message="File appears to be one column. Check that it is a comma-separated (.csv) file."))
+      return(list('data'=seqdata))}else{return(NULL)}
   }
-  return(list('data'=seqdata))
 })
 
 # check if a file has been uploaded and create output variable to report this
