@@ -1,6 +1,12 @@
 
 # Terms of Use
 
+If you have concerns about the terms of use for this web hosted application,
+please run the app locally on your computer. See the "Instructions" tab for more information on
+this.
+
+# Shinyapps.io Terms of Use
+
 This application is hosted on a Shinyapps.io server <https://www.shinyapps.io/>.
 
 By using this app you are agreeing to the terms of use as described by Shinnyaps.io: <https://www.rstudio.com/about/shinyapps-terms-use/>
