@@ -1,8 +1,7 @@
 ---
-output: 
-  html_document: 
+output:
+  html_document:
     theme: united
-    toc: yes
 ---
 
 **The START app allows users to visualize RNA-seq data starting with count data.**
@@ -33,6 +32,7 @@ shiny::runGitHub("STARTapp", "jminnier")
 ```
 
 <a name="inputdata"></a> 
+
 ## Input Data 
 
 You may use this app by
@@ -44,6 +44,7 @@ You may use this app by
 3. Uploading an .RData file containing your data that was previously downloaded from a START app session.
 
 <a name="dataformat"></a> 
+
 ### Data Format 
 
 - Must be a .CSV *comma-separated-value* file (you may export from Excel).
@@ -53,6 +54,7 @@ You may use this app by
 
 
 #### Count or Expression Data
+
 - Each row denotes a gene, each column denotes a sample.
 
 ![](examplecounts.png)
@@ -64,6 +66,7 @@ Analysis: When raw counts are uploaded, the data is then analyzed by the app. Th
 Example file: https://github.com/jminnier/STARTapp/blob/master/data/examplecounts_short.csv
 
 #### Analyzed Data
+
 - Each row denotes a gene, each column denotes a sample.
 - Additional columns provide Fold Changes and P-values
 
@@ -91,11 +94,13 @@ Next time use the "Input Data" tab --> "START RData file" option.
 
 
 <a name="vis"></a> 
+
 # Visualizations
 
 ## Group Plots
 
 <a name="pcaplots"></a>
+
 ### PCA Plot
 
 This plot uses Principal Component Analysis (PCA) to calculate the principal components of the expression data using data from all genes. Euclidean distances between expression values are used. Samples are projected on the first two principal components (PCs) and the percent variance explained by those PCs are displayed along the x and y axes. Ideally your samples will cluster by group identifier.
@@ -112,6 +117,7 @@ This plot displays unsupervised clustering of the Euclidean distances between sa
 These plots use the p-values and fold changes to visualize your data.
 
 <a name="volcano"></a>
+
 ### Volcano Plot
 
 This is a scatter plot log fold changes vs –log10(p-values) so that genes with the largest fold changes and smallest p-values are shown on the extreme top left and top right of the plot. Hover over points to see which gene is represented by each point.
@@ -120,17 +126,20 @@ This is a scatter plot log fold changes vs –log10(p-values) so that genes with
  
 
 <a name="scatterplots"></a>
+
 ### Scatter Plot
 
 This is a scatter plot of average gene expression in one group against another group. This allows the viewer to observe which genes have the largest differences between two groups. The smallest distances will be along the diagonal line, and points far away from the diagonal show the most differences. Hover over points to see which gene is represented by each point.
 
  
 <a name="boxplots"></a>
+
 ## Gene Expression Boxplot
 
 Use the search bar to look up genes in your data set. For selected gene(s) the stripchart (dotplot) and boxplots of the expression values are presented for each group. You may plot one or multiple genes along side each other. Hover over points for more information about the data.
 
 <a name="heatmaps"></a>
+
 ## Heatmap
 
 A heatmap of expression values are shown, with genes and samples arranged by unsupervised clustering. You may filter on test results as well as P-value cutoffs. By default the top 100 genes (with lowest P-values) are shown.
