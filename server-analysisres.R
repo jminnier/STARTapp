@@ -71,7 +71,9 @@ observe({
                    #                 absFCcut = input$analysisres_fold_change_cut,
                    #                 fdrcut = input$analysisres_fdrcut)%>%
                    #   bind_shiny("volcanoplot_2groups_ggvis","volcanoplot_2groups_ggvisUI")
-                   rna_volcanoplot(data_results = data_results,
+                   if (names(dev.cur()) != "null device") dev.off()
+                   pdf(NULL)
+                   p=rna_volcanoplot(data_results = data_results,
                                    test_sel = input$analysisres_test,
                                    absFCcut = input$analysisres_fold_change_cut,
                                    fdrcut = input$analysisres_fdrcut)
@@ -101,7 +103,9 @@ observe({
   output$scatterplot <- renderPlotly({ 
     validate(need(length(input$analysisres_groups)==2,"Please select two groups."))
     withProgress(message = "Drawing scatterplot, please wait",{
-      rna_scatterplot(data_long = data_long,
+      if (names(dev.cur()) != "null device") dev.off()
+      pdf(NULL)
+      p=rna_scatterplot(data_long = data_long,
                       group_sel = input$analysisres_groups,
                       valuename=input$scattervaluename)
     })#end withProgress

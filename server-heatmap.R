@@ -27,7 +27,7 @@
 #update list of groups
 observe({
   print("server-heatmap-update")
- # browser()
+  # browser()
   data_analyzed = analyzeDataReactive()
   tmpgroups = data_analyzed$group_names
   tmpdat = data_analyzed$results
@@ -151,7 +151,9 @@ output$heatmapplotly <- renderPlotly({
   isolate({ #avoid dependency on everything else except action_heatmaps
     print("drawing heatmap plotly")
     withProgress(message = "Drawing interactive heatmap, please wait",{
-      myplotly <- heatmap_render(
+      if (names(dev.cur()) != "null device") dev.off()
+      pdf(NULL)
+      p=heatmap_render(
         data_analyzed=data_analyzed,
         yname = input$heatmapvaluename,
         interactive = TRUE,
@@ -171,8 +173,8 @@ output$heatmapplotly <- renderPlotly({
         fold_change_range=input$fold_change_range,
         fold_change_groups=input$fold_change_groups,
         heatmap_rowlabels=input$heatmap_rowlabels)
-      validate(need(!is.null(myplotly),message="These filters result in 0 genes."))
-      myplotly
+      validate(need(!is.null(p),message="These filters result in 0 genes."))
+      p
     })
   })#isolate
 })

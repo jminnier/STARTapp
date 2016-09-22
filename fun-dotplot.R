@@ -117,7 +117,6 @@ dotplot_fun <- function(data_long,
     #hack to check if counts are not logged first need to fix this better
     if(max(data_long[,ytype])>=500) {p <- p+scale_y_continuous(trans = log2_trans(),breaks=2^(0:100))}
       
-
     #print(p)
     g <- ggplotly(p)
     g %>% layout(yaxis = list(title=ytype))

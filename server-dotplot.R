@@ -82,7 +82,9 @@ output$dotplot <- renderPlotly({
   data_analyzed = analyzeDataReactive()
   data_long = data_analyzed$data_long
   geneids = data_analyzed$geneids
-  dotplot_fun(data_long = data_long,geneids = geneids,
+  if (names(dev.cur()) != "null device") dev.off()
+  pdf(NULL)
+  p=dotplot_fun(data_long = data_long,geneids = geneids,
               genelabel=input$sel_gene_header,
               sel_group=input$sel_group,sel_gene=input$sel_gene,
               #log2y=input$log2cpm_checked,
