@@ -17,14 +17,17 @@
 # 
 # You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
 ## ==================================================================================== ##
+## 
 
 
-tabPanel("Terms & Conditions",
+tabPanel("News",
          fluidRow(
            column(4,wellPanel(
-             h4("Shinyapps.io Terms & Conditions")
+             h4("News & Releases")
            )
            ),#column
            column(8,
-                  includeMarkdown("instructions/terms.md"))
-         ))
+                  includeMarkdown("instructions/news.md")
+                  )
+         )
+)

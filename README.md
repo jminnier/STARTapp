@@ -1,7 +1,8 @@
 # START App 
 
-The Shiny Transcriptome Analysis Resource Tool (START) App: 
-A Web-Based RNAseq Analysis and Visualization Resource
+This is the code to run the app described in the manuscript: 
+
+[Nelson, JW, Sklenar J, Barnes AP, Minnier J. (2016) "The START App: A Web-Based RNAseq Analysis and Visualization Resource." Bioinformatics.  doi: 10.1093/bioinformatics/btw624.](http://bioinformatics.oxfordjournals.org/content/early/2016/09/27/bioinformatics.btw624.abstract)
 
 The app is hosted on Shinyapps.io here:
 <https://kcvi.shinyapps.io/START/>
@@ -10,7 +11,8 @@ To run this app locally on your machine, download R or RStudio and run the follo
 ```
 
 install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT",
-                   "RColorBrewer","pheatmap","shinyBS","plotly","markdown","NMF","scales","heatmaply"))
+                   "RColorBrewer","pheatmap","shinyBS","plotly",
+                   "markdown","NMF","scales","heatmaply"))
 ## try http:// if https:// URLs are not supported
 source("https://bioconductor.org/biocLite.R")
 biocLite(c("limma","edgeR"))
@@ -24,11 +26,14 @@ shiny::runGitHub("STARTapp", "jminnier")
 ```
 
 Jonathan Nelson, Jiri Sklenar, Anthony Barnes, Jessica Minnier.
-*The Knight Cardiovascular Institute, Oregon Health & Science University, Portland, OR 97239-3098, USA.*
+*The Knight Cardiovascular Institute and OHSU-PSU School of Public Health, Oregon Health & Science University, Portland, OR 97239-3098, USA.*
+
+We would appreciate reports of any issues with the app via the issues option of 
+[Github](https://github.com/jminnier/STARTapp) or by emailing start.app.help-at-gmail.com.
 
 # Instructions
 
-Instructions can be found here: <https://github.com/jminnier/STARTapp/blob/master/instructions/Instructions.pdf> 
+Instructions can be found here: <https://github.com/jminnier/STARTapp/blob/master/instructions/Instructions.md> 
 
 # Licensing
 

@@ -7,6 +7,7 @@ output: html_document
 - *Explore* the app's features with the example data set pre-loaded by clicking on the tabs above.
 - *Upload* your data in the "Input Data" tab.
 
+
 #### <a name="features"></a> Features
 
 <img src="explot_pca.png" alt="PCA Plot" style="width: 20%"/>
@@ -54,8 +55,14 @@ Next time use the "Input Data" tab --> "START RData file" option.
 Additional help information and more detailed instructions are provided under the "Instructions" tab.
 
 #### App Info
+
 The START app has been developed by Jessica Minnier, Jiri Sklenar, Anthony Paul Barnes, and Jonathan Nelson
 of Oregon Health & Science University, Knight Cardiovascular Institute and School of Public Health.
+
+
+**Please cite our app:**
+
+[Nelson, JW, Sklenar J, Barnes AP, Minnier J. (2016) "The START App: A Web-Based RNAseq Analysis and Visualization Resource." Bioinformatics.  doi: 10.1093/bioinformatics/btw624.](http://bioinformatics.oxfordjournals.org/content/early/2016/09/27/bioinformatics.btw624.abstract)
 
 The source code of START is available on [Github](https://github.com/jminnier/STARTapp).
 
