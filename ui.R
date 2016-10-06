@@ -74,7 +74,7 @@ tagList(
              p(("Knight Cardiovascular Institute, Oregon Health & Science University"),align="center",width=4),
              p(("Copyright (C) 2016, code licensed under GPLv3"),align="center",width=4),
              p(("Code available on Github:"),a("https://github.com/jminnier/STARTapp",href="https://github.com/jminnier/STARTapp"),align="center",width=4),
-             p(a("Nelson, JW, Sklenar J, Barnes AP, Minnier J. (2016) `The START App: A Web-Based RNAseq Analysis and Visualization Resource.` Bioinformatics.  doi: 10.1093/bioinformatics/btw624.",href="http://bioinformatics.oxfordjournals.org/content/early/2016/09/27/bioinformatics.btw624.abstract"),align="center",width=4)
+             p(a("Nelson JW, Sklenar J, Barnes AP, Minnier J. (2016) `The START App: A Web-Based RNAseq Analysis and Visualization Resource.` Bioinformatics.  doi: 10.1093/bioinformatics/btw624.",href="http://bioinformatics.oxfordjournals.org/content/early/2016/09/27/bioinformatics.btw624.abstract"),align="center",width=4)
     ),
     
     ## ==================================================================================== ##
