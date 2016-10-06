@@ -24,15 +24,20 @@ observe({
   print("server-samplegroupplots-update")
   data_analyzed = analyzeDataReactive()
   tmpgroups = data_analyzed$group_names
+  tmpsamples = colnames(data_analyzed$expr_data) # intersect with tmpgroups
   updateSelectizeInput(session,'sampleres_groups',
                        choices=tmpgroups, selected=tmpgroups)
-  
-  
-  
+  updateSelectizeInput(session,'sampleres_samples',
+                       choices=tmpsamples, selected=tmpsamples)
 })
 
-
-
+observe({
+  tmpgroups = input$sampleres_groups
+  tmpdat = data_analyzed$sampledata%>%filter(group%in%tmpgroups)
+  tmpsamples = as.character(tmpdat$sampleid) # intersect with tmpgroups  
+  updateSelectizeInput(session,'sampleres_samples',
+                       choices=tmpsamples, selected=tmpsamples)
+})
 
 observe({
   
@@ -44,11 +49,13 @@ observe({
     sampledata = data_analyzed$sampledata
     
     tmpgroups = input$sampleres_groups
-    tmpkeep = which(sampledata$group%in%tmpgroups)
+    tmpsamples = input$sampleres_samples
+    tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
     
     if(length(tmpkeep)>0) {
       tmpdat = data_analyzed$expr_data[,tmpkeep]
-      gene_pheatmap(as.matrix(tmpdat),sampleid=sampledata$sampleid[tmpkeep],annotation_row = sampledata[tmpkeep,"group",drop=FALSE])
+      gene_pheatmap(as.matrix(tmpdat),
+                    sampleid=sampledata$sampleid[tmpkeep],annotation_row = sampledata[tmpkeep,"group",drop=FALSE])
     }
   })
   
@@ -62,7 +69,8 @@ observe({
     
     
     tmpgroups = input$sampleres_groups
-    tmpkeep = which(sampledata$group%in%tmpgroups)
+    tmpsamples = input$sampleres_samples
+    tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
     
     if(length(tmpkeep)>0) {
       tmpdat = data_analyzed$expr_data[,tmpkeep]
