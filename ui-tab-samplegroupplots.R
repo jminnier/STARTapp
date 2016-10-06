@@ -26,14 +26,22 @@ tabPanel("Group Plots",
          fluidRow(column(4,wellPanel(
            selectizeInput("sampleres_groups", label="Select Groups",
                           choices=NULL,
-                          multiple=TRUE)
+                          multiple=TRUE),
+           conditionalPanel("input.groupplot_tabset=='PCA Plot'",
+                            selectizeInput("pcnum",label="Select Principal Components",
+                                           choices=1:10,
+                                           multiple=TRUE,
+                                           selected=1:2,
+                                           options = list(maxItems = 2))
+             
+           )
          )#,#wellpanel
          
            
            #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column
          column(8,
-           tabsetPanel(
+           tabsetPanel(id="groupplot_tabset",
              tabPanel(title="PCA Plot",
                       plotOutput("pca_plot")
              ),#tabPanel

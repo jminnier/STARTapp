@@ -1,5 +1,10 @@
 # Version History
 
+**Development**
+
+- PCA Plots: add selection of principal components, allow selection of samples
+
+
 **Version 1.0.0.** *September 23, 2016.* START is published and the first publically released version is online.
 
 **Version 0.9.0001** *May 26, 2014.* First development version (previously KCVI Heart Atlas) is online via shinyapps.io alpha!

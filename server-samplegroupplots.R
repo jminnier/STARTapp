@@ -66,7 +66,12 @@ observe({
     
     if(length(tmpkeep)>0) {
       tmpdat = data_analyzed$expr_data[,tmpkeep]
-      gene_pcaplot(tmpdat,sampleid=sampledata$sampleid[tmpkeep], groupdat= sampledata[tmpkeep,"group",drop=FALSE],colorfactor="group")
+      validate(need(length(input$pcnum)==2,message = "Select 2 Prinical Components."))
+      gene_pcaplot(tmpdat,
+                   sampleid= sampledata$sampleid[tmpkeep],
+                   groupdat= sampledata[tmpkeep,"group",drop=FALSE],
+                   pcnum = as.numeric(input$pcnum),
+                   colorfactor="group")
     }
     
     
