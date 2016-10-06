@@ -24,17 +24,20 @@ observe({
   print("server-samplegroupplots-update")
   data_analyzed = analyzeDataReactive()
   tmpgroups = data_analyzed$group_names
-  tmpsamples = colnames(data_analyzed$expr_data) # intersect with tmpgroups
+  tmpsamples = colnames(data_analyzed$expr_data) 
   updateSelectizeInput(session,'sampleres_groups',
                        choices=tmpgroups, selected=tmpgroups)
   updateSelectizeInput(session,'sampleres_samples',
                        choices=tmpsamples, selected=tmpsamples)
 })
 
+# sampleres_groups = intersect selected groups with sample names 
 observe({
+  print("server-sampleplots-update-samples")
+  data_analyzed = analyzeDataReactive()
   tmpgroups = input$sampleres_groups
   tmpdat = data_analyzed$sampledata%>%filter(group%in%tmpgroups)
-  tmpsamples = as.character(tmpdat$sampleid) # intersect with tmpgroups  
+  tmpsamples = as.character(tmpdat$sampleid)  
   updateSelectizeInput(session,'sampleres_samples',
                        choices=tmpsamples, selected=tmpsamples)
 })
