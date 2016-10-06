@@ -1,0 +1,9 @@
+name: START_devel
+account: kcvi
+server: shinyapps.io
+appId: 129924
+bundleId: 578666
+url: https://kcvi.shinyapps.io/START_devel/
+when: 1475768751.31451
+asMultiple: FALSE
+asStatic: FALSE
