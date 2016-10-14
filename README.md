@@ -72,3 +72,7 @@ linear model analysis tools for RNA-seq read counts. Genome Biology 15, R29.
 Love MI, Huber W, and Anders S (2014). Moderated
   estimation of fold change and dispersion for RNA-Seq data with DESeq2.
   Genome Biology, 15, 550.
+
+# DOI
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.160626.svg)](https://doi.org/10.5281/zenodo.160626)
