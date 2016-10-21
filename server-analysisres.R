@@ -76,6 +76,7 @@ observe({
                    p=rna_volcanoplot(data_results = data_results,
                                    test_sel = input$analysisres_test,
                                    absFCcut = input$analysisres_fold_change_cut,
+                                   pvalcut = input$analysisres_pvalcut,
                                    fdrcut = input$analysisres_fdrcut)
                    
                  })#end withProgress

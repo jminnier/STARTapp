@@ -30,7 +30,7 @@
 # need to be more careful about what p-value (adjusted or raw) is used for colors
 # add option to label a set of genes (top 5, or name them)
 rna_volcanoplot <- function(data_results, geneids=NULL, 
-                            test_sel=NULL,absFCcut=0,fdrcut=0.05) {
+                            test_sel=NULL,absFCcut=0,pvalcut=0.05,fdrcut=0.05) {
   
   validate(need(mean(is.na(data_results$P.Value))<1,message = "All p-values are NA. 
                 Check to make sure you have replicates or >1 groups for statistical analysis."))
@@ -54,33 +54,40 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
     res$adj.P.Val = res$P.Value
     usepadj = FALSE 
     pvalname = "pval"
+    print("no adjusted p-value found for volcano plot")
   }
   
   res$color="None"
-  res$color[which((abs(res$logFC)>absFCcut)*(res$P.Value<fdrcut)==1)] = paste0("pval","<",fdrcut," & abs(logfc)>",absFCcut)
-  res$color[which((abs(res$logFC)<absFCcut)*(res$P.Value<fdrcut)==1)] =  paste0("pval","<",fdrcut, " & abs(logfc)<",absFCcut)
-  res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<fdrcut)==1)] = paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
-  res$color[which((abs(res$logFC)<absFCcut)*(res$adj.P.Val<fdrcut)==1)] = paste0(pvalname,"<",fdrcut, " & abs(logfc)<",absFCcut)
-  #res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val>fdrcut)==1)] = paste0(pvalname,">",fdrcut, " & abs(logfc)>",absFCcut)
-  res$color = factor(res$color,levels = unique(c("None",
-                                                 paste0("pval","<",fdrcut, " & abs(logfc)<",absFCcut), # only exists if pval != pvalname 
-                                                 paste0(pvalname,"<",fdrcut," & abs(logfc)<",absFCcut), 
-                                                 paste0("pval","<",fdrcut, " & abs(logfc)>",absFCcut), # only exists if pval != pvalname 
-                                                 paste0(pvalname,"<",fdrcut, " & abs(logfc)>",absFCcut)
-  )))
+  res$color[which((abs(res$logFC)>absFCcut)*(res$P.Value<pvalcut)==1)] = 
+    paste0("pval","<",pvalcut," & abs(logfc)>",absFCcut)
+  res$color[which((abs(res$logFC)<absFCcut)*(res$P.Value<pvalcut)==1)] =  
+    paste0("pval","<",pvalcut, " & abs(logfc)<",absFCcut)
+  res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<fdrcut)==1)] = 
+    paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
+  res$color[which((abs(res$logFC)<absFCcut)*(res$adj.P.Val<fdrcut)==1)] = 
+    paste0(pvalname,"<",fdrcut, " & abs(logfc)<",absFCcut)
+  # if pvalcut is high and only have genes < fdrcut, fdrcut dominates, is this the best way, or should it
+  # be intersection?
+  
+  # levels of color will be a subset of all_levels, but we want the color to match the all_levels
+  tmplevels = levels(as.factor(res$color))
+  all_levels = c("None",
+                 paste0("pval","<",pvalcut, " & abs(logfc)<",absFCcut), # only exists if pval != pvalname 
+                 paste0(pvalname,"<",fdrcut," & abs(logfc)<",absFCcut), 
+                 paste0("pval","<",pvalcut, " & abs(logfc)>",absFCcut), # only exists if pval != pvalname 
+                 paste0(pvalname,"<",fdrcut, " & abs(logfc)>",absFCcut))
+  res$color = factor(
+    res$color,
+    levels = intersect(all_levels,
+                      tmplevels
+    ))
+  tmplevels = levels(res$color)
   
   
   p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+geom_point()
-  
-  if(length(levels(res$color))>3) {
-    p <- p + scale_color_manual(values=c("grey40","grey60","green3","grey70","red2"),
-                       limits=levels(res$color),
-                       name="Significance")
-  }else{
-    p <- p +  scale_color_manual(values=c("grey40","green3","red2"),
-                                 limits=levels(res$color),
-                                 name="Significance")
-  }
+  p <- p + scale_color_manual(values=c("grey40","grey60","green3","grey70","red2")[match(tmplevels,all_levels)],
+                              limits=levels(res$color),
+                              name="Significance")
   p <- p + theme_base() + theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
   g <- plotly_build(p)

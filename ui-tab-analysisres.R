@@ -31,9 +31,9 @@ tabPanel("Analysis Plots",
                             numericInput("analysisres_fold_change_cut",
                                          label="Choose log2(Fold Change) Threshold\n(based on your input FCs, 
                        or fitted FCs if your data has been analyzed by START)",min= 0, max=20,value=1),
-                            numericInput("analysisres_fdrcut",
-                                         label="Choose P-value Threshold",min=0,max=1,value=0.05),
                             numericInput("analysisres_pvalcut",
+                                         label="Choose P-value Threshold",min=0,max=1,value=0.05),
+                            numericInput("analysisres_fdrcut",
                                          label="Choose adjusted P-value (or FDR) Threshold",min=0,max=1,value=0.05)
            ),#conditionalpanel
            
