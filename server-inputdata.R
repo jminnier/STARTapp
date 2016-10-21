@@ -20,6 +20,9 @@
 
 
 observe({
+  # Observe any changes in the input data, then update choices for column names
+  # in the input data tab.
+  # 
   # Check if example selected, or if not then ask to upload a file.
   validate(
     need((input$data_file_type=="examplecounts")|((!is.null(input$rdatafile))|(!is.null(input$datafile))), 
@@ -40,6 +43,8 @@ observe({
       updateSelectInput(session,"c_fc2",choices =tmpcols)
       updateSelectInput(session,"c_pval1",choices =tmpcols)
       updateSelectInput(session,"c_pval2",choices =tmpcols)
+      updateSelectInput(session,"c_qval1",choices =tmpcols)
+      updateSelectInput(session,"c_qval2",choices =tmpcols)
     }
   }
   
@@ -101,16 +106,20 @@ analyzeDataReactive <-
                     
                     print("analysisCountDataReactive")
                     
-                    #if an example just return previously analyzed results
+                    ## ==================================================================================== ##
+                    ## Example data
+                    ## ==================================================================================== ##
                     if(input$data_file_type=="examplecounts") {
                       load('data/mousecounts_example_analysis_results.RData')
-                      load('data/mousecounts_example_analyzed.RData') #example_data_results
+                      load('data/mousecounts_example_analyzed.RData') #example_data_results for data_results_table
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=results,"data_long"=data_long, "geneids"=geneids,
                                   "expr_data"=expr_data,"data_results_table"=example_data_results))
                     }
                     
-                    #if uploading own data:
+                    ## ==================================================================================== ##
+                    ## Upload previously downloaded RData
+                    ## ==================================================================================== ##
                     
                     if(input$data_file_type=="previousrdata"){
                       inRfile <- input$rdatafile
@@ -121,6 +130,10 @@ analyzeDataReactive <-
                                   "geneids"=geneids, "expr_data"=expr_data,
                                   "data_results_table"=data_results_table))
                     }
+                    
+                    ## ==================================================================================== ##
+                    ## Else, continue on with uploading csv data
+                    ## ==================================================================================== ##
                     
                     alldata <- inputDataReactive()$data
                     
@@ -136,14 +149,15 @@ analyzeDataReactive <-
                       }
                     }
                     
-                    validate(
-                      not_numeric(alldata)
-                    )
+                    validate(not_numeric(alldata))
                     
                     # remove empty columns
                     alldata = alldata[,colMeans(is.na(alldata))<1]
                     
-                    if(input$inputdat_type=="counts") {
+                    ## ==================================================================================== ##
+                    ## Count/expression data
+                    ## ==================================================================================== ##
+                    if(input$inputdat_type=="expression_only") {
                       numgeneids <- 0
                       
                       #catch incorrect gene id error, only works if geneids are 1:numgeneids and no other columns are characters
@@ -167,9 +181,11 @@ analyzeDataReactive <-
                       tmpexprcols = seq(match(input$c_expr1,colnames(alldata)),match(input$c_expr2,colnames(alldata)))
                       tmpfccols = seq(match(input$c_fc1,colnames(alldata)),match(input$c_fc2,colnames(alldata)))
                       tmppvalcols = seq(match(input$c_pval1,colnames(alldata)),match(input$c_pval2,colnames(alldata)))
-                      
-                      validate(need(length(tmpfccols)==length(tmppvalcols),message =
-                                      "Number of fold change columns needs to be same number as p-value columns (and in the same order)."))
+                      tmpqvalcols = seq(match(input$c_qval1,colnames(alldata)),match(input$c_qval2,colnames(alldata)))
+                                            
+                      validate(need((length(tmpfccols)==length(tmppvalcols))&(length(tmpfccols)==length(tmpqvalcols)),message =
+                                      "Number of fold change columns needs to be same number as 
+                                      p-value and q-value columns (and in the same order)."))
                     }
                     
                     #split expression names into groups
@@ -187,7 +203,9 @@ analyzeDataReactive <-
                     print(paste0("Num genes kept after removing empty geneids: ",
                                  length(tmpkeep)," of ", nrow(geneids)))
                     
-                    validate(need(length(tmpkeep)>0,message = "Your data is empty. Please check file format is .csv. You may need a non-empty gene identifier column."))
+                    validate(need(length(tmpkeep)>0,
+                                  message = "Your data is empty. Please check file format is .csv. 
+                                  You may need a non-empty gene identifier column."))
                     
                     geneids = geneids[tmpkeep,,drop=FALSE]
                     countdata = countdata[tmpkeep,,drop=FALSE]
@@ -220,14 +238,18 @@ analyzeDataReactive <-
                       
                       fcdata = cbind("unique_id"=geneids$unique_id,tmpfc)
                       pvaldata = cbind("unique_id"=geneids$unique_id,alldata[tmpkeep,tmppvalcols,drop=F])
-                      
-                      tmpnames = paste(colnames(fcdata),colnames(pvaldata),sep=":")[-1]
+                      qvaldata = cbind("unique_id"=geneids$unique_id,alldata[tmpkeep,tmpqvalcols,drop=F])
+            
+                      tmpnames = paste(colnames(fcdata),colnames(qvaldata),sep=":")[-1]
                       colnames(fcdata)[-1] = tmpnames
                       colnames(pvaldata)[-1] = tmpnames
+                      colnames(qvaldata)[-1] = tmpnames
                       
                       fcdatalong = fcdata%>%gather(key = "test",value = "logFC",-1)
                       pvaldatalong = pvaldata%>%gather(key = "test",value = "P.Value",-1)
+                      qvaldatalong = qvaldata%>%gather(key = "test",value = "adj.P.Val",-1)
                       tmpres = full_join(fcdatalong,pvaldatalong)
+                      tmpres = full_join(tmpres,qvaldatalong)
                       
                       tmpdat = cbind("unique_id"=geneids$unique_id,expr_data)
                       tmpdatlong = tmpdat%>%gather(key="sampleid",value="expr",-1)
@@ -239,7 +261,7 @@ analyzeDataReactive <-
                                   "results"=tmpres,"data_long"=data_long, 
                                   "geneids"=geneids,"expr_data"=expr_data,
                                   "data_results_table"=alldata))
-                    }else if(input$inputdat_type=="counts") {
+                    }else if(input$inputdat_type=="expression_only") {
                       
                       #analyze data
                       

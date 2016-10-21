@@ -32,9 +32,9 @@ tabPanel("Analysis Plots",
                                          label="Choose log2(Fold Change) Threshold\n(based on your input FCs, 
                        or fitted FCs if your data has been analyzed by START)",min= 0, max=20,value=1),
                             numericInput("analysisres_fdrcut",
-                                         label="Choose P-value Threshold\n(based on your input p-value, 
-                        or the FDR adjusted p-value if 
-                                         data has been analyzed by START)",min=0,max=1,value=0.05)
+                                         label="Choose P-value Threshold",min=0,max=1,value=0.05),
+                            numericInput("analysisres_pvalcut",
+                                         label="Choose adjusted P-value (or FDR) Threshold",min=0,max=1,value=0.05)
            ),#conditionalpanel
            
            conditionalPanel("input.analysisres_tabset=='Scatterplot of Fold Changes'",

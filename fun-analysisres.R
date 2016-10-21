@@ -93,9 +93,9 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
                    "P.Value",signif(res$P.Value,3),"<br>",
                    "adj.P.Val",signif(res$adj.P.Val,3))
   
-  for(ii in 1:length(g$data)) {
-    tmpid = do.call(rbind,strsplit(g$data[[ii]]$text,"<br>"))[,4]
-    g$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
+  for(ii in 1:length(g$x$data)) {
+    tmpid = do.call(rbind,strsplit(g$x$data[[ii]]$text,"<br>"))[,4]
+    g$x$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
   }
   
   g
@@ -118,7 +118,11 @@ rna_volcanoplot_ggvis <- function(data_results, geneids=NULL,
   res$color[which(res$adj.P.Val<fdrcut)] = paste0("adj-pval<",fdrcut)
   res$color[which(abs(res$logFC)>absFCcut)] = paste0("abs(logfc)>",absFCcut)
   res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<.05)==1)] = paste0("adj-pval<",fdrcut," & abs(logfc)>",absFCcut)
-  res$color = factor(res$color,levels = c("None",paste0("adj-pval<",fdrcut),paste0("abs(logfc)>",absFCcut),paste0("adj-pval<",fdrcut," & abs(logfc)>",absFCcut)))
+  res$color = factor(res$color,
+                     levels = c("None",
+                                paste0("adj-pval<",fdrcut),
+                                paste0("abs(logfc)>",absFCcut),
+                                paste0("adj-pval<",fdrcut," & abs(logfc)>",absFCcut)))
   res$id = 1:nrow(res)
   
   
