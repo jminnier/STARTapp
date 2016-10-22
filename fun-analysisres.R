@@ -29,6 +29,11 @@
 # change rna_volcanoplot to have an input function that depends on type of variables and then a plotting function
 # need to be more careful about what p-value (adjusted or raw) is used for colors
 # add option to label a set of genes (top 5, or name them)
+
+# profvis::profvis(
+#   rna_volcanoplot(results,test_sel="group1/group2",absFCcut=0,pvalcut=0.05,fdrcut=0.05)
+#   )
+
 rna_volcanoplot <- function(data_results, geneids=NULL, 
                             test_sel=NULL,absFCcut=0,pvalcut=0.05,fdrcut=0.05) {
   
@@ -163,6 +168,12 @@ rna_volcanoplot_ggvis <- function(data_results, geneids=NULL,
 ## Scatter plot of log2 fold changes
 ## ==================================================================================== ##  	
 
+# profvis::profvis(
+#   rna_scatterplot(data_long,results,results_test_name="group1/group2",
+#                                  color_result_name="P.Value",group_sel=c('group1','group2'))
+#   )
+
+
 rna_scatterplot <- function(data_long, results, 
                             results_test_name = NULL,
                             color_result_name=NULL,
@@ -179,7 +190,9 @@ rna_scatterplot <- function(data_long, results,
   pp_wide$id = 1:nrow(pp_wide)
   
   colnames(pp_wide)[c(match(group1,colnames(pp_wide)),match(group2,colnames(pp_wide)))] = c("g1","g2")
-  pp_wide = pp_wide%>%mutate(diff = g1-g2,color=1*(g1>=g2))
+  #pp_wide = pp_wide%>%mutate(diff = g1-g2,color=1*(g1>=g2)) # mutate is too slow
+  pp_wide$diff = pp_wide$g1 - pp_wide$g2
+  pp_wide$color = 1*(pp_wide$g1>=pp_wide$g2)
   
   results = results%>%filter(test==results_test_name)
   pp_wide = left_join(pp_wide,results)
