@@ -41,7 +41,13 @@ tabPanel("Analysis Plots",
                             selectizeInput("analysisres_groups",label="Select Groups for Scatterplot",
                                            choices=NULL,
                                            multiple=TRUE,options = list(maxItems = 2)),
-                            radioButtons("scattervaluename",label="Select Scatterplot Value",choices="")
+                            radioButtons("scattervaluename",label="Select Scatterplot Value",choices=""),
+                            radioButtons("scattercolor",label="Select Color Factor Value",
+                                         choices=c("Sign of FC","logFC","P.Value","adj.P.Val"),
+                                         selected = "P.Value"),
+                            radioButtons("scatterresultsname",label="Select Test for Color Factor",
+                                         choices="")
+                            
            )#conditionalpanel
          )#,
          #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	

@@ -79,7 +79,7 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
   res$color = factor(
     res$color,
     levels = intersect(all_levels,
-                      tmplevels
+                       tmplevels
     ))
   tmplevels = levels(res$color)
   
@@ -163,7 +163,10 @@ rna_volcanoplot_ggvis <- function(data_results, geneids=NULL,
 ## Scatter plot of log2 fold changes
 ## ==================================================================================== ##  	
 
-rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
+rna_scatterplot <- function(data_long, results, 
+                            results_test_name = NULL,
+                            color_result_name=NULL,
+                            geneids=NULL, group_sel=NULL,
                             valuename="log2cpm") {
   group1 = group_sel[1]; group2 = group_sel[2]
   
@@ -177,6 +180,28 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   
   colnames(pp_wide)[c(match(group1,colnames(pp_wide)),match(group2,colnames(pp_wide)))] = c("g1","g2")
   pp_wide = pp_wide%>%mutate(diff = g1-g2,color=1*(g1>=g2))
+  
+  results = results%>%filter(test==results_test_name)
+  pp_wide = left_join(pp_wide,results)
+  len_nacolor = 0
+  colorname = NULL
+  if(color_result_name=="Sign of FC") color_result_name = NULL
+  color_is_factor = TRUE
+  if(!is.null(color_result_name)) {
+    tmpcolor = get(color_result_name,pp_wide)
+    len_nacolor = sum(is.na(tmpcolor))
+    colorname = color_result_name
+    color_is_factor = FALSE
+    if(len_nacolor>0) warning(paste0("Color factor has ",len_nacolor, "missing values, these genes will not appear on graph."))
+    pp_wide$color = tmpcolor
+  }
+  if(length(unique(pp_wide$color))<5) {
+    color_is_factor = TRUE
+    pp_wide$color = factor(pp_wide$color)
+  }
+  
+  
+  
   #  pp_wide = pp_wide%>%filter(value>=valuecut[1],value<=valuecut[2])
   
   # all_values <- function(x){
@@ -198,26 +223,44 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   
   # switch to ggplotly since ggvis was slow
   p <- ggplot(pp_wide,aes(x=g1,y=g2,
-                          color=factor(color),text=unique_id))+geom_point()
-  p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))+
-    scale_color_manual(values=c("darkred","darkorange"))
+                          color=color,text=unique_id))+geom_point()
+  p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))
+  
+  if(is.null(colorname)) {
+    p <- p + guides(color=FALSE)
+  }else {
+    if(color_is_factor){
+      p <- p + scale_color_manual(name=colorname)
+    }else{
+      p <- p + scale_color_continuous(name=colorname)
+    }
+  }
+  
   p <- p + theme_base() + #ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
-    theme(legend.position="none",plot.margin = unit(c(2,2,2,2), "cm"))
+    theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
   g <- plotly_build(p)
+  
+  if(is.null(pp_wide$adj.P.Val)) pp_wide$adj.P.Val = NA
   
   #Match order of text to proper gene order
   newtext =  paste("Gene ID:",pp_wide$unique_id,"<br>",
                    paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
                    paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2,3),"<br>",
-                   "Difference:",round(pp_wide$diff,3))
+                   "Difference:",round(pp_wide$diff,3),"<br>",
+                   "logFC:",round(pp_wide$logFC,3),"<br>",
+                   "P.Value:",round(pp_wide$P.Value,3),"<br>",
+                   "adj.P.Val:",round(pp_wide$adj.P.Val,3),"<br>"
+  )
   
   
-  tmpid = do.call(rbind,strsplit(g$data[[1]]$text,"<br>"))[,4]
-  g$data[[1]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
   
-  tmpid = do.call(rbind,strsplit(g$data[[2]]$text,"<br>"))[,4]
-  g$data[[2]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
+  for(ii in 1:length(g$x$data)) {
+    if(!is.null(g$x$data[[ii]]$text)) {
+      tmpid = do.call(rbind,strsplit(g$x$data[[ii]]$text,"<br>"))[,4]
+      g$x$data[[ii]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
+    }
+  }
   
   g
   
