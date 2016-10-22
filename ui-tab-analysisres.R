@@ -48,7 +48,10 @@ tabPanel("Analysis Plots",
                             radioButtons("scatterresultsname",label="Select Test for Color Factor",
                                          choices="")
                             
-           )#conditionalpanel
+           ),#conditionalpanel
+           selectizeInput("analysisres_genes",label="Select Genes to Highlight",
+                          choices=NULL,
+                          multiple=TRUE)
          )#,
          #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column

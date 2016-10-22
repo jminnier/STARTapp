@@ -35,7 +35,8 @@
 #   )
 
 rna_volcanoplot <- function(data_results, geneids=NULL, 
-                            test_sel=NULL,absFCcut=0,pvalcut=0.05,fdrcut=0.05) {
+                            test_sel=NULL,absFCcut=0,pvalcut=0.05,fdrcut=0.05,
+                            sel_genes=NULL) {
   
   validate(need(mean(is.na(data_results$P.Value))<1,message = "All p-values are NA. 
                 Check to make sure you have replicates or >1 groups for statistical analysis."))
@@ -88,11 +89,28 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
     ))
   tmplevels = levels(res$color)
   
+  # add selected genes
+  shapedata = data.frame()
+  if(!is.null(sel_genes)) {
+    tmpind = sapply(sel_genes,function(k) grep(k,res$unique_id))
+    shapedata <- res[unique(tmpind),]
+  }
   
-  p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+geom_point()
-  p <- p + scale_color_manual(values=c("grey40","grey60","green3","grey70","red2")[match(tmplevels,all_levels)],
+  
+  p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+
+    geom_point(shape=19,fill="black")
+  p <- p + scale_color_manual(values=
+                                c("grey40","grey60","green3","grey70","red2")[match(tmplevels,all_levels)],
                               limits=levels(res$color),
                               name="Significance")
+  
+  if(nrow(shapedata)>0) {
+    p <- p + geom_point(data=shapedata,fill="orange",shape=23,size=3,color="grey40") +
+      #scale_size_manual(values = c(1,3))+
+      guides(size=FALSE,shape=FALSE,fill=FALSE)
+  }
+  
+  
   p <- p + theme_base() + theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
   g <- plotly_build(p)
@@ -170,15 +188,17 @@ rna_volcanoplot_ggvis <- function(data_results, geneids=NULL,
 
 # profvis::profvis(
 #   rna_scatterplot(data_long,results,results_test_name="group1/group2",
-#                                  color_result_name="P.Value",group_sel=c('group1','group2'))
-#   )
+#                   color_result_name="P.Value",group_sel=c('group1','group2',
+#                                                           sel_genes=c("Itpkb","ENSMUSG00000051977_Prdm9")))
+# )
 
 
 rna_scatterplot <- function(data_long, results, 
                             results_test_name = NULL,
                             color_result_name=NULL,
                             geneids=NULL, group_sel=NULL,
-                            valuename="log2cpm") {
+                            valuename="log2cpm",
+                            sel_genes=NULL) {
   group1 = group_sel[1]; group2 = group_sel[2]
   
   data_long$value = data_long[,valuename]
@@ -213,7 +233,12 @@ rna_scatterplot <- function(data_long, results,
     pp_wide$color = factor(pp_wide$color)
   }
   
-  
+  # add selected genes
+  shapedata = data.frame()
+  if(!is.null(sel_genes)) {
+    tmpind = sapply(sel_genes,function(k) grep(k,pp_wide$unique_id))
+    shapedata <- pp_wide[unique(tmpind),]
+  }
   
   #  pp_wide = pp_wide%>%filter(value>=valuecut[1],value<=valuecut[2])
   
@@ -235,9 +260,11 @@ rna_scatterplot <- function(data_long, results,
   #   add_tooltip(all_values, "hover")%>%hide_legend("fill")
   
   # switch to ggplotly since ggvis was slow
-  p <- ggplot(pp_wide,aes(x=g1,y=g2,
-                          color=color,text=unique_id))+geom_point()
+  p <-   ggplot(pp_wide,aes(x=g1,y=g2,
+                            color=color,
+                            text=unique_id),fill=1)+geom_point(shape=19,size=1)+guides(fill=FALSE)
   p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))
+  
   
   if(is.null(colorname)) {
     p <- p + guides(color=FALSE)
@@ -249,11 +276,20 @@ rna_scatterplot <- function(data_long, results,
     }
   }
   
+  
+  if(nrow(shapedata)>0) {
+    p <- p + geom_point(data=shapedata,fill=2,shape=23,size=4) +
+      scale_size_manual(values = c(1,3))+
+      scale_fill_manual(values = c("black","red"))+
+      guides(size=FALSE,shape=FALSE,fill=FALSE)
+  }
+  
   p <- p + theme_base() + #ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
     theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
   g <- plotly_build(p)
   
+  # just in case we don't have adj.p.val, don't error newtext
   if(is.null(pp_wide$adj.P.Val)) pp_wide$adj.P.Val = NA
   
   #Match order of text to proper gene order

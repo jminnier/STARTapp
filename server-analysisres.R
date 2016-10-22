@@ -30,6 +30,7 @@ observe({
   tmptests = unique(as.character(tmpdat$test))
   tmpdatlong = data_analyzed$data_long
   tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  tmpgeneids = data_analyzed$geneids
   
   updateSelectizeInput(session,'analysisres_test',
                        choices=tmptests, selected=tmptests[1])
@@ -40,6 +41,8 @@ observe({
     updateSelectizeInput(session,'analysisres_groups',
                          choices=tmpgroups,selected = tmpgroups)
   }
+  updateSelectizeInput(session,"analysisres_genes",
+                       choices=tmpgeneids)
   
   updateRadioButtons(session,'scattervaluename',
                      choices=sort(tmpynames,decreasing = TRUE))
@@ -78,7 +81,8 @@ observe({
                                      test_sel = input$analysisres_test,
                                      absFCcut = input$analysisres_fold_change_cut,
                                      pvalcut = input$analysisres_pvalcut,
-                                     fdrcut = input$analysisres_fdrcut)
+                                     fdrcut = input$analysisres_fdrcut,
+                                     sel_genes = input$analysisres_genes)
                    
                  })#end withProgress
     
@@ -117,7 +121,8 @@ observe({
                         group_sel = input$analysisres_groups,
                         valuename=input$scattervaluename,
                         color_result_name = input$scattercolor,
-                        results_test_name = input$scatterresultsname
+                        results_test_name = input$scatterresultsname,
+                        sel_genes = input$analysisres_genes
       )
     })#end withProgress
   })
