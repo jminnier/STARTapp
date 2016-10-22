@@ -3,6 +3,8 @@
 **Development**
 
 - PCA Plots: add selection of principal components, allow selection of samples
+- Analyzed Data upload: allow upload of adjusted p-values (FDR) and unadjusted p-values, now volcano plot shows both
+- Scatterplots: color by fold change or p-value from results; need to add ability to choose color or color by log-p-value.
 
 
 **Version 1.0.0.** *September 23, 2016.* START is published and the first publically released version is online.
