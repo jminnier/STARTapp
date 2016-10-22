@@ -92,8 +92,9 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
   # add selected genes
   shapedata = data.frame()
   if(!is.null(sel_genes)) {
-    tmpind = sapply(sel_genes,function(k) grep(k,res$unique_id))
-    shapedata <- res[unique(tmpind),]
+    tmpind = sapply(unlist(sel_genes),function(k) grep(k,res$unique_id,fixed=TRUE))
+    tmpind = unique(unlist(tmpind))
+    shapedata <- res[tmpind,]
   }
   
   
@@ -236,8 +237,9 @@ rna_scatterplot <- function(data_long, results,
   # add selected genes
   shapedata = data.frame()
   if(!is.null(sel_genes)) {
-    tmpind = sapply(sel_genes,function(k) grep(k,pp_wide$unique_id))
-    shapedata <- pp_wide[unique(tmpind),]
+    tmpind = sapply(sel_genes,function(k) grep(k,pp_wide$unique_id,fixed=TRUE))
+    tmpind = unique(unlist(tmpind))
+    shapedata <- pp_wide[tmpind,]
   }
   
   #  pp_wide = pp_wide%>%filter(value>=valuecut[1],value<=valuecut[2])
