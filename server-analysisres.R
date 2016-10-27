@@ -122,6 +122,8 @@ observe({
                         valuename=input$scattervaluename,
                         color_result_name = input$scattercolor,
                         results_test_name = input$scatterresultsname,
+                        color_low = input$scattercolor_low,
+                        color_hi = input$scattercolor_hi,
                         sel_genes = input$analysisres_genes
       )
     })#end withProgress

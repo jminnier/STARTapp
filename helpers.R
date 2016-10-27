@@ -42,6 +42,7 @@ library(NMF)
 library(scales)
 library(heatmaply)
 library(readr)
+library(colourpicker)
 
 ##================================================================================##
 

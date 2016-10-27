@@ -43,10 +43,17 @@ tabPanel("Analysis Plots",
                                            multiple=TRUE,options = list(maxItems = 2)),
                             radioButtons("scattervaluename",label="Select Scatterplot Value",choices=""),
                             radioButtons("scattercolor",label="Select Color Factor Value",
-                                         choices=c("Sign of FC","logFC","P.Value","adj.P.Val"),
-                                         selected = "P.Value"),
+                                         choices=c("Sign of FC",
+                                                   "logFC","p-value","adjusted p-value (q-value)",
+                                                   "p-value < .1","q-value < .1",
+                                                   "-log10(p-value)","-log10(q-value)"),
+                                         selected = "-log10(p-value)"),
                             radioButtons("scatterresultsname",label="Select Test for Color Factor",
-                                         choices="")
+                                         choices=""),
+                            colourInput("scattercolor_low",label="Select Color - Low Values","blue",
+                                        showColour = "background"),
+                            colourInput("scattercolor_hi",label="Select Color - High Values","orange",
+                                        showColour = "background")
                             
            ),#conditionalpanel
            selectizeInput("analysisres_genes",label="Select Genes to Highlight",

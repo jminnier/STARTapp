@@ -186,17 +186,20 @@ rna_volcanoplot_ggvis <- function(data_results, geneids=NULL,
 ## ==================================================================================== ##
 ## Scatter plot of log2 fold changes
 ## ==================================================================================== ##  	
-
+# 
 # profvis::profvis(
 #   rna_scatterplot(data_long,results,results_test_name="group1/group2",
-#                   color_result_name="P.Value",group_sel=c('group1','group2',
-#                                                           sel_genes=c("Itpkb","ENSMUSG00000051977_Prdm9")))
+#                   color_result_name="-log10(p-value)",
+#                   group_sel=c('group1','group2'),
+#                   sel_genes=c("Itpkb","ENSMUSG00000051977_Prdm9"))
 # )
 
 
 rna_scatterplot <- function(data_long, results, 
                             results_test_name = NULL,
                             color_result_name=NULL,
+                            color_low="blue",
+                            color_hi="orange",
                             geneids=NULL, group_sel=NULL,
                             valuename="log2cpm",
                             sel_genes=NULL) {
@@ -217,16 +220,33 @@ rna_scatterplot <- function(data_long, results,
   
   results = results%>%filter(test==results_test_name)
   pp_wide = left_join(pp_wide,results)
+  
+  
+  # Choose variable for colors
+  colorlabels = c("logFC","p-value","adjusted p-value (q-value)",
+                  "-log10(p-value)","-log10(q-value)",
+                  "p-value < .1","q-value < .1")
+  colorvars = c("logFC","P.Value","adj.P.Val","log10.P.Value","log10.adj.P.Val",
+                "P.Value.1","adj.P.Val.1")
+  pp_wide$log10.P.Value = -log10(pp_wide$P.Value)
+  pp_wide$log10.adj.P.Val = -log10(pp_wide$adj.P.Val)
+  pp_wide$P.Value.1 = pp_wide$P.Value
+  pp_wide$P.Value.1[pp_wide$P.Value>.1] = .11
+  pp_wide$adj.P.Val.1 = pp_wide$adj.P.Val
+  pp_wide$adj.P.Val.1[pp_wide$adj.P.Val>.1] = .11
+  
   len_nacolor = 0
   colorname = NULL
   if(color_result_name=="Sign of FC") color_result_name = NULL
   color_is_factor = TRUE
   if(!is.null(color_result_name)) {
-    tmpcolor = get(color_result_name,pp_wide)
+    tmpcolorvar = colorvars[match(color_result_name,colorlabels)]
+    tmpcolor = get(tmpcolorvar,pp_wide)
     len_nacolor = sum(is.na(tmpcolor))
     colorname = color_result_name
     color_is_factor = FALSE
-    if(len_nacolor>0) warning(paste0("Color factor has ",len_nacolor, "missing values, these genes will not appear on graph."))
+    if(len_nacolor>0) {
+      warning(paste0("Color factor has ",len_nacolor, "missing values, these genes will not appear on graph."))}
     pp_wide$color = tmpcolor
   }
   if(length(unique(pp_wide$color))<5) {
@@ -237,7 +257,8 @@ rna_scatterplot <- function(data_long, results,
   # add selected genes
   shapedata = data.frame()
   if(!is.null(sel_genes)) {
-    tmpind = sapply(sel_genes,function(k) grep(k,pp_wide$unique_id,fixed=TRUE))
+    tmpgenes = stringr::str_split(pp_wide$unique_id,"_",simplify = TRUE)
+    tmpind = sapply(sel_genes,function(k) unique(which(tmpgenes==k,arr.ind=T)[,1]))
     tmpind = unique(unlist(tmpind))
     shapedata <- pp_wide[tmpind,]
   }
@@ -272,9 +293,11 @@ rna_scatterplot <- function(data_long, results,
     p <- p + guides(color=FALSE)
   }else {
     if(color_is_factor){
-      p <- p + scale_color_manual(name=colorname)
+      mycolors = colorRampPalette(c(color_low,color_hi))(nlevels(pp_wide$color))
+      p <- p + scale_color_manual(name=colorname,values = mycolors)
     }else{
-      p <- p + scale_color_continuous(name=colorname)
+      mycolors = colorRampPalette(c(color_low,color_hi))(nlevels(pp_wide$color))
+      p <- p + scale_color_gradient(name=colorname,low=color_low,high=color_hi)
     }
   }
   
@@ -308,7 +331,7 @@ rna_scatterplot <- function(data_long, results,
   
   for(ii in 1:length(g$x$data)) {
     if(!is.null(g$x$data[[ii]]$text)) {
-      tmpid = do.call(rbind,strsplit(g$x$data[[ii]]$text,"<br>"))[,4]
+      tmpid = stringr::str_split(g$x$data[[ii]]$text,"<br>",simplify=TRUE)[,4]
       g$x$data[[ii]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
     }
   }
