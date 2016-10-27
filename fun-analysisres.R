@@ -323,8 +323,8 @@ rna_scatterplot <- function(data_long, results,
                    paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2,3),"<br>",
                    "Difference:",round(pp_wide$diff,3),"<br>",
                    "logFC:",round(pp_wide$logFC,3),"<br>",
-                   "P.Value:",round(pp_wide$P.Value,3),"<br>",
-                   "adj.P.Val:",round(pp_wide$adj.P.Val,3),"<br>"
+                   "P.Value:",signif(pp_wide$P.Value,3),"<br>",
+                   "adj.P.Val:",signif(pp_wide$adj.P.Val,3),"<br>"
   )
   
   
