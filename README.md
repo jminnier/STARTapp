@@ -1,4 +1,8 @@
-# START App 
+# START App - Nelson's HT Data
+
+This is the repo for the START app containing J. Nelson's Hypertension data.
+
+# START App
 
 This is the code to run the app described in the manuscript: 
 
