@@ -18,7 +18,11 @@
 # You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
 ## ==================================================================================== ##
 ## 
-gene_pheatmap <- function(exprdat,sampleid,annotation_row=NULL) {
+gene_pheatmap <- function(data_long,valuename,sampleid,annotation_row=NULL) {
+  data_long$value = data_long[,valuename]
+  exprdat = data_long%>%select(unique_id,sampleid,value)%>%spread(sampleid,value)
+  exprdat = as.matrix(exprdat[,-1])
+  
   sampleDists <- dist(t(exprdat))
   sampleDistMatrix <- as.matrix(sampleDists)
   rownames(sampleDistMatrix) <- sampleid
@@ -32,8 +36,12 @@ gene_pheatmap <- function(exprdat,sampleid,annotation_row=NULL) {
                      col=colors)
 }
 
-gene_pcaplot <- function(exprdat,sampleid,groupdat=NULL,colorfactor=NULL,shapefactor=NULL,
+gene_pcaplot <- function(data_long,valuename,sampleid,groupdat=NULL,colorfactor=NULL,shapefactor=NULL,
                          plot_sampleids=TRUE, pcnum=1:2, plottitle = "PCA Plot") {
+  data_long$value = data_long[,valuename]
+  exprdat = data_long%>%select(unique_id,sampleid,value)%>%spread(sampleid,value)
+  exprdat = as.matrix(exprdat[,-1])
+  
   #adapted from DESeq2:::plotPCA.DESeqTransform
   pca <- prcomp(t(exprdat))
   percentVar <- pca$sdev^2/sum(pca$sdev^2)

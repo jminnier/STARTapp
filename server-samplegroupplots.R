@@ -18,10 +18,23 @@
 # You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
 ## ==================================================================================== ##
 ## 
-## 
+
+
+# update expression names for plotting
+observe({
+  print("server-samplegroupplots-update-yname")
+  data_analyzed = analyzeDataReactive()
+  tmpdatlong = data_analyzed$data_long
+  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  
+  updateRadioButtons(session,'groupplot_valuename',
+                     choices=sort(tmpynames,decreasing = TRUE))
+  
+})
+
 #update list of groups
 observe({
-  print("server-samplegroupplots-update")
+  print("server-samplegroupplots-update-groups")
   data_analyzed = analyzeDataReactive()
   tmpgroups = data_analyzed$group_names
   tmpsamples = colnames(data_analyzed$expr_data) 
@@ -53,13 +66,17 @@ observe({
     
     tmpgroups = input$sampleres_groups
     tmpsamples = input$sampleres_samples
+    
+    tmplong = data_analyzed$data_long
+    tmplong = tmplong%>%filter(sampleid%in%tmpsamples,group%in%tmpgroups)
+    
+    validate(need(nrow(tmplong)>1,message = "Need more samples to plot."))
+    
     tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
     
-    if(length(tmpkeep)>0) {
-      tmpdat = data_analyzed$expr_data[,tmpkeep]
-      gene_pheatmap(as.matrix(tmpdat),
-                    sampleid=sampledata$sampleid[tmpkeep],annotation_row = sampledata[tmpkeep,"group",drop=FALSE])
-    }
+    gene_pheatmap(data_long=tmplong,valuename=input$groupplot_valuename,
+                  sampleid=sampledata$sampleid[tmpkeep],annotation_row = sampledata[tmpkeep,"group",drop=FALSE])
+    
   })
   
   output$pca_plot <- renderPlot({
@@ -73,17 +90,22 @@ observe({
     
     tmpgroups = input$sampleres_groups
     tmpsamples = input$sampleres_samples
+    
+    tmplong = data_analyzed$data_long
+    tmplong = tmplong%>%filter(sampleid%in%tmpsamples,group%in%tmpgroups)
+    
     tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
     
-    if(length(tmpkeep)>0) {
-      tmpdat = data_analyzed$expr_data[,tmpkeep]
-      validate(need(length(input$pcnum)==2,message = "Select 2 Prinical Components."))
-      gene_pcaplot(tmpdat,
-                   sampleid= sampledata$sampleid[tmpkeep],
-                   groupdat= sampledata[tmpkeep,"group",drop=FALSE],
-                   pcnum = as.numeric(input$pcnum),
-                   colorfactor="group")
-    }
+    validate(need(nrow(tmplong)>1,message = "Need more samples to plot."))
+    validate(need(length(input$pcnum)==2,message = "Select 2 Prinical Components."))
+    
+    gene_pcaplot(data_long=tmplong,
+                 valuename=input$groupplot_valuename,
+                 sampleid= sampledata$sampleid[tmpkeep],
+                 groupdat= sampledata[tmpkeep,"group",drop=FALSE],
+                 pcnum = as.numeric(input$pcnum),
+                 colorfactor="group")
+    
     
     
   })
