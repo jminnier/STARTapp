@@ -114,7 +114,7 @@ analyzeDataReactive <-
                       load('data/mousecounts_example_analyzed.RData') #example_data_results for data_results_table
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=results,"data_long"=data_long, "geneids"=geneids,
-                                  "expr_data"=expr_data,"data_results_table"=example_data_results))
+                                  "data_results_table"=example_data_results))
                     }
                     
                     ## ==================================================================================== ##
@@ -127,7 +127,7 @@ analyzeDataReactive <-
                       
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=results,"data_long"=data_long, 
-                                  "geneids"=geneids, "expr_data"=expr_data,
+                                  "geneids"=geneids,
                                   "data_results_table"=data_results_table))
                     }
                     
@@ -259,7 +259,7 @@ analyzeDataReactive <-
                       
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=tmpres,"data_long"=data_long, 
-                                  "geneids"=geneids,"expr_data"=expr_data,
+                                  "geneids"=geneids,
                                   "data_results_table"=alldata))
                     }else if(input$inputdat_type=="expression_only") {
                       
@@ -395,14 +395,11 @@ analyzeDataReactive <-
                         data_long = data_long%>%select(-one_of(tmpgeneidnames))
                       }
                       
-                      #expr_data = tmplog2cpm[,-1]
-                      
                       print('analyze data: done')
                       
                       
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=lmobj_res,"data_long"=data_long, "geneids"=geneids, 
-                                  "expr_data"=expr_data,
                                   "data_results_table"=data_results_table))
                       
                     }     
@@ -452,11 +449,10 @@ output$downloadResults_RData <- downloadHandler(filename= paste0("START_results_
                                                   results = tmp$results
                                                   data_long = tmp$data_long
                                                   geneids = tmp$geneids
-                                                  expr_data = tmp$expr_data
                                                   data_results_table = tmp$data_results_table
                                                   
                                                   save(group_names,sampledata,results,
-                                                       data_long,geneids,expr_data,
+                                                       data_long,geneids,
                                                        data_results_table,file=file)
                                                 })
 

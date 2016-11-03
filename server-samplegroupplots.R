@@ -37,7 +37,7 @@ observe({
   print("server-samplegroupplots-update-groups")
   data_analyzed = analyzeDataReactive()
   tmpgroups = data_analyzed$group_names
-  tmpsamples = colnames(data_analyzed$expr_data) 
+  tmpsamples = as.character(data_analyzed$sampledata$sampleid)
   updateSelectizeInput(session,'sampleres_groups',
                        choices=tmpgroups, selected=tmpgroups)
   updateSelectizeInput(session,'sampleres_samples',
