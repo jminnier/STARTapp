@@ -427,12 +427,12 @@ observeEvent(inputDataReactive(),({
 })
 )
 
-output$analysisoutput <- DT::renderDataTable({
+output$analysisoutput <- renderDataTable({
   print("output$analysisoutput")
   getresults <- analyzeDataReactive()
   res = getresults$results
   res[,sapply(res,is.numeric)] <- signif(res[,sapply(res,is.numeric)],3)
-  DT::datatable(res)
+  datatable(res)
 })
 
 

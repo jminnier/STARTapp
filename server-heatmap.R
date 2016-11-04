@@ -307,11 +307,11 @@ output$numheat <- renderText({
   paste("Chosen filters result in ",tmpnum, " genes.")
 })
 
-output$heatdat_rna <- DT::renderDataTable({
+output$heatdat_rna <- renderDataTable({
   if(input$action_heatmaps==0) return()
   tmpdat = HeatdatReactive_rna()
   tmpdat[,sapply(tmpdat,is.numeric)] <- signif(tmpdat[,sapply(tmpdat,is.numeric)],3)
-  DT::datatable(tmpdat)
+  datatable(tmpdat)
 },options=list(sDom="ilftpr"))
 
 output$downloadHeatmapData_rna <- downloadHandler(

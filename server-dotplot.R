@@ -103,10 +103,10 @@ DataDotplotReactive <- reactive({
   return(subdat)
 })
 
-output$dat_dotplot <- DT::renderDataTable({
+output$dat_dotplot <- renderDataTable({
   tmpdat = DataDotplotReactive()
   tmpdat[,sapply(tmpdat,is.numeric)] <- signif(tmpdat[,sapply(tmpdat,is.numeric)],3)
-  DT::datatable(tmpdat)
+  datatable(tmpdat)
 }
 )			
 
