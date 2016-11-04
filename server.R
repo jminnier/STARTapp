@@ -28,6 +28,7 @@ shinyServer(function(input, output,session) {
   ## Server functions are divided by tab
   ## 
   source("server-inputdata.R",local = TRUE)
+  source("server-filterdata.R",local = TRUE)
   source("server-dotplot.R",local = TRUE)
   source("server-heatmap.R",local = TRUE)
   source("server-samplegroupplots.R",local=TRUE)
