@@ -37,7 +37,7 @@ observe({
   #
   tmpynames = data_analyzed$data_long%>%select(-unique_id,-sampleid,-group)%>%colnames()
   updateSelectizeInput(session,'sel_gene',
-                       choices= tmpgeneids)
+                       choices= tmpgeneids,server=TRUE)
   updateCheckboxGroupInput(session,'sel_group',
                            choices=tmpgroups, selected=tmpgroups)
   updateRadioButtons(session,'sel_gene_header',

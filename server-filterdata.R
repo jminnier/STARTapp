@@ -36,7 +36,7 @@ observe({
                        choices=tmpsamples,selected=tmpsamples)
   
   updateSelectizeInput(session,"datafilter_gene_select",
-                       choices=tmpgeneids)
+                       choices=tmpgeneids,server=TRUE)
   
   updateSelectizeInput(session,"datafilter_selecttest",choices=tmptests)
   

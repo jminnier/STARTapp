@@ -42,7 +42,7 @@ observe({
                          choices=tmpgroups,selected = tmpgroups)
   }
   updateSelectizeInput(session,"analysisres_genes",
-                       choices=tmpgeneids)
+                       choices=tmpgeneids,server=TRUE)
   
   updateRadioButtons(session,'scattervaluename',
                      choices=sort(tmpynames,decreasing = TRUE))
