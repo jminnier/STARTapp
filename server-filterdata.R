@@ -27,6 +27,7 @@ observe({
   tmpgroups = data_analyzed$group_names
   tmpsamples = as.character(data_analyzed$sampledata$sampleid)
   tmpgeneids = data_analyzed$geneids
+  data_analyzedgenes = as.character(unlist(tmpgeneids))
   tmpdat = data_analyzed$results
   tmptests = unique(as.character(tmpdat$test))
   
@@ -36,7 +37,7 @@ observe({
                        choices=tmpsamples,selected=tmpsamples)
   
   updateSelectizeInput(session,"datafilter_gene_select",
-                       choices=tmpgeneids,server=TRUE)
+                       choices=data_analyzedgenes,server=TRUE)
   
   updateSelectizeInput(session,"datafilter_selecttest",choices=tmptests)
   

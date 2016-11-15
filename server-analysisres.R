@@ -31,6 +31,7 @@ observe({
   tmpdatlong = data_analyzed$data_long
   tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
   tmpgeneids = data_analyzed$geneids
+  data_analyzedgenes = as.character(unlist(tmpgeneids))
   
   updateSelectizeInput(session,'analysisres_test',
                        choices=tmptests, selected=tmptests[1])
@@ -42,7 +43,7 @@ observe({
                          choices=tmpgroups,selected = tmpgroups)
   }
   updateSelectizeInput(session,"analysisres_genes",
-                       choices=tmpgeneids,server=TRUE)
+                       choices=data_analyzedgenes,server=TRUE)
   
   updateRadioButtons(session,'scattervaluename',
                      choices=sort(tmpynames,decreasing = TRUE))
