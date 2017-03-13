@@ -28,6 +28,7 @@ tabPanel("Filter Data",
          ## Left hand column has the filtera settings and options
          ## ==================================================================================== ##
          fluidRow(column(4,wellPanel(
+           h5("Note: this does not redo any analysis, it merely filters the data already analyzed based on gene identifiers or sample/group names."),
            selectizeInput("datafilter_groups", label="Select Groups",
                           choices=NULL,
                           multiple=TRUE),
@@ -87,7 +88,7 @@ tabPanel("Filter Data",
          ## Right hand column shows data input DT and data analysis result DT
          ## ==================================================================================== ##
          column(8,wellPanel(
-           
+           dataTableOutput('filterdataoutput')
          )#wellpanel
          )#column
          )#fluidRow
