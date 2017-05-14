@@ -83,23 +83,23 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
   }
   p <- p + theme_base() + theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
-  g <- plotly_build(p)
-  
+  gg <- plotly_build(p)
+  g <- gg$x
   
   #Match order of text to proper gene order
-  newtext =  paste("Gene ID:",res$unique_id,"<br>",
-                   "Comparison",res$test,"<br>",
-                   "logFC",signif(res$logFC,3),"<br>",
-                   "P.Value",signif(res$P.Value,3),"<br>",
+  newtext =  paste("Gene ID:",res$unique_id,"<br />",
+                   "Comparison",res$test,"<br />",
+                   "logFC",signif(res$logFC,3),"<br />",
+                   "P.Value",signif(res$P.Value,3),"<br />",
                    "adj.P.Val",signif(res$adj.P.Val,3))
+  print(length(g$data))
   
   for(ii in 1:length(g$data)) {
-    tmpid = do.call(rbind,strsplit(g$data[[ii]]$text,"<br>"))[,4]
+    tmpid = do.call(rbind,strsplit(g$data[[ii]]$text,"<br />"))[,4]
     g$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
   }
   
-  g
-  
+  gg
 }
 
 # switched from ggvis to plotly, this function is not currently used
@@ -193,22 +193,23 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   p <- p + theme_base() + #ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
     theme(legend.position="none",plot.margin = unit(c(2,2,2,2), "cm"))
   
-  g <- plotly_build(p)
+  gg <- plotly_build(p)
+  g <- gg$x
   
   #Match order of text to proper gene order
-  newtext =  paste("Gene ID:",pp_wide$unique_id,"<br>",
-                   paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
-                   paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2,3),"<br>",
+  newtext =  paste("Gene ID:",pp_wide$unique_id,"<br />",
+                   paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br />",
+                   paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2,3),"<br />",
                    "Difference:",round(pp_wide$diff,3))
   
   
-  tmpid = do.call(rbind,strsplit(g$data[[1]]$text,"<br>"))[,4]
+  tmpid = do.call(rbind,strsplit(g$data[[1]]$text,"<br />"))[,4]
   g$data[[1]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
   
-  tmpid = do.call(rbind,strsplit(g$data[[2]]$text,"<br>"))[,4]
+  tmpid = do.call(rbind,strsplit(g$data[[2]]$text,"<br />"))[,4]
   g$data[[2]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
   
-  g
+  gg
   
 }
 
