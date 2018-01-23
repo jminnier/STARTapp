@@ -125,7 +125,7 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
                    "adj.P.Val",signif(res$adj.P.Val,3))
   
   for(ii in 1:length(g$x$data)) {
-    tmpid = do.call(rbind,strsplit(g$x$data[[ii]]$text,"<br>"))[,4]
+    tmpid = do.call(rbind,strsplit(g$x$data[[ii]]$text,"<br />"))[,4]
     g$x$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
   }
   
@@ -331,7 +331,7 @@ rna_scatterplot <- function(data_long, results,
   
   for(ii in 1:length(g$x$data)) {
     if(!is.null(g$x$data[[ii]]$text)) {
-      tmpid = stringr::str_split(g$x$data[[ii]]$text,"<br>",simplify=TRUE)[,4]
+      tmpid = stringr::str_split(g$x$data[[ii]]$text,"<br />",simplify=TRUE)[,4]
       g$x$data[[ii]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
     }
   }
