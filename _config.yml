@@ -1,0 +1,8 @@
+title: START - Shiny App
+description: "The START App: R Shiny Transcriptome Analysis Resource Tool"
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-dinky
+
+gems:
+  - jekyll-mentions
