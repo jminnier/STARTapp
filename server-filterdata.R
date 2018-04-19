@@ -78,9 +78,9 @@ observe({
     tmpmax = max(tmpdat[,colnames(tmpdat)==exprname],na.rm=T)
     
     updateNumericInput(session,"datafilter_exprmin",
-                       min=tmpmin,max= tmpmax,value=tmpmin)
+                       min=floor(tmpmin),max= ceiling(tmpmax),value=floor(tmpmin))
     updateNumericInput(session,"datafilter_exprmax",
-                       min=tmpmin,max= tmpmax,value=tmpmax)
+                       min=floor(tmpmin),max= ceiling(tmpmax),value=ceiling(tmpmax))
   }
 })
 
@@ -160,7 +160,7 @@ filterDataReactive <- reactive({
   if(input$datafilter_expr) {
     tmpdatlong_filter = data.table::data.table(tmpdatlong)[unique_id%in%mydata_genes$unique_id,]
     data.table::setnames(tmpdatlong_filter,input$datafilter_selectexpr, "mycol")
-    tmpdatlong_filter = tmpdatlong_filter[,.(min=min(mycol),max=max(mycol)),by=unique_id]
+    tmpdatlong_filter = tmpdatlong_filter[,.(min=min(mycol,na.rm=T),max=max(mycol,na.rm=T)),by=unique_id]
     tmpdatlong_filter = tmpdatlong_filter[(min>=input$datafilter_exprmin)&(max<=input$datafilter_exprmax),]
 
     tmpgenes = as.character(tmpdatlong_filter$unique_id)
@@ -175,7 +175,6 @@ filterDataReactive <- reactive({
   mydata  
   # need to add: 
   # filter only within some groups, should filter be based on above group selections? no because test is not
-  # if nrow(mydata)==0 validate send message no data
   # save data as file with filter settings concatinated?
   # show number of genes that pass filter like in heatmap
   # data frame display too wide, truncate columns?
@@ -183,7 +182,6 @@ filterDataReactive <- reactive({
   #download record of filters buttons
   #DF display, make prettier?
   #data summary?
-  # print out how many records meet each criterea
 })
 
 
@@ -194,6 +192,11 @@ output$filterdataoutput <- renderDataTable({
   datatable(res, class = 'cell-border stripe', rownames = FALSE)
 })
 
+output$nrow_filterdata <- renderText({
+  res <- filterDataReactive()
+  tmpnum = ifelse(is.null(res),0,nrow(res))
+  paste("Chosen filters result in ",tmpnum, " genes.")
+})
 
 
 # if datafilter_fold_change_groups selected

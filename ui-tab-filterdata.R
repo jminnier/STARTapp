@@ -88,6 +88,7 @@ tabPanel("Filter Data",
          ## Right hand column shows data input DT and data analysis result DT
          ## ==================================================================================== ##
          column(8,wellPanel(
+           h4(textOutput("nrow_filterdata")),
            downloadButton('download_filtered_data_csv','Save Filtered Results as CSV File'),
            dataTableOutput('filterdataoutput')
          )#wellpanel
