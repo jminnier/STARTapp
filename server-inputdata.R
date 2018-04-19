@@ -105,7 +105,6 @@ analyzeDataReactive <-
                   withProgress(message = "Analyzing RNA-seq data, please wait",{
                     
                     print("analysisCountDataReactive")
-                    
                     ## ==================================================================================== ##
                     ## Example data
                     ## ==================================================================================== ##

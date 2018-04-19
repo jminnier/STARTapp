@@ -93,6 +93,7 @@ filterDataReactive <- reactive({
   tmpgeneids = data_analyzed$geneids
   tmpres = data_analyzed$results
   tmpgroups = data_analyzed$group_names
+  tmpdatlong = data_analyzed$data_long
   
   # tmpdatlong = data_analyzed$data_long
   # tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
@@ -155,14 +156,34 @@ filterDataReactive <- reactive({
     mydata_genes = mydata_genes[tmpind,]
   }
   
-  mydata
   
-  # filter results by test and expression and then take intersection of gene ids with mydata?
+  if(input$datafilter_expr) {
+    tmpdatlong_filter = data.table::data.table(tmpdatlong)[unique_id%in%mydata_genes$unique_id,]
+    data.table::setnames(tmpdatlong_filter,input$datafilter_selectexpr, "mycol")
+    tmpdatlong_filter = tmpdatlong_filter[,.(min=min(mycol),max=max(mycol)),by=unique_id]
+    tmpdatlong_filter = tmpdatlong_filter[(min>=input$datafilter_exprmin)&(max<=input$datafilter_exprmax),]
+
+    tmpgenes = as.character(tmpdatlong_filter$unique_id)
+    tmpind = match(tmpgenes,mydata_genes$unique_id,nomatch=0)
+    
+    mydata = mydata[tmpind,]
+    mydata_genes = mydata_genes[tmpind,]
+  }
+  
+  
+  shiny::validate(need(nrow(mydata)>0,message="No features pass this filter."))
+  mydata  
+  # need to add: 
+  # filter only within some groups, should filter be based on above group selections? no because test is not
   # if nrow(mydata)==0 validate send message no data
   # save data as file with filter settings concatinated?
   # show number of genes that pass filter like in heatmap
-  # get rid of rownames
   # data frame display too wide, truncate columns?
+  # output data should have counts too? which is shown, log2cpm? log2cpm_voom?
+  #download record of filters buttons
+  #DF display, make prettier?
+  #data summary?
+  # print out how many records meet each criterea
 })
 
 
@@ -170,16 +191,8 @@ output$filterdataoutput <- renderDataTable({
   print("output$filterdataoutput")
   res <- filterDataReactive()
   res[,sapply(res,is.numeric)] <- signif(res[,sapply(res,is.numeric)],3)
-  datatable(res)
+  datatable(res, class = 'cell-border stripe', rownames = FALSE)
 })
-
-
-#download buttons
-#DF display, make prettier?
-#data summary?
-
-
-
 
 
 
@@ -194,8 +207,9 @@ output$filterdataoutput <- renderDataTable({
 # })
 
 
-
-
+output$download_filtered_data_csv <- downloadHandler(filename = paste0("START_results_filtered_",Sys.Date(),".csv"),
+                                              content = function(file) {
+                                                write_csv(filterDataReactive(), file)})
 
 
 
