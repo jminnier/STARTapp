@@ -50,7 +50,7 @@ observe({
 
 observe({
   print("server-datafilter-update-tests")
-  
+  data_analyzed = analyzeDataReactive()
   if(!(input$datafilter_selecttest=="")) {
     tmptest = input$datafilter_selecttest
     # get max abs fold change for this test
@@ -69,6 +69,7 @@ observe({
 # after selecting expression value
 observe({
   print("server-datafilter-update-expr")
+  data_analyzed = analyzeDataReactive()
   if(!(input$datafilter_selectexpr=="")) {
     exprname = input$datafilter_selectexpr
     #calculate miin and max
@@ -91,8 +92,7 @@ filterDataReactive <- reactive({
   tmpsampledata = data_analyzed$sampledata
   tmpgeneids = data_analyzed$geneids
   tmpres = data_analyzed$results
-  
-  
+  tmpgroups = data_analyzed$group_names
   
   # tmpdatlong = data_analyzed$data_long
   # tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
@@ -162,6 +162,7 @@ filterDataReactive <- reactive({
   # save data as file with filter settings concatinated?
   # show number of genes that pass filter like in heatmap
   # get rid of rownames
+  # data frame display too wide, truncate columns?
 })
 
 
