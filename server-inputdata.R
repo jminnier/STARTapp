@@ -20,6 +20,9 @@
 
 
 observe({
+  # Observe any changes in the input data, then update choices for column names
+  # in the input data tab.
+  # 
   # Check if example selected, or if not then ask to upload a file.
   validate(
     need((input$data_file_type=="examplecounts")|((!is.null(input$rdatafile))|(!is.null(input$datafile))), 
@@ -40,6 +43,8 @@ observe({
       updateSelectInput(session,"c_fc2",choices =tmpcols)
       updateSelectInput(session,"c_pval1",choices =tmpcols)
       updateSelectInput(session,"c_pval2",choices =tmpcols)
+      updateSelectInput(session,"c_qval1",choices =tmpcols)
+      updateSelectInput(session,"c_qval2",choices =tmpcols)
     }
   }
   
@@ -100,17 +105,20 @@ analyzeDataReactive <-
                   withProgress(message = "Analyzing RNA-seq data, please wait",{
                     
                     print("analysisCountDataReactive")
-                    
-                    #if an example just return previously analyzed results
+                    ## ==================================================================================== ##
+                    ## Example data
+                    ## ==================================================================================== ##
                     if(input$data_file_type=="examplecounts") {
                       load('data/mousecounts_example_analysis_results.RData')
-                      load('data/mousecounts_example_analyzed.RData') #example_data_results
+                      load('data/mousecounts_example_analyzed.RData') #example_data_results for data_results_table
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=results,"data_long"=data_long, "geneids"=geneids,
-                                  "expr_data"=expr_data,"data_results_table"=example_data_results))
+                                  "data_results_table"=example_data_results))
                     }
                     
-                    #if uploading own data:
+                    ## ==================================================================================== ##
+                    ## Upload previously downloaded RData
+                    ## ==================================================================================== ##
                     
                     if(input$data_file_type=="previousrdata"){
                       inRfile <- input$rdatafile
@@ -118,9 +126,13 @@ analyzeDataReactive <-
                       
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=results,"data_long"=data_long, 
-                                  "geneids"=geneids, "expr_data"=expr_data,
+                                  "geneids"=geneids,
                                   "data_results_table"=data_results_table))
                     }
+                    
+                    ## ==================================================================================== ##
+                    ## Else, continue on with uploading csv data
+                    ## ==================================================================================== ##
                     
                     alldata <- inputDataReactive()$data
                     
@@ -136,14 +148,15 @@ analyzeDataReactive <-
                       }
                     }
                     
-                    validate(
-                      not_numeric(alldata)
-                    )
+                    validate(not_numeric(alldata))
                     
                     # remove empty columns
                     alldata = alldata[,colMeans(is.na(alldata))<1]
                     
-                    if(input$inputdat_type=="counts") {
+                    ## ==================================================================================== ##
+                    ## Count/expression data
+                    ## ==================================================================================== ##
+                    if(input$inputdat_type=="expression_only") {
                       numgeneids <- 0
                       
                       #catch incorrect gene id error, only works if geneids are 1:numgeneids and no other columns are characters
@@ -167,9 +180,11 @@ analyzeDataReactive <-
                       tmpexprcols = seq(match(input$c_expr1,colnames(alldata)),match(input$c_expr2,colnames(alldata)))
                       tmpfccols = seq(match(input$c_fc1,colnames(alldata)),match(input$c_fc2,colnames(alldata)))
                       tmppvalcols = seq(match(input$c_pval1,colnames(alldata)),match(input$c_pval2,colnames(alldata)))
-                      
-                      validate(need(length(tmpfccols)==length(tmppvalcols),message =
-                                      "Number of fold change columns needs to be same number as p-value columns (and in the same order)."))
+                      tmpqvalcols = seq(match(input$c_qval1,colnames(alldata)),match(input$c_qval2,colnames(alldata)))
+                                            
+                      validate(need((length(tmpfccols)==length(tmppvalcols))&(length(tmpfccols)==length(tmpqvalcols)),message =
+                                      "Number of fold change columns needs to be same number as 
+                                      p-value and q-value columns (and in the same order)."))
                     }
                     
                     #split expression names into groups
@@ -187,7 +202,9 @@ analyzeDataReactive <-
                     print(paste0("Num genes kept after removing empty geneids: ",
                                  length(tmpkeep)," of ", nrow(geneids)))
                     
-                    validate(need(length(tmpkeep)>0,message = "Your data is empty. Please check file format is .csv. You may need a non-empty gene identifier column."))
+                    validate(need(length(tmpkeep)>0,
+                                  message = "Your data is empty. Please check file format is .csv. 
+                                  You may need a non-empty gene identifier column."))
                     
                     geneids = geneids[tmpkeep,,drop=FALSE]
                     countdata = countdata[tmpkeep,,drop=FALSE]
@@ -220,14 +237,18 @@ analyzeDataReactive <-
                       
                       fcdata = cbind("unique_id"=geneids$unique_id,tmpfc)
                       pvaldata = cbind("unique_id"=geneids$unique_id,alldata[tmpkeep,tmppvalcols,drop=F])
-                      
-                      tmpnames = paste(colnames(fcdata),colnames(pvaldata),sep=":")[-1]
+                      qvaldata = cbind("unique_id"=geneids$unique_id,alldata[tmpkeep,tmpqvalcols,drop=F])
+            
+                      tmpnames = paste(colnames(fcdata),colnames(qvaldata),sep=":")[-1]
                       colnames(fcdata)[-1] = tmpnames
                       colnames(pvaldata)[-1] = tmpnames
+                      colnames(qvaldata)[-1] = tmpnames
                       
                       fcdatalong = fcdata%>%gather(key = "test",value = "logFC",-1)
                       pvaldatalong = pvaldata%>%gather(key = "test",value = "P.Value",-1)
+                      qvaldatalong = qvaldata%>%gather(key = "test",value = "adj.P.Val",-1)
                       tmpres = full_join(fcdatalong,pvaldatalong)
+                      tmpres = full_join(tmpres,qvaldatalong)
                       
                       tmpdat = cbind("unique_id"=geneids$unique_id,expr_data)
                       tmpdatlong = tmpdat%>%gather(key="sampleid",value="expr",-1)
@@ -237,9 +258,9 @@ analyzeDataReactive <-
                       
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=tmpres,"data_long"=data_long, 
-                                  "geneids"=geneids,"expr_data"=expr_data,
+                                  "geneids"=geneids,
                                   "data_results_table"=alldata))
-                    }else if(input$inputdat_type=="counts") {
+                    }else if(input$inputdat_type=="expression_only") {
                       
                       #analyze data
                       
@@ -264,7 +285,7 @@ analyzeDataReactive <-
                         }
                       }
                       
-                      #do not perform voom on non-counts and assumpe log2 uploaded intensities
+                      #do not perform voom/edgeR on non-counts and assumpe log2 uploaded intensities
                       dovoom= datacounts(countdata)
                       
                       # if(not_counts(countdata)){print("Warning: You are uploading data that does not appear to be counts, the analysis pipeline will not be valid!")}
@@ -283,7 +304,7 @@ analyzeDataReactive <-
                         colnames(design) = levels(as.factor(sampledata$group))
                       }
                       
-                      if(dovoom) {
+                      if(dovoom){
                         #voom+limma
                         dge <- DGEList(counts=countdata) #TMM normalization first
                         dge <- calcNormFactors(dge)
@@ -301,13 +322,15 @@ analyzeDataReactive <-
                         
                         expr_data = v$E
                       }else{
-                        print("not doing voom")
+                        print("already normalized")
                         countdata2 = countdata
                         # crude check for logged data, unlikely to have a logged value >1000
                         if(max(countdata)>1000) countdata2 = log2(countdata+0.5)
                         log2cpm = countdata2
                         expr_data = countdata2
                       }
+                      
+
                       
                       tmpgroup = sampledata$group
                       #contrasts(tmpgroup)
@@ -321,17 +344,27 @@ analyzeDataReactive <-
                         lmobj_res = list()
                         for(ii in 1:length(group_names)) {
                           grp = relevel(tmpgroup,ref= group_names[ii] )
-                          lm.obj = lm(t(expr_data) ~ grp)
-                          beta.lm = t(lm.obj$coefficients)
-                          pval.lm = t(lm.pval(lm.obj)$pval)
-                          pval.adj.lm = apply(pval.lm,2,p.adjust,method="BH")
+                          design <- model.matrix(~grp)
                           
-                          colnames(beta.lm) = colnames(pval.lm) = colnames(pval.adj.lm) = 
-                            gsub("grp","",colnames(beta.lm))
+                          if(input$analysis_method=="edgeR") {
+                            dge <- estimateDisp(dge,design)
+                            fit <- glmQLFit(dge,design)
+                            beta <- fit$coefficients[,-1,drop=FALSE]
+                            pval <- sapply(2:(ncol(design)),
+                                        function(k) {glmQLFTest(fit,k)$table[,"PValue"]})
+                          }else{
+                            lm.obj = lm(t(expr_data) ~ grp)
+                            beta = t(lm.obj$coefficients)[,-1,drop=FALSE]
+                            pval = t(lm.pval(lm.obj)$pval)[,-1,drop=FALSE]
+                          }
+                          pval.adj = apply(pval,2,p.adjust,method="BH")
                           
-                          tmpout = cbind(melt(beta.lm[,-1,drop=FALSE]),
-                                         melt(pval.lm[,-1,drop=FALSE])$value,
-                                         melt(pval.adj.lm[,-1,drop=FALSE])$value)
+                          colnames(beta) = colnames(pval) = colnames(pval.adj) = 
+                            gsub("grp","",colnames(beta))
+                          
+                          tmpout = cbind(melt(beta),
+                                         melt(pval)$value,
+                                         melt(pval.adj)$value)
                           colnames(tmpout) = c("unique_id","numer_group","logFC","P.Value","adj.P.Val")
                           tmpout$denom_group = group_names[ii]
                           tmpout$test = with(tmpout, paste(numer_group,denom_group,sep="/"))
@@ -373,14 +406,11 @@ analyzeDataReactive <-
                         data_long = data_long%>%select(-one_of(tmpgeneidnames))
                       }
                       
-                      #expr_data = tmplog2cpm[,-1]
-                      
                       print('analyze data: done')
                       
                       
                       return(list('group_names'=group_names,'sampledata'=sampledata,
                                   "results"=lmobj_res,"data_long"=data_long, "geneids"=geneids, 
-                                  "expr_data"=expr_data,
                                   "data_results_table"=data_results_table))
                       
                     }     
@@ -408,12 +438,12 @@ observeEvent(inputDataReactive(),({
 })
 )
 
-output$analysisoutput <- DT::renderDataTable({
+output$analysisoutput <- renderDataTable({
   print("output$analysisoutput")
   getresults <- analyzeDataReactive()
   res = getresults$results
   res[,sapply(res,is.numeric)] <- signif(res[,sapply(res,is.numeric)],3)
-  DT::datatable(res)
+  datatable(res)
 })
 
 
@@ -430,11 +460,10 @@ output$downloadResults_RData <- downloadHandler(filename= paste0("START_results_
                                                   results = tmp$results
                                                   data_long = tmp$data_long
                                                   geneids = tmp$geneids
-                                                  expr_data = tmp$expr_data
                                                   data_results_table = tmp$data_results_table
                                                   
                                                   save(group_names,sampledata,results,
-                                                       data_long,geneids,expr_data,
+                                                       data_long,geneids,
                                                        data_results_table,file=file)
                                                 })
 

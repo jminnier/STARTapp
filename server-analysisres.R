@@ -30,6 +30,8 @@ observe({
   tmptests = unique(as.character(tmpdat$test))
   tmpdatlong = data_analyzed$data_long
   tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  tmpgeneids = data_analyzed$geneids
+  data_analyzedgenes = as.character(unlist(tmpgeneids))
   
   updateSelectizeInput(session,'analysisres_test',
                        choices=tmptests, selected=tmptests[1])
@@ -40,10 +42,13 @@ observe({
     updateSelectizeInput(session,'analysisres_groups',
                          choices=tmpgroups,selected = tmpgroups)
   }
+  updateSelectizeInput(session,"analysisres_genes",
+                       choices=data_analyzedgenes,server=TRUE)
   
   updateRadioButtons(session,'scattervaluename',
                      choices=sort(tmpynames,decreasing = TRUE))
-  
+  updateRadioButtons(session,'scatterresultsname',
+                     choices=tmptests)
   
 })
 
@@ -74,9 +79,11 @@ observe({
                    if (names(dev.cur()) != "null device") dev.off()
                    pdf(NULL)
                    p=rna_volcanoplot(data_results = data_results,
-                                   test_sel = input$analysisres_test,
-                                   absFCcut = input$analysisres_fold_change_cut,
-                                   fdrcut = input$analysisres_fdrcut)
+                                     test_sel = input$analysisres_test,
+                                     absFCcut = input$analysisres_fold_change_cut,
+                                     pvalcut = input$analysisres_pvalcut,
+                                     fdrcut = input$analysisres_fdrcut,
+                                     sel_genes = input$analysisres_genes)
                    
                  })#end withProgress
     
@@ -93,6 +100,7 @@ observe({
   data_analyzed = analyzeDataReactive()
   data_long = data_analyzed$data_long
   geneids = data_analyzed$geneids
+  results = data_analyzed$results
   
   
   
@@ -100,14 +108,25 @@ observe({
   #                 group_sel = input$analysisres_groups,
   #                 valuename=input$scattervaluename)%>%
   #   bind_shiny("scatterplot_fc_2groups_ggvis","scatterplot_fc_2groups_ggvisUI")
+  
+  
+  
   output$scatterplot <- renderPlotly({ 
     validate(need(length(input$analysisres_groups)==2,"Please select two groups."))
     withProgress(message = "Drawing scatterplot, please wait",{
       if (names(dev.cur()) != "null device") dev.off()
       pdf(NULL)
+      
       p=rna_scatterplot(data_long = data_long,
-                      group_sel = input$analysisres_groups,
-                      valuename=input$scattervaluename)
+                        results = results,
+                        group_sel = input$analysisres_groups,
+                        valuename=input$scattervaluename,
+                        color_result_name = input$scattercolor,
+                        results_test_name = input$scatterresultsname,
+                        color_low = input$scattercolor_low,
+                        color_hi = input$scattercolor_hi,
+                        sel_genes = input$analysisres_genes
+      )
     })#end withProgress
   })
   

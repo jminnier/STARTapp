@@ -132,7 +132,7 @@ tabPanel("Heatmaps",
                   tabPanel(title="Data Output",
                            downloadButton('downloadHeatmapData_rna', 
                                           'Download Heatmap Data as CSV File'),
-                           DT::dataTableOutput("heatdat_rna"))
+                           dataTableOutput("heatdat_rna"))
                 )#tabsetPanel
          )#column
          )#fluidrow

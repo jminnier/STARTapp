@@ -42,6 +42,8 @@ library(NMF)
 library(scales)
 library(heatmaply)
 library(readr)
+library(colourpicker)
+library(data.table)
 
 ##================================================================================##
 
@@ -58,7 +60,7 @@ if(FALSE) {
   load('data/mousecounts_example_analyzed.RData') #example_data_results
   data_analyzed = list('group_names'=group_names,'sampledata'=sampledata,
                        "results"=results,"data_long"=data_long, "geneids"=geneids,
-                       "expr_data"=expr_data,"data_results_table"=example_data_results)
+                       "data_results_table"=example_data_results)
   
   data_results = data_analyzed$results
   

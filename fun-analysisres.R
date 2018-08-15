@@ -29,8 +29,14 @@
 # change rna_volcanoplot to have an input function that depends on type of variables and then a plotting function
 # need to be more careful about what p-value (adjusted or raw) is used for colors
 # add option to label a set of genes (top 5, or name them)
+
+# profvis::profvis(
+#   rna_volcanoplot(results,test_sel="group1/group2",absFCcut=0,pvalcut=0.05,fdrcut=0.05)
+#   )
+
 rna_volcanoplot <- function(data_results, geneids=NULL, 
-                            test_sel=NULL,absFCcut=0,fdrcut=0.05) {
+                            test_sel=NULL,absFCcut=0,pvalcut=0.05,fdrcut=0.05,
+                            sel_genes=NULL) {
   
   validate(need(mean(is.na(data_results$P.Value))<1,message = "All p-values are NA. 
                 Check to make sure you have replicates or >1 groups for statistical analysis."))
@@ -54,33 +60,58 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
     res$adj.P.Val = res$P.Value
     usepadj = FALSE 
     pvalname = "pval"
+    print("no adjusted p-value found for volcano plot")
   }
   
   res$color="None"
-  res$color[which((abs(res$logFC)>absFCcut)*(res$P.Value<fdrcut)==1)] = paste0("pval","<",fdrcut," & abs(logfc)>",absFCcut)
-  res$color[which((abs(res$logFC)<absFCcut)*(res$P.Value<fdrcut)==1)] =  paste0("pval","<",fdrcut, " & abs(logfc)<",absFCcut)
-  res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<fdrcut)==1)] = paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
-  res$color[which((abs(res$logFC)<absFCcut)*(res$adj.P.Val<fdrcut)==1)] = paste0(pvalname,"<",fdrcut, " & abs(logfc)<",absFCcut)
-  #res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val>fdrcut)==1)] = paste0(pvalname,">",fdrcut, " & abs(logfc)>",absFCcut)
-  res$color = factor(res$color,levels = unique(c("None",
-                                                 paste0("pval","<",fdrcut, " & abs(logfc)<",absFCcut), # only exists if pval != pvalname 
-                                                 paste0(pvalname,"<",fdrcut," & abs(logfc)<",absFCcut), 
-                                                 paste0("pval","<",fdrcut, " & abs(logfc)>",absFCcut), # only exists if pval != pvalname 
-                                                 paste0(pvalname,"<",fdrcut, " & abs(logfc)>",absFCcut)
-  )))
+  res$color[which((abs(res$logFC)>absFCcut)*(res$P.Value<pvalcut)==1)] = 
+    paste0("pval","<",pvalcut," & abs(logfc)>",absFCcut)
+  res$color[which((abs(res$logFC)<absFCcut)*(res$P.Value<pvalcut)==1)] =  
+    paste0("pval","<",pvalcut, " & abs(logfc)<",absFCcut)
+  res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<fdrcut)==1)] = 
+    paste0(pvalname,"<",fdrcut," & abs(logfc)>",absFCcut)
+  res$color[which((abs(res$logFC)<absFCcut)*(res$adj.P.Val<fdrcut)==1)] = 
+    paste0(pvalname,"<",fdrcut, " & abs(logfc)<",absFCcut)
+  # if pvalcut is high and only have genes < fdrcut, fdrcut dominates, is this the best way, or should it
+  # be intersection?
   
+  # levels of color will be a subset of all_levels, but we want the color to match the all_levels
+  tmplevels = levels(as.factor(res$color))
+  all_levels = c("None",
+                 paste0("pval","<",pvalcut, " & abs(logfc)<",absFCcut), # only exists if pval != pvalname 
+                 paste0(pvalname,"<",fdrcut," & abs(logfc)<",absFCcut), 
+                 paste0("pval","<",pvalcut, " & abs(logfc)>",absFCcut), # only exists if pval != pvalname 
+                 paste0(pvalname,"<",fdrcut, " & abs(logfc)>",absFCcut))
+  res$color = factor(
+    res$color,
+    levels = intersect(all_levels,
+                       tmplevels
+    ))
+  tmplevels = levels(res$color)
   
-  p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+geom_point()
-  
-  if(length(levels(res$color))>3) {
-    p <- p + scale_color_manual(values=c("grey40","grey60","green3","grey70","red2"),
-                       limits=levels(res$color),
-                       name="Significance")
-  }else{
-    p <- p +  scale_color_manual(values=c("grey40","green3","red2"),
-                                 limits=levels(res$color),
-                                 name="Significance")
+  # add selected genes
+  shapedata = data.frame()
+  if(!is.null(sel_genes)) {
+    tmpind = sapply(unlist(sel_genes),function(k) grep(k,res$unique_id,fixed=TRUE))
+    tmpind = unique(unlist(tmpind))
+    shapedata <- res[tmpind,]
   }
+  
+  
+  p <- ggplot(res,aes(x=logFC,y=-log10(P.Value),color=color,text=unique_id))+
+    geom_point(shape=19,fill="black")
+  p <- p + scale_color_manual(values=
+                                c("grey40","grey60","green3","grey70","red2")[match(tmplevels,all_levels)],
+                              limits=levels(res$color),
+                              name="Significance")
+  
+  if(nrow(shapedata)>0) {
+    p <- p + geom_point(data=shapedata,fill="orange",shape=23,size=3,color="grey40") +
+      #scale_size_manual(values = c(1,3))+
+      guides(size=FALSE,shape=FALSE,fill=FALSE)
+  }
+  
+  
   p <- p + theme_base() + theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
   gg <- plotly_build(p)
@@ -94,9 +125,9 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
                    "adj.P.Val",signif(res$adj.P.Val,3))
   print(length(g$data))
   
-  for(ii in 1:length(g$data)) {
-    tmpid = do.call(rbind,strsplit(g$data[[ii]]$text,"<br />"))[,4]
-    g$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
+  for(ii in 1:length(g$x$data)) {
+    tmpid = do.call(rbind,strsplit(g$x$data[[ii]]$text,"<br />"))[,4]
+    g$x$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
   }
   
   gg
@@ -118,7 +149,11 @@ rna_volcanoplot_ggvis <- function(data_results, geneids=NULL,
   res$color[which(res$adj.P.Val<fdrcut)] = paste0("adj-pval<",fdrcut)
   res$color[which(abs(res$logFC)>absFCcut)] = paste0("abs(logfc)>",absFCcut)
   res$color[which((abs(res$logFC)>absFCcut)*(res$adj.P.Val<.05)==1)] = paste0("adj-pval<",fdrcut," & abs(logfc)>",absFCcut)
-  res$color = factor(res$color,levels = c("None",paste0("adj-pval<",fdrcut),paste0("abs(logfc)>",absFCcut),paste0("adj-pval<",fdrcut," & abs(logfc)>",absFCcut)))
+  res$color = factor(res$color,
+                     levels = c("None",
+                                paste0("adj-pval<",fdrcut),
+                                paste0("abs(logfc)>",absFCcut),
+                                paste0("adj-pval<",fdrcut," & abs(logfc)>",absFCcut)))
   res$id = 1:nrow(res)
   
   
@@ -151,9 +186,23 @@ rna_volcanoplot_ggvis <- function(data_results, geneids=NULL,
 ## ==================================================================================== ##
 ## Scatter plot of log2 fold changes
 ## ==================================================================================== ##  	
+# 
+# profvis::profvis(
+#   rna_scatterplot(data_long,results,results_test_name="group1/group2",
+#                   color_result_name="-log10(p-value)",
+#                   group_sel=c('group1','group2'),
+#                   sel_genes=c("Itpkb","ENSMUSG00000051977_Prdm9"))
+# )
 
-rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
-                            valuename="log2cpm") {
+
+rna_scatterplot <- function(data_long, results, 
+                            results_test_name = NULL,
+                            color_result_name=NULL,
+                            color_low="blue",
+                            color_hi="orange",
+                            geneids=NULL, group_sel=NULL,
+                            valuename="log2cpm",
+                            sel_genes=NULL) {
   group1 = group_sel[1]; group2 = group_sel[2]
   
   data_long$value = data_long[,valuename]
@@ -165,7 +214,55 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   pp_wide$id = 1:nrow(pp_wide)
   
   colnames(pp_wide)[c(match(group1,colnames(pp_wide)),match(group2,colnames(pp_wide)))] = c("g1","g2")
-  pp_wide = pp_wide%>%mutate(diff = g1-g2,color=1*(g1>=g2))
+  #pp_wide = pp_wide%>%mutate(diff = g1-g2,color=1*(g1>=g2)) # mutate is too slow
+  pp_wide$diff = pp_wide$g1 - pp_wide$g2
+  pp_wide$color = 1*(pp_wide$g1>=pp_wide$g2)
+  
+  results = results%>%filter(test==results_test_name)
+  pp_wide = left_join(pp_wide,results)
+  
+  
+  # Choose variable for colors
+  colorlabels = c("logFC","p-value","adjusted p-value (q-value)",
+                  "-log10(p-value)","-log10(q-value)",
+                  "p-value < .1","q-value < .1")
+  colorvars = c("logFC","P.Value","adj.P.Val","log10.P.Value","log10.adj.P.Val",
+                "P.Value.1","adj.P.Val.1")
+  pp_wide$log10.P.Value = -log10(pp_wide$P.Value)
+  pp_wide$log10.adj.P.Val = -log10(pp_wide$adj.P.Val)
+  pp_wide$P.Value.1 = pp_wide$P.Value
+  pp_wide$P.Value.1[pp_wide$P.Value>.1] = .11
+  pp_wide$adj.P.Val.1 = pp_wide$adj.P.Val
+  pp_wide$adj.P.Val.1[pp_wide$adj.P.Val>.1] = .11
+  
+  len_nacolor = 0
+  colorname = NULL
+  if(color_result_name=="Sign of FC") color_result_name = NULL
+  color_is_factor = TRUE
+  if(!is.null(color_result_name)) {
+    tmpcolorvar = colorvars[match(color_result_name,colorlabels)]
+    tmpcolor = get(tmpcolorvar,pp_wide)
+    len_nacolor = sum(is.na(tmpcolor))
+    colorname = color_result_name
+    color_is_factor = FALSE
+    if(len_nacolor>0) {
+      warning(paste0("Color factor has ",len_nacolor, "missing values, these genes will not appear on graph."))}
+    pp_wide$color = tmpcolor
+  }
+  if(length(unique(pp_wide$color))<5) {
+    color_is_factor = TRUE
+    pp_wide$color = factor(pp_wide$color)
+  }
+  
+  # add selected genes
+  shapedata = data.frame()
+  if(!is.null(sel_genes)) {
+    tmpgenes = stringr::str_split(pp_wide$unique_id,"_",simplify = TRUE)
+    tmpind = sapply(sel_genes,function(k) unique(which(tmpgenes==k,arr.ind=T)[,1]))
+    tmpind = unique(unlist(tmpind))
+    shapedata <- pp_wide[tmpind,]
+  }
+  
   #  pp_wide = pp_wide%>%filter(value>=valuecut[1],value<=valuecut[2])
   
   # all_values <- function(x){
@@ -186,28 +283,59 @@ rna_scatterplot <- function(data_long, geneids=NULL, group_sel=NULL,
   #   add_tooltip(all_values, "hover")%>%hide_legend("fill")
   
   # switch to ggplotly since ggvis was slow
-  p <- ggplot(pp_wide,aes(x=g1,y=g2,
-                          color=factor(color),text=unique_id))+geom_point()
-  p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))+
-    scale_color_manual(values=c("darkred","darkorange"))
+  p <-   ggplot(pp_wide,aes(x=g1,y=g2,
+                            color=color,
+                            text=unique_id),fill=1)+geom_point(shape=19,size=1)+guides(fill=FALSE)
+  p <- p + xlab(paste0(group1,"_Ave",valuename)) + ylab(paste0(group2,"_Ave",valuename))
+  
+  
+  if(is.null(colorname)) {
+    p <- p + guides(color=FALSE)
+  }else {
+    if(color_is_factor){
+      mycolors = colorRampPalette(c(color_low,color_hi))(nlevels(pp_wide$color))
+      p <- p + scale_color_manual(name=colorname,values = mycolors)
+    }else{
+      mycolors = colorRampPalette(c(color_low,color_hi))(nlevels(pp_wide$color))
+      p <- p + scale_color_gradient(name=colorname,low=color_low,high=color_hi)
+    }
+  }
+  
+  
+  if(nrow(shapedata)>0) {
+    p <- p + geom_point(data=shapedata,fill=2,shape=23,size=4) +
+      scale_size_manual(values = c(1,3))+
+      scale_fill_manual(values = c("black","red"))+
+      guides(size=FALSE,shape=FALSE,fill=FALSE)
+  }
+  
   p <- p + theme_base() + #ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
-    theme(legend.position="none",plot.margin = unit(c(2,2,2,2), "cm"))
+    theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
   gg <- plotly_build(p)
   g <- gg$x
   
+  # just in case we don't have adj.p.val, don't error newtext
+  if(is.null(pp_wide$adj.P.Val)) pp_wide$adj.P.Val = NA
+  
   #Match order of text to proper gene order
-  newtext =  paste("Gene ID:",pp_wide$unique_id,"<br />",
-                   paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br />",
-                   paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2,3),"<br />",
-                   "Difference:",round(pp_wide$diff,3))
+  newtext =  paste("Gene ID:",pp_wide$unique_id,"<br>",
+                   paste0(group1,"_Ave",valuename,":"),round(pp_wide$g1,3),"<br>",
+                   paste0(group2,"_Ave",valuename,":"),round(pp_wide$g2,3),"<br>",
+                   "Difference:",round(pp_wide$diff,3),"<br>",
+                   "logFC:",round(pp_wide$logFC,3),"<br>",
+                   "P.Value:",signif(pp_wide$P.Value,3),"<br>",
+                   "adj.P.Val:",signif(pp_wide$adj.P.Val,3),"<br>"
+  )
   
   
-  tmpid = do.call(rbind,strsplit(g$data[[1]]$text,"<br />"))[,4]
-  g$data[[1]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
   
-  tmpid = do.call(rbind,strsplit(g$data[[2]]$text,"<br />"))[,4]
-  g$data[[2]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
+  for(ii in 1:length(g$x$data)) {
+    if(!is.null(g$x$data[[ii]]$text)) {
+      tmpid = stringr::str_split(g$x$data[[ii]]$text,"<br />",simplify=TRUE)[,4]
+      g$x$data[[ii]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
+    }
+  }
   
   gg
   

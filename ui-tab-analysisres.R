@@ -31,18 +31,34 @@ tabPanel("Analysis Plots",
                             numericInput("analysisres_fold_change_cut",
                                          label="Choose log2(Fold Change) Threshold\n(based on your input FCs, 
                        or fitted FCs if your data has been analyzed by START)",min= 0, max=20,value=1),
+                            numericInput("analysisres_pvalcut",
+                                         label="Choose P-value Threshold",min=0,max=1,value=0.05),
                             numericInput("analysisres_fdrcut",
-                                         label="Choose P-value Threshold\n(based on your input p-value, 
-                        or the FDR adjusted p-value if 
-                                         data has been analyzed by START)",min=0,max=1,value=0.05)
+                                         label="Choose adjusted P-value (or FDR) Threshold",min=0,max=1,value=0.05)
            ),#conditionalpanel
            
            conditionalPanel("input.analysisres_tabset=='Scatterplot of Fold Changes'",
                             selectizeInput("analysisres_groups",label="Select Groups for Scatterplot",
                                            choices=NULL,
                                            multiple=TRUE,options = list(maxItems = 2)),
-                            radioButtons("scattervaluename",label="Select Scatterplot Value",choices="")
-           )#conditionalpanel
+                            radioButtons("scattervaluename",label="Select Scatterplot Value",choices=""),
+                            radioButtons("scattercolor",label="Select Color Factor Value",
+                                         choices=c("Sign of FC",
+                                                   "logFC","p-value","adjusted p-value (q-value)",
+                                                   "p-value < .1","q-value < .1",
+                                                   "-log10(p-value)","-log10(q-value)"),
+                                         selected = "-log10(p-value)"),
+                            radioButtons("scatterresultsname",label="Select Test for Color Factor",
+                                         choices=""),
+                            colourInput("scattercolor_low",label="Select Color - Low Values","blue",
+                                        showColour = "background"),
+                            colourInput("scattercolor_hi",label="Select Color - High Values","orange",
+                                        showColour = "background")
+                            
+           ),#conditionalpanel
+           selectizeInput("analysisres_genes",label="Select Genes to Highlight",
+                          choices=NULL,
+                          multiple=TRUE)
          )#,
          #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column

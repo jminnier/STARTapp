@@ -71,7 +71,7 @@ tabPanel("Gene Expression Boxplots",
                   ## ==================================================================================== ## 
                   tabPanel(title="Data Output",
                            downloadButton('downloadSubsetData', 'Download Data Subset as CSV File'),
-                           DT::dataTableOutput("dat_dotplot")
+                           dataTableOutput("dat_dotplot")
                   )#tabsetPanel
                 ))#column
          

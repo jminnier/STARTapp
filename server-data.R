@@ -34,8 +34,8 @@ output$downloadData <- downloadHandler(filename = c('all_data.csv'),
 
 
 
-output$outdat <- DT::renderDataTable({
+output$outdat <- renderDataTable({
   tmpdat = AllRNAdatReactive()
   tmpdat[,sapply(tmpdat,is.numeric)] <- signif(tmpdat[,sapply(tmpdat,is.numeric)],3)
-  DT::datatable(tmpdat)
+  datatable(tmpdat)
 })

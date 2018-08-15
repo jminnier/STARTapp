@@ -1,4 +1,4 @@
-# START App 
+# START App
 
 This is the code to run the app described in the manuscript: 
 

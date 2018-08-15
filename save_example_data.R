@@ -157,7 +157,7 @@ data = countdata
 results = lmobj_res
 
 #after running analysis pipeline, export this code to another example construction file
-save(countdata,group_names,sampledata,results,data_long,geneids,expr_data,
+save(countdata,group_names,sampledata,results,data_long,geneids,
      file="data/mousecounts_example_analysis_results.RData")
 
 

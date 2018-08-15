@@ -24,6 +24,7 @@
 ## ==================================================================================== ##   
 tabPanel("Group Plots",  
          fluidRow(column(4,wellPanel(
+           radioButtons("groupplot_valuename",label="Select Value to Plot",choices=""),
            selectizeInput("sampleres_groups", label="Select Groups",
                           choices=NULL,
                           multiple=TRUE),

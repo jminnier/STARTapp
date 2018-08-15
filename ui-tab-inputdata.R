@@ -18,35 +18,48 @@
 # You may contact the author of this code, Jessica Minnier, at <minnier@ohsu.edu>
 ## ==================================================================================== ##
 ## 
-## 
-## # This tab is used to input the count or normalized data files
+
+## ==================================================================================== ##
+## This tab is used to input the count or normalized data files
+## ==================================================================================== ##
 
 tabPanel("Input Data", 
+         ## ==================================================================================== ##
+         ## Left hand column has the input data settings and options
+         ## ==================================================================================== ##
          fluidRow(column(4,wellPanel(
+           # PDF of instructions link
            downloadLink("instructionspdf",label="Download Instructions (pdf)"),
+           # Upload data from csv, upload data from RData, use example data
            radioButtons('data_file_type','Use example file or upload your own data',
                         c('Upload Data'="upload",
                           'START RData file'="previousrdata",
                           'Example Data'="examplecounts"
                         ),selected = "examplecounts"),
+           # Conditional panels appear based on input.data_file_type selection
            conditionalPanel(condition="input.data_file_type=='previousrdata'",
                             fileInput('rdatafile','Upload START Generated RData File'),
-                            conditionalPanel("output.fileUploaded",h4(strong("Check data contents then click:")))
+                            conditionalPanel("output.fileUploaded",
+                                             h4(strong("Check data contents then click:")))
            ),
            conditionalPanel(condition="input.data_file_type=='upload'",
                             radioButtons("inputdat_type","Input Data Type:",
-                                         c("Expression data: Gene Counts or log-expression (log2cpms)"="counts",
-                                           #"Microarray expression data"="microarray",
+                                         c("Expression data: Gene Counts or log-expression (log2cpms)"="expression_only",
                                            "Analyzed data: Expression Values, p-values, fold changes"="analyzed")),
-                            conditionalPanel(condition="input.inputdat_type=='counts'",
-                                             downloadLink("example_counts_file",label="Download Example Count File"),
-                                             p(""),
-                                             img(src="examplecounts.png",width="100%"),
-                                             tags$ul(
-                                               tags$li("File must have a header row."), 
-                                               tags$li("First/Left-hand column(s) must be gene identifiers."), 
-                                               tags$li("Format expression column names as GROUPNAME_REPLICATE#: Group1_1, Group1_2, Group2_1, Group2_2...")
-                                             )
+                            conditionalPanel(
+                              condition="input.inputdat_type=='expression_only'",
+                              downloadLink("example_counts_file",label="Download Example Count File"),
+                              p(""),
+                              img(src="examplecounts.png",width="100%"),
+                              tags$ul(
+                                tags$li("File must have a header row."), 
+                                tags$li("First/Left-hand column(s) must be gene identifiers."), 
+                                tags$li("Format expression column names as GROUPNAME_REPLICATE#: Group1_1, Group1_2, Group2_1, Group2_2...")
+                              ),
+                              radioButtons("analysis_method","Analysis Method",
+                                           c("edgeR"="edgeR",
+                                             "voom/limma"="voom_limma",
+                                             "Array or counts already normalized, linear models"="lmmodel"))
                             ),
                             conditionalPanel(condition="input.inputdat_type=='analyzed'",
                                              downloadLink("example_analysis_file",label="Download Example Analysis Results File"),
@@ -72,7 +85,9 @@ tabPanel("Input Data",
                                              selectInput("c_fc2",label="Last column # with fold changes",choices=NULL),
                                              radioButtons("isfclogged",label="Is FC logged? (if false, expression values will be log2-transformed for visualization)",choices=c("Yes (Leave it alone)","No (Log my data please)"),selected="No (Log my data please)"),
                                              selectInput("c_pval1",label="First column # with p-values",choices=NULL),
-                                             selectInput("c_pval2",label="Last column # with p-values",choices=NULL)
+                                             selectInput("c_pval2",label="Last column # with p-values",choices=NULL),
+                                             selectInput("c_qval1",label="First column # with adjusted p-values (can be same columns as p-values)",choices=NULL),
+                                             selectInput("c_qval2",label="Last column # with adjusted p-values (can be same columns as p-values)",choices=NULL)
                             )
            ),
            conditionalPanel("output.fileUploaded",
@@ -80,13 +95,11 @@ tabPanel("Input Data",
                                          style="color: #fff; background-color: #CD0000; border-color: #9E0000"))
          )#,
          # add reference group selection
-         # add instructions
          # missing value character?
-         # allow to input counts and analyze via standard limma, OR
-         # input counts, fitted logcpm, and p-values? if multiple comparisons
-         # p-values would be complicated
-         #img(src="KCardio_CMYK_4C_pos_small.jpg",height=150,width= 275,align="right")	
          ),#column
+         ## ==================================================================================== ##
+         ## Right hand column shows data input DT and data analysis result DT
+         ## ==================================================================================== ##
          column(8,
                 bsCollapse(id="input_collapse_panel",open="data_panel",multiple = FALSE,
                            bsCollapsePanel(title="Data Contents: Check Before `Submit`",value="data_panel",
