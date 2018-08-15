@@ -55,7 +55,11 @@ tabPanel("Input Data",
                                 tags$li("File must have a header row."), 
                                 tags$li("First/Left-hand column(s) must be gene identifiers."), 
                                 tags$li("Format expression column names as GROUPNAME_REPLICATE#: Group1_1, Group1_2, Group2_1, Group2_2...")
-                              )
+                              ),
+                              radioButtons("analysis_method","Analysis Method",
+                                           c("edgeR"="edgeR",
+                                             "voom/limma"="voom_limma",
+                                             "Array or counts already normalized, linear models"="lmmodel"))
                             ),
                             conditionalPanel(condition="input.inputdat_type=='analyzed'",
                                              downloadLink("example_analysis_file",label="Download Example Analysis Results File"),

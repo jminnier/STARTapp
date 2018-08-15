@@ -285,7 +285,7 @@ analyzeDataReactive <-
                         }
                       }
                       
-                      #do not perform voom on non-counts and assumpe log2 uploaded intensities
+                      #do not perform voom/edgeR on non-counts and assumpe log2 uploaded intensities
                       dovoom= datacounts(countdata)
                       
                       # if(not_counts(countdata)){print("Warning: You are uploading data that does not appear to be counts, the analysis pipeline will not be valid!")}
@@ -304,7 +304,7 @@ analyzeDataReactive <-
                         colnames(design) = levels(as.factor(sampledata$group))
                       }
                       
-                      if(dovoom) {
+                      if(dovoom){
                         #voom+limma
                         dge <- DGEList(counts=countdata) #TMM normalization first
                         dge <- calcNormFactors(dge)
@@ -322,13 +322,15 @@ analyzeDataReactive <-
                         
                         expr_data = v$E
                       }else{
-                        print("not doing voom")
+                        print("already normalized")
                         countdata2 = countdata
                         # crude check for logged data, unlikely to have a logged value >1000
                         if(max(countdata)>1000) countdata2 = log2(countdata+0.5)
                         log2cpm = countdata2
                         expr_data = countdata2
                       }
+                      
+
                       
                       tmpgroup = sampledata$group
                       #contrasts(tmpgroup)
@@ -342,17 +344,27 @@ analyzeDataReactive <-
                         lmobj_res = list()
                         for(ii in 1:length(group_names)) {
                           grp = relevel(tmpgroup,ref= group_names[ii] )
-                          lm.obj = lm(t(expr_data) ~ grp)
-                          beta.lm = t(lm.obj$coefficients)
-                          pval.lm = t(lm.pval(lm.obj)$pval)
-                          pval.adj.lm = apply(pval.lm,2,p.adjust,method="BH")
+                          design <- model.matrix(~grp)
                           
-                          colnames(beta.lm) = colnames(pval.lm) = colnames(pval.adj.lm) = 
-                            gsub("grp","",colnames(beta.lm))
+                          if(input$analysis_method=="edgeR") {
+                            dge <- estimateDisp(dge,design)
+                            fit <- glmQLFit(dge,design)
+                            beta <- fit$coefficients[,-1,drop=FALSE]
+                            pval <- sapply(2:(ncol(design)),
+                                        function(k) {glmQLFTest(fit,k)$table[,"PValue"]})
+                          }else{
+                            lm.obj = lm(t(expr_data) ~ grp)
+                            beta = t(lm.obj$coefficients)[,-1,drop=FALSE]
+                            pval = t(lm.pval(lm.obj)$pval)[,-1,drop=FALSE]
+                          }
+                          pval.adj = apply(pval,2,p.adjust,method="BH")
                           
-                          tmpout = cbind(melt(beta.lm[,-1,drop=FALSE]),
-                                         melt(pval.lm[,-1,drop=FALSE])$value,
-                                         melt(pval.adj.lm[,-1,drop=FALSE])$value)
+                          colnames(beta) = colnames(pval) = colnames(pval.adj) = 
+                            gsub("grp","",colnames(beta))
+                          
+                          tmpout = cbind(melt(beta),
+                                         melt(pval)$value,
+                                         melt(pval.adj)$value)
                           colnames(tmpout) = c("unique_id","numer_group","logFC","P.Value","adj.P.Val")
                           tmpout$denom_group = group_names[ii]
                           tmpout$test = with(tmpout, paste(numer_group,denom_group,sep="/"))
