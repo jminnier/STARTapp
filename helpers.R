@@ -44,6 +44,7 @@ library(heatmaply)
 library(readr)
 library(colourpicker)
 library(data.table)
+library(janitor)
 
 ##================================================================================##
 

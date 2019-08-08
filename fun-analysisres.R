@@ -207,6 +207,7 @@ rna_scatterplot <- function(data_long, results,
   
   data_long$value = data_long[,valuename]
   
+  # remove this, takes too long, do up front
   pp = data_long%>%filter(group%in%group_sel)
   pp_sum = pp%>%group_by(unique_id,group)%>%summarise("Ave_value"=mean(value))
   
