@@ -137,40 +137,53 @@ analyzeDataReactive <-
                     }else if(input$data_file_type=="previousrdata"){
                       inRfile <- input$rdatafile
                       load_existing_rdata(inRfile$datapath)
-                    }
+                    }else{
                     
                     ## ==================================================================================== ##
                     ## Else, continue on with uploading csv data
                     ## ==================================================================================== ##
-                    else{
                       alldata <- inputDataReactive()$data
                       # remove empty columns
                       alldata = alldata %>% remove_empty(which=c("rows","cols"))
-                    
-                    ## ==================================================================================== ##
-                    ## Count/expression data
-                    ## ==================================================================================== ##
-                    if(input$inputdat_type=="analyzed") {
-                      tmpgenecols = seq(match(input$c_geneid1,colnames(alldata)),match(input$c_geneid2,colnames(alldata)))
-                      tmpexprcols = seq(match(input$c_expr1,colnames(alldata)),match(input$c_expr2,colnames(alldata)))
-                      tmpfccols = seq(match(input$c_fc1,colnames(alldata)),match(input$c_fc2,colnames(alldata)))
-                      tmppvalcols = seq(match(input$c_pval1,colnames(alldata)),match(input$c_pval2,colnames(alldata)))
-                      tmpqvalcols = seq(match(input$c_qval1,colnames(alldata)),match(input$c_qval2,colnames(alldata)))
                       
-                      validate(need((length(tmpfccols)==length(tmppvalcols))&(length(tmpfccols)==length(tmpqvalcols)),message =
-                                      "Number of fold change columns needs to be same number as 
+                      ## ==================================================================================== ##
+                      ## Count/expression data
+                      ## ==================================================================================== ##
+                      if(input$inputdat_type=="analyzed") {
+                        tmpgenecols = seq(match(input$c_geneid1,colnames(alldata)),match(input$c_geneid2,colnames(alldata)))
+                        tmpexprcols = seq(match(input$c_expr1,colnames(alldata)),match(input$c_expr2,colnames(alldata)))
+                        tmpfccols = seq(match(input$c_fc1,colnames(alldata)),match(input$c_fc2,colnames(alldata)))
+                        tmppvalcols = seq(match(input$c_pval1,colnames(alldata)),match(input$c_pval2,colnames(alldata)))
+                        tmpqvalcols = seq(match(input$c_qval1,colnames(alldata)),match(input$c_qval2,colnames(alldata)))
+                        
+                        validate(need((length(tmpfccols)==length(tmppvalcols))&(length(tmpfccols)==length(tmpqvalcols)),message =
+                                        "Number of fold change columns needs to be same number as 
                                       p-value and q-value columns (and in the same order)."))
+                        
+                        tmpres <- load_analyzed_data(alldata, 
+                                                     tmpgenecols, tmpexprcols, tmpfccols, tmppvalcols, tmpqvalcols,
+                                                     isfclogged = input$isfclogged)
+                        return(list("countdata"=tmpres$countdata,
+                                    "group_names"=tmpres$group_names,
+                                    "sampledata"=tmpres$sampledata,
+                                    "results"=tmpres$results,
+                                    "data_long"=tmpres$data_long, 
+                                    "geneids"=tmpres$geneids, 
+                                    "data_results_table"=tmpres$data_results_table))
+                        
+                      }else if(input$inputdat_type=="expression_only") {
+                        tmpres <- analyze_expression_data(alldata, analysis_method = input$analysis_method)
+                        return(list("countdata"=tmpres$countdata,
+                                    "group_names"=tmpres$group_names,
+                                    "sampledata"=tmpres$sampledata,
+                                    "results"=tmpres$results,
+                                    "data_long"=tmpres$data_long, 
+                                    "geneids"=tmpres$geneids, 
+                                    "data_results_table"=tmpres$data_results_table))
+                      }     
                       
-                      load_analyzed_data(alldata, 
-                                         tmpgenecols, tmpexprcols, tmpfccols, tmppvalcols, tmpqvalcols,
-                                         isfclogged = input$isfclogged) 
-                      
-                    }else if(input$inputdat_type=="expression_only") {
-                        analyze_expression_data(alldata, analysis_method = input$analysis_method)
-                      
-                    }     
-                    
                     }
+
                     return(list("countdata"=countdata,
                                 "group_names"=group_names,
                                 "sampledata"=sampledata,
@@ -178,7 +191,6 @@ analyzeDataReactive <-
                                 "data_long"=data_long, 
                                 "geneids"=geneids, 
                                 "data_results_table"=data_results_table))
-                    
                   })
                 })
 
