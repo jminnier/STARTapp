@@ -23,7 +23,7 @@ observe({
   print("server-datafilter-update-filters")
   data_analyzed = analyzeDataReactive()
   tmpdatlong = data_analyzed$data_long
-  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group,-one_of("rep"))%>%colnames()
   tmpgroups = data_analyzed$group_names
   tmpsamples = as.character(data_analyzed$sampledata$sampleid)
   tmpgeneids = data_analyzed$geneids

@@ -29,7 +29,7 @@ observe({
   tmpgroups = data_analyzed$group_names
   tmptests = unique(as.character(tmpdat$test))
   tmpdatlong = data_analyzed$data_long
-  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group,-one_of("rep"))%>%colnames()
   tmpgeneids = data_analyzed$geneids
   data_analyzedgenes = as.character(unlist(tmpgeneids))
   

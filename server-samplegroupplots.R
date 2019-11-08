@@ -25,7 +25,7 @@ observe({
   print("server-samplegroupplots-update-yname")
   data_analyzed = analyzeDataReactive()
   tmpdatlong = data_analyzed$data_long
-  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group,-one_of("rep"))%>%colnames()
   
   updateRadioButtons(session,'groupplot_valuename',
                      choices=sort(tmpynames,decreasing = TRUE))

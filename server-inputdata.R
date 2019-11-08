@@ -130,7 +130,6 @@ analyzeDataReactive <-
                       # load('data/mousecounts_example_analyzed.RData') #example_data_results for data_results_table
                       load_existing_rdata('data/mousecounts_example.RData')
                     
-                    
                     ## ==================================================================================== ##
                     ## Upload previously downloaded RData
                     ## ==================================================================================== ##
@@ -173,6 +172,14 @@ analyzeDataReactive <-
                     }     
                     
                     }
+                    return(list("countdata"=countdata,
+                                "group_names"=group_names,
+                                "sampledata"=sampledata,
+                                "results"=results,
+                                "data_long"=data_long, 
+                                "geneids"=geneids, 
+                                "data_results_table"=data_results_table))
+                    
                   })
                 })
 

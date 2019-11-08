@@ -35,7 +35,7 @@ observe({
   tmpgroups = data_analyzed$group_names
   #data_analyzedgenes = c("a","b","c")
 
-  tmpynames = data_analyzed$data_long%>%select(-unique_id,-sampleid,-group)%>%colnames()
+  tmpynames = data_analyzed$data_long%>%select(-unique_id,-sampleid,-group,-one_of("rep"))%>%colnames()
   updateSelectizeInput(session,'sel_gene',
                        choices= data_analyzedgenes,server=TRUE)
   updateCheckboxGroupInput(session,'sel_group',

@@ -42,7 +42,7 @@ extract_count_data <- function(alldata, tmpexprcols, tmpgenecols) {
   
   geneids = geneids[tmpkeep,,drop=FALSE]
   countdata = countdata[tmpkeep,,drop=FALSE]
-  alldata = countdata[tmpkeep,,drop=FALSE]
+  alldata = alldata[tmpkeep,,drop=FALSE]
   
   # Create unique identifier
   geneids = geneids%>%unite_("unique_id",colnames(geneids),remove = FALSE)
@@ -55,6 +55,7 @@ extract_count_data <- function(alldata, tmpexprcols, tmpgenecols) {
       ungroup()%>%mutate(unique_id=new)%>%select(-rn,-new)
   }
   
+  countdata = as.data.frame(countdata) # so we can add rownames
   rownames(countdata) = geneids$unique_id
 
   return(list(countdata=countdata, 
@@ -65,118 +66,136 @@ extract_count_data <- function(alldata, tmpexprcols, tmpgenecols) {
   
 }
 
+# Check if data appears to be integer counts. If not, skip voom.
+is_datacounts <- function(input) {
+  remainder = sum(apply(input,2,function(k) sum(k%%1,na.rm=T)),na.rm=T)
+  if (remainder ==0) {
+    TRUE
+  } else {
+    FALSE
+  }
+}
 
-
-analyze_expression_data <- function(alldata, analysis_method, numgeneids = 0) {
+analyze_expression_data <- function(alldata, analysis_method = "edgeR", numgeneids = 0) {
   # catch incorrect gene id error, only works if geneids are 1:numbeneids and no other columns are characters
   numgeneids <- max(numgeneids, max(which(sapply(alldata,class)=="character")))
-  validate(need(numgeneids>0,
-                message = "You have no columns with characters, check that you have a least one column of gene ids as the first column in your file."))
+  validate(
+    need(numgeneids>0,
+         message = "You have no columns with characters, check that you have a least one column of gene ids
+         as the first column in your file."))
   tmpgenecols = 1:numgeneids
   tmpexprcols = setdiff(1:ncol(alldata),tmpgenecols)
   
-  validate(need(length(tmpexprcols)>0,
-                message = "Your last column has characters. Check that your count data is numeric and that your gene ids are in the
+  validate(
+    need(length(tmpexprcols)>0,
+         message = "Your last column has characters. Check that your count data is numeric and that your gene ids are in the
                 first (left) columns only."))
   
-  tmpcount <- extract_count_data(alldata, tmpexprcols, tmpgenecols)
-  list2env(tmpcount)
+  datalist <- extract_count_data(alldata, tmpexprcols, tmpgenecols)
+  
+  
+  # do not perform voom/edgeR on non-counts and assume log2 uploaded intensities
+  # is_counts <- is_datacounts(tmpcount$countdata)
+  
+  print("analyze data")
+  
+  countdata <- datalist$countdata # or normalized expressiondata
+  sampledata <- datalist$sampledata
+  geneids <- datalist$geneids
+  group_names <- datalist$group_names
+  alldata <- datalist$alldata
   
   #add filter for max # counts
   
   #handle NAs, update this later
   countdata[which(is.na(countdata),arr.ind=T)] <- 0 #allow choice of this or removal
   
-  #analyze data
-  
-  # Check if data appears to be integer counts. If not, skip voom.
-  datacounts <- function(input) {
-    remainder = sum(apply(input,2,function(k) sum(k%%1,na.rm=T)),na.rm=T)
-    if (remainder ==0) {
-      TRUE
-    } else {
-      FALSE
-    }
-  }
-  
-  #do not perform voom/edgeR on non-counts and assume log2 uploaded intensities
-  dovoom= datacounts(countdata)
-  
-  # if(not_counts(countdata)){print("Warning: You are uploading data that does not appear to be counts, the analysis pipeline will not be valid!")}
-  # validate(
-  #   not_counts(countdata)
-  # )
-  
-  print("analyze data: counts")
-  
   # Only one group
   if(nlevels(sampledata$group)<2) {
     design <- matrix(1,nrow=nrow(sampledata),ncol=1)
     colnames(design) = "(Intercept)"
-  }else{
-    design <- model.matrix(~0+sampledata$group) # allow selection of reference group
+  }else{ # more than one group
+    design <- model.matrix(~0+sampledata$group) # 0+ allows selection of reference group
     colnames(design) = levels(as.factor(sampledata$group))
   }
   
-  if(dovoom){
-    #voom+limma
-    dge <- DGEList(counts=countdata) #TMM normalization first
-    dge <- calcNormFactors(dge)
-    log2cpm <- cpm(dge, prior.count=0.5, log=TRUE)
+  num_groups_without_reps = sum(colSums(design)==1)
+  validate(
+    need(num_groups_without_reps==0,
+         message = glue::glue("{num_groups_without_reps} of your groups do not have replicates. Analysis cannot be performed.")))
+  
+  dge <- DGEList(counts=countdata) #TMM normalization first
+  dge <- calcNormFactors(dge)
+  log2cpm <- cpm(dge, prior.count=0.5, log=TRUE)
+  
+  # Expression data
+  
+  if(analysis_method=="edgeR") {
+    if(!is_datacounts(countdata)) {
+      print("Warning: You are uploading data that does not appear to be counts, the analysis pipeline will not be valid!")
+    }
+    expr_data = log2cpm
+    expr_data_name = "log2cpm"
+  }else if(analysis_method=="voom") {
     if(max(colSums(design)==1)) {
       # if only one replicate for each group
-      v <- voom(dge,normalize.method = "cyclicloess")
+      v <- voom(dge)
     }else{
-      v <- voom(dge,design,plot=FALSE,normalize.method = "cyclicloess")
+      v <- voom(dge,design)
     }
-    
-    # v <- voom(countdata,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
-    #fit <- lmFit(v,design)
-    #fit <- eBayes(fit)
-    
     expr_data = v$E
-  }else{
+    expr_data_name = "log2_normalized_voom"
+  }else if (analysis_method=="linear_model") {
     print("already normalized")
     countdata2 = countdata
     # crude check for logged data, unlikely to have a logged value >1000
     if(max(countdata)>1000) countdata2 = log2(countdata+0.5)
     log2cpm = countdata2
     expr_data = countdata2
+    expr_data_name = "log2_expression"
   }
+
+  # Test results
   
-  
-  
-  tmpgroup = sampledata$group
-  #contrasts(tmpgroup)
   if(length(group_names)==1) { #If only one group no tests
     lmobj_res = data.frame(matrix(NA,nrow=nrow(expr_data),ncol=6))
-    colnames(lmobj_res) = c("test","dneom_group","numer_group","logFC","P.Value","adj.P.Val")
+    colnames(lmobj_res) = c("test","denom_group","numer_group","logFC","P.Value","adj.P.Val")
     lmobj_res = cbind("unique_id"=geneids$unique_id,lmobj_res)
     lmobj_res$numer_group = group_names[1]
     lmobj_res$test = "None"
   }else{
+    tmpgroup = sampledata$group
     lmobj_res = list()
     for(ii in 1:length(group_names)) {
-      grp = relevel(tmpgroup,ref= group_names[ii] )
-      design <- model.matrix(~grp)
+      grp     <-    relevel(tmpgroup, ref= group_names[ii])
+      design  <-    model.matrix(~grp)
+      dge     <-    estimateDisp(dge,design)
       
       if(analysis_method=="edgeR") {
-        dge <- estimateDisp(dge,design)
-        fit <- glmQLFit(dge,design)
-        beta <- fit$coefficients[,-1,drop=FALSE]
-        pval <- sapply(2:(ncol(design)),
-                       function(k) {glmQLFTest(fit,k)$table[,"PValue"]})
-      }else{
+        fit     <-    glmQLFit(dge,design)
+        beta    <-    fit$coefficients[,-1,drop=FALSE]
+        pval    <-    sapply(2:(ncol(design)),
+                             function(k) {glmQLFTest(fit,k)$table[,"PValue"]})
+      }else if(analysis_method=="voom") {
+        v <- voom(dge, design, plot=FALSE)
+        # v <- voom(countdata,design,plot=TRUE,normalize="quantile") #use this to allow different normalization
+        fit <- lmFit(v,design)
+        fit <- eBayes(fit)
+        beta    <-    fit$coefficients[,-1,drop=FALSE]
+        pval    <-    sapply(2:(ncol(design)),
+                             function(k) {topTable(fit,coef=k,number = nrow(beta))[,"P.Value"]})
+      }else if(analysis_method=="linear_model") {
         lm.obj = lm(t(expr_data) ~ grp)
         beta = t(lm.obj$coefficients)[,-1,drop=FALSE]
         pval = t(lm.pval(lm.obj)$pval)[,-1,drop=FALSE]
       }
-      pval.adj = apply(pval,2,p.adjust,method="BH")
+      
+      pval.adj <-   apply(pval,2,p.adjust,method="BH")
       
       colnames(beta) = colnames(pval) = colnames(pval.adj) = 
         gsub("grp","",colnames(beta))
       
-      tmpout = cbind(melt(beta),
+      tmpout = cbind(melt(beta), # uses rownames of beta for id
                      melt(pval)$value,
                      melt(pval.adj)$value)
       colnames(tmpout) = c("unique_id","numer_group","logFC","P.Value","adj.P.Val")
@@ -185,54 +204,57 @@ analyze_expression_data <- function(alldata, analysis_method, numgeneids = 0) {
       tmpout = tmpout[,c("unique_id","test","denom_group","numer_group",
                          "logFC","P.Value","adj.P.Val")]
       
-      lmobj_res[[ii]] = tmpout
+      lmobj_res[[ii]] = tmpout %>% mutate_if(is.factor,as.character)
     }
-    lmobj_res = do.call(rbind,lmobj_res)
+    lmobj_res = bind_rows(lmobj_res)
   }
+
+    # matrix of pvalues with each column a type of test, same for logfc
+    pvals = lmobj_res%>%select(unique_id,test,adj.P.Val)%>%spread(test,adj.P.Val)
+    logfcs = lmobj_res%>%select(unique_id,test,logFC)%>%spread(test,logFC)
+    
+    colnames(pvals)[-1] = paste0("padj_",colnames(pvals)[-1])
+    colnames(logfcs)[-1] = paste0("logFC_",colnames(logfcs)[-1])
+    tmpdat = cbind(geneids,log2cpm)
+    tmpdat = left_join(tmpdat,logfcs)
+    tmpdat = left_join(tmpdat,pvals)
+    
+    data_results_table = tmpdat%>%select(-unique_id) #save this into csv
+    
+    tmpexprdata = data.frame("unique_id" =geneids$unique_id,expr_data)
+    tmpcountdata = data.frame("unique_id"=geneids$unique_id,countdata)
+    
+    tmplog2cpm = data.frame("unique_id"=geneids$unique_id,log2cpm)
+    log2cpm_long = melt(tmplog2cpm,variable.name = "sampleid",value.name="log2cpm")
+    
+    countdata_long = melt(tmpcountdata,variable.name = "sampleid",value.name="count")
+    #countdata_long$log2count = log2(countdata_long$count+.25)
+    
+    exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name=expr_data_name)
+    
+    data_long = countdata_long
+    if(analysis_method!="linear_model") {data_long = left_join(data_long,log2cpm_long)}
+    if(analysis_method!="edgeR") {data_long = left_join(data_long,exprdata_long)}
+    data_long = data_long %>% separate(sampleid, into = c("group","rep"),sep = "_", remove = FALSE, extra = "merge")
+    tmpgeneidnames = colnames(geneids%>%select(-unique_id))
+    if(any(tmpgeneidnames%in%colnames(data_long))) {
+      data_long = data_long%>%select(-one_of(tmpgeneidnames))
+    }
+    
+    print('analyze data: done')
+    
+    return(list("countdata"=countdata,
+                "group_names"=group_names,
+                "sampledata"=sampledata,
+                "results"=lmobj_res,
+                "data_long"=data_long, 
+                "geneids"=geneids, 
+                "data_results_table"=data_results_table))
+}  
   
-  # matrix of pvalues with each column a type of test, same for logfc
-  pvals = lmobj_res%>%select(unique_id,test,adj.P.Val)%>%spread(test,adj.P.Val)
-  logfcs = lmobj_res%>%select(unique_id,test,logFC)%>%spread(test,logFC)
-  
-  colnames(pvals)[-1] = paste0("padj_",colnames(pvals)[-1])
-  colnames(logfcs)[-1] = paste0("logFC_",colnames(logfcs)[-1])
-  tmpdat = cbind(geneids,log2cpm)
-  tmpdat = left_join(tmpdat,logfcs)
-  tmpdat = left_join(tmpdat,pvals)
-  
-  data_results_table = tmpdat%>%select(-unique_id) #save this into csv
-  
-  tmpexprdata = data.frame("unique_id" =geneids$unique_id,expr_data)
-  tmpcountdata = data.frame("unique_id"=geneids$unique_id,countdata)
-  
-  tmplog2cpm = data.frame("unique_id"=geneids$unique_id,log2cpm)
-  log2cpm_long = melt(tmplog2cpm,variable.name = "sampleid",value.name="log2cpm")
-  
-  countdata_long = melt(tmpcountdata,variable.name = "sampleid",value.name="count")
-  #countdata_long$log2count = log2(countdata_long$count+.25)
-  
-  exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name="log2cpm_voom")
-  data_long = left_join(countdata_long,log2cpm_long)
-  data_long = left_join(data_long,exprdata_long)
-  data_long$group = do.call(rbind,strsplit(as.character(data_long$sampleid),"_",fixed=TRUE))[,1]
-  tmpgeneidnames = colnames(geneids%>%select(-unique_id))
-  if(length(tmpgeneidnames)>0) {
-    data_long = data_long%>%select(-one_of(tmpgeneidnames))
-  }
-  
-  print('analyze data: done')
-  
-  
-  return(list('group_names'=group_names,
-              'sampledata'=sampledata,
-              "results"=lmobj_res,
-              "data_long"=data_long, 
-              "geneids"=geneids, 
-              "data_results_table"=data_results_table))
-  
-  
-  
-}
+
+
+
 
 
 load_analyzed_data <- function(alldata, tmpgenecols, tmpexprcols, tmpfccols, tmppvalcols, tmpqvalcols, isfclogged) {

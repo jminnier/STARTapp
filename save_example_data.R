@@ -23,17 +23,17 @@ source("fun-input-analyze-data.R")
 
 alldata  <- read_csv("data/mousecounts_example.csv")
 
-tmp2 <- analyze_expression_data(alldata, analysis_method="edgeR", numgeneids = 2)
+analyzed_data <- analyze_expression_data(alldata, analysis_method="edgeR", numgeneids = 2)
 
-data_results_table = tmpdat%>%select(-unique_id)
-write.csv(data_results_table,file="data/mousecounts_example_analyzed.csv",quote=FALSE,row.names=FALSE)
-write.csv(data_results_table[1:100,],file="data/exampleanalysisres_short.csv",quote=FALSE,row.names=FALSE)
+write.csv(analyzed_data$data_results_table,file="data/mousecounts_example_analyzed.csv",quote=FALSE,row.names=FALSE)
+write.csv(analyzed_data$data_results_table[1:100,],file="data/exampleanalysisres_short.csv",quote=FALSE,row.names=FALSE)
 write.csv(alldata[1:100,],"data/examplecounts_short.csv",row.names = FALSE)
 
+list2env(analyzed_data, envir=.GlobalEnv)
 
 # LOADED DATA FOR EXAMPLE
 save(countdata,group_names,sampledata,results,data_long,geneids,data_results_table,
-     file="data/mousecounts_example_analysis_results.RData")
+     file="data/mousecounts_example.RData")
 
 
 
