@@ -58,8 +58,8 @@ tabPanel("Input Data",
                               ),
                               radioButtons("analysis_method","Analysis Method",
                                            c("edgeR"="edgeR",
-                                             "voom/limma"="voom_limma",
-                                             "Array or counts already normalized, linear models"="lmmodel"))
+                                             "voom/limma"="voom",
+                                             "Array or counts already normalized, linear models"="linear_model"))
                             ),
                             conditionalPanel(condition="input.inputdat_type=='analyzed'",
                                              downloadLink("example_analysis_file",label="Download Example Analysis Results File"),

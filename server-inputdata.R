@@ -166,8 +166,7 @@ analyzeDataReactive <-
                                          isfclogged = input$isfclogged) 
                       
                     }else if(input$inputdat_type=="expression_only") {
-                        analyze_expression_data(alldata, tmpgenecols, tmpexprcols, 
-                                                analysis_method = input$analysis_method)
+                        analyze_expression_data(alldata, analysis_method = input$analysis_method)
                       
                     }     
                     
