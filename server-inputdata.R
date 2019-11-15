@@ -128,7 +128,7 @@ analyzeDataReactive <-
                     if(input$data_file_type=="examplecounts") {
                       # load('data/mousecounts_example_analysis_results.RData')
                       # load('data/mousecounts_example_analyzed.RData') #example_data_results for data_results_table
-                      load_existing_rdata('data/mousecounts_example.RData')
+                      start_results <- load_existing_rdata('data/mousecounts_example.RData')
                     
                     ## ==================================================================================== ##
                     ## Upload previously downloaded RData
@@ -136,7 +136,7 @@ analyzeDataReactive <-
                     
                     }else if(input$data_file_type=="previousrdata"){
                       inRfile <- input$rdatafile
-                      load_existing_rdata(inRfile$datapath)
+                      start_results <- load_existing_rdata(inRfile$datapath)
                     }else{
                     
                     ## ==================================================================================== ##
@@ -172,25 +172,12 @@ analyzeDataReactive <-
                                     "data_results_table"=tmpres$data_results_table))
                         
                       }else if(input$inputdat_type=="expression_only") {
-                        tmpres <- analyze_expression_data(alldata, analysis_method = input$analysis_method)
-                        return(list("countdata"=tmpres$countdata,
-                                    "group_names"=tmpres$group_names,
-                                    "sampledata"=tmpres$sampledata,
-                                    "results"=tmpres$results,
-                                    "data_long"=tmpres$data_long, 
-                                    "geneids"=tmpres$geneids, 
-                                    "data_results_table"=tmpres$data_results_table))
+                        start_results <- analyze_expression_data(alldata, analysis_method = input$analysis_method)
+                        return(start_results)
                       }     
                       
                     }
-
-                    return(list("countdata"=countdata,
-                                "group_names"=group_names,
-                                "sampledata"=sampledata,
-                                "results"=results,
-                                "data_long"=data_long, 
-                                "geneids"=geneids, 
-                                "data_results_table"=data_results_table))
+                    return(start_results)
                   })
                 })
 
@@ -221,44 +208,42 @@ output$analysisoutput <- renderDataTable({
   datatable(res)
 })
 
+# Download analyzed data
 
-output$downloadResults_CSV <- downloadHandler(filename = paste0("START_results_",Sys.Date(),".csv"),
-                                              content = function(file) {
-                                                write.csv(analyzeDataReactive()$data_results_table, file, row.names=FALSE)})
+output$downloadResults_CSV <- downloadHandler(
+  filename = paste0("START_results_",Sys.Date(),".csv"),
+  content = function(file) {
+    write.csv(analyzeDataReactive()$data_results_table, file, row.names=FALSE)})
 
-output$downloadResults_RData <- downloadHandler(filename= paste0("START_results_",Sys.Date(),".RData"),
-                                                content=function(file){
-                                                  tmp = analyzeDataReactive()
-                                                  
-                                                  group_names = tmp$group_names
-                                                  sampledata = tmp$sampledata
-                                                  results = tmp$results
-                                                  data_long = tmp$data_long
-                                                  geneids = tmp$geneids
-                                                  data_results_table = tmp$data_results_table
-                                                  
-                                                  save(group_names,sampledata,results,
-                                                       data_long,geneids,
-                                                       data_results_table,file=file)
-                                                })
+output$downloadResults_RData <- downloadHandler(
+  filename= paste0("START_results_",Sys.Date(),".RData"),
+  content=function(file){
+    start_list = analyzeDataReactive()
+    save(start_list,file=file)
+  })
 
 
-output$example_counts_file <- downloadHandler(filename="examplecounts_short.csv",
-                                              content=function(file){
-                                                file.copy("data/examplecounts_short.csv",file)
-                                              })
+# Download example files and instruction files ----
 
-output$example_analysis_file <- downloadHandler(filename="exampleanalysisres_short.csv",
-                                                content=function(file){
-                                                  file.copy("data/exampleanalysisres_short.csv",file)
-                                                })
+output$example_counts_file <- downloadHandler(
+  filename="examplecounts_short.csv",
+  content=function(file){
+    file.copy("data/examplecounts_short.csv",file)
+  })
+
+output$example_analysis_file <- downloadHandler(
+  filename="exampleanalysisres_short.csv",
+  content=function(file){
+    file.copy("data/exampleanalysisres_short.csv",file)
+  })
 
 
 
-output$instructionspdf <- downloadHandler(filename="Instructions.pdf",
-                                          content=function(file){
-                                            file.copy("instructions/Instructions.pdf",file)
-                                          })
+output$instructionspdf <- downloadHandler(
+  filename="Instructions.pdf",
+  content=function(file){
+    file.copy("instructions/Instructions.pdf",file)
+  })
 
 
 

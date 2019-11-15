@@ -3,16 +3,18 @@ required_data_names <- c("group_names","sampledata","results","data_long","genei
 
 load_existing_rdata <- function(rdata_filepath) {
   
-  loaded_datanames <- load(rdata_filepath,envir=environment())
+  start_data <- load(rdata_filepath)
+  start_results <- get(start_data)
+  loaded_datanames <- names(start_results)
   missing_datanames <- setdiff(required_data_names,loaded_datanames)
   validate(
     need(length(missing_datanames)==0, 
-         paste("The data file does not contain all the required data objects for this version of the START app.
+         paste("The data file does not contain all the required data objects for this version of the START app or is the wrong format.
          Please reload your data using counts/analyzed data and re-save the .RData file.\nData objects missing:", 
                paste0(missing_datanames,collapse=", ")))
   )
   
-  
+  return(start_results)
 }
 
 # rdata_filepath <- "data/mousecounts_example_analysis_results.RData"
