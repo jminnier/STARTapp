@@ -53,6 +53,7 @@ source("fun-heatmap.R")
 source("fun-analyzecounts.R")
 source("fun-analysisres.R")
 source("fun-groupplots.R")
+source("fun-input-analyze-data.R")
 
 #troubleshooting
 if(FALSE) {
