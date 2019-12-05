@@ -28,8 +28,7 @@ observe({
   tmpsamples = as.character(data_analyzed$sampledata$sampleid)
   tmpgeneids = data_analyzed$geneids
   data_analyzedgenes = as.character(unlist(tmpgeneids))
-  tmpdat = data_analyzed$results
-  tmptests = unique(as.character(tmpdat$test))
+  tmptests = unique(as.character(data_analyzed$results$test))
   
   updateSelectizeInput(session,"datafilter_groups", 
                        choices=tmpgroups,selected=tmpgroups)
@@ -44,14 +43,16 @@ observe({
   updateRadioButtons(session,'datafilter_selectexpr',
                      choices=sort(tmpynames,decreasing = TRUE))
   
-})
+}, priority=1)
 
 # after selecting test
 
 observe({
   print("server-datafilter-update-tests")
   data_analyzed = analyzeDataReactive()
-  if(!(input$datafilter_selecttest=="")) {
+  tmptests = unique(as.character(data_analyzed$results$test))
+
+  if(input$datafilter_selecttest%in%tmptests) {
     tmptest = input$datafilter_selecttest
     # get max abs fold change for this test
     tmpdat = data_analyzed$results
@@ -64,13 +65,15 @@ observe({
       updateNumericInput(session,"datafilter_fccut",
                          min=0,max= ceiling(tmpmax),value=0)
   }
-})
+}, priority = 2)
 
 # after selecting expression value
 observe({
   print("server-datafilter-update-expr")
   data_analyzed = analyzeDataReactive()
-  if(!(input$datafilter_selectexpr=="")) {
+  tmpynames = data_analyzed$data_long%>%select(-unique_id,-sampleid,-group,-one_of("rep"))%>%colnames()
+  
+  if(input$datafilter_selectexpr%in%tmpynames) {
     exprname = input$datafilter_selectexpr
     #calculate miin and max
     tmpdat = data_analyzed$data_long # add filter by group and sample id
@@ -82,7 +85,7 @@ observe({
     updateNumericInput(session,"datafilter_exprmax",
                        min=floor(tmpmin),max= ceiling(tmpmax),value=ceiling(tmpmax))
   }
-})
+}, priority = 2)
 
 
 

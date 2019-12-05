@@ -44,3 +44,12 @@ tmp3 <- analyze_expression_data(alldata, analysis_method="edgeR")
 # sample heatmaps not working
 
 
+testdata <- read_csv("data/testdata_analyzed_onecomparison.csv")
+data_analyzed = load_analyzed_data(testdata, tmpgenecols = 1:2, tmpexprcols = 3:12,
+                         tmpfccols = 13, tmppvalcols = 14, tmpqvalcols = 15, isfclogged = TRUE)
+tmpdatlong = data_analyzed$data_long
+(tmpynames = tmpdatlong%>%select(-unique_id,-sampleid,-group,-one_of("rep"))%>%colnames())
+(tmpgroups = data_analyzed$group_names)
+(tmpsamples = as.character(data_analyzed$sampledata$sampleid))
+tmpdat = data_analyzed$results
+(tmptests = unique(as.character(tmpdat$test)))

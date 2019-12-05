@@ -4,7 +4,15 @@ required_data_names <- c("group_names","sampledata","results","data_long","genei
 load_existing_rdata <- function(rdata_filepath) {
   
   start_data <- load(rdata_filepath)
-  start_results <- get(start_data)
+  start_results <-  list(
+    countdata = countdata,
+    geneids = geneids,
+    group_names = group_names,
+    sampledata = sampledata,
+    results = results,
+    data_long = data_long,
+    data_results_table = data_results_table
+  )
   loaded_datanames <- names(start_results)
   missing_datanames <- setdiff(required_data_names,loaded_datanames)
   validate(
@@ -41,7 +49,6 @@ extract_count_data <- function(alldata, tmpexprcols, tmpgenecols) {
   validate(need(length(tmpkeep)>0,
                 message = "Your data is empty. Please check file format is .csv. 
                                   You may need a non-empty gene identifier column."))
-  
   geneids = geneids[tmpkeep,,drop=FALSE]
   countdata = countdata[tmpkeep,,drop=FALSE]
   alldata = alldata[tmpkeep,,drop=FALSE]
@@ -94,7 +101,6 @@ analyze_expression_data <- function(alldata, analysis_method = "edgeR", numgenei
                 first (left) columns only."))
   
   datalist <- extract_count_data(alldata, tmpexprcols, tmpgenecols)
-  
   
   # do not perform voom/edgeR on non-counts and assume log2 uploaded intensities
   # is_counts <- is_datacounts(tmpcount$countdata)
@@ -262,7 +268,11 @@ analyze_expression_data <- function(alldata, analysis_method = "edgeR", numgenei
 load_analyzed_data <- function(alldata, tmpgenecols, tmpexprcols, tmpfccols, tmppvalcols, tmpqvalcols, isfclogged) {
 
   tmpcount <- extract_count_data(alldata, tmpexprcols, tmpgenecols)
-  list2env(tmpcount)
+  countdata = tmpcount$countdata
+  geneids = tmpcount$geneids
+  group_names = tmpcount$group_names
+  sampledata = tmpcount$sampledata
+  alldata = tmpcount$alldata
   
   tmpfc = alldata[,tmpfccols,drop=F]
   if(isfclogged=="No (Log my data please)") {log2(tmpfc)}
@@ -282,17 +292,18 @@ load_analyzed_data <- function(alldata, tmpgenecols, tmpexprcols, tmpfccols, tmp
   tmpres = full_join(fcdatalong,pvaldatalong)
   tmpres = full_join(tmpres,qvaldatalong)
   
-  tmpdat = cbind("unique_id"=geneids$unique_id,expr_data)
+  tmpdat = cbind("unique_id"=geneids$unique_id,countdata)
   tmpdatlong = tmpdat%>%gather(key="sampleid",value="expr",-1)
   data_long = left_join(tmpdatlong,sampledata%>%select(sampleid,group))
   # add summized means by group/unique id for scatterplot
   
   tmpres$test = as.character(tmpres$test)
   
-  return(list("group_names"=group_names,
+  return(list("countdata"=countdata,
+              "group_names"=group_names,
               "sampledata"=sampledata,
               "results"=tmpres,
               "data_long"=data_long, 
-              "geneids"=geneids,
+              "geneids"=geneids, 
               "data_results_table"=alldata))
 }
