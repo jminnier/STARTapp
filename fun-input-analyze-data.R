@@ -2,17 +2,8 @@
 required_data_names <- c("group_names","sampledata","results","data_long","geneids","data_results_table")
 
 load_existing_rdata <- function(rdata_filepath) {
-  
   start_data <- load(rdata_filepath)
-  start_results <-  list(
-    countdata = countdata,
-    geneids = geneids,
-    group_names = group_names,
-    sampledata = sampledata,
-    results = results,
-    data_long = data_long,
-    data_results_table = data_results_table
-  )
+  start_results <-  get(start_data)
   loaded_datanames <- names(start_results)
   missing_datanames <- setdiff(required_data_names,loaded_datanames)
   validate(
@@ -25,7 +16,7 @@ load_existing_rdata <- function(rdata_filepath) {
   return(start_results)
 }
 
-# rdata_filepath <- "data/mousecounts_example_analysis_results.RData"
+# rdata_filepath <- "data/mousecounts_example.RData"
 # load_existing_rdata(rdata_filepath)
 
 
