@@ -1,13 +1,8 @@
 # Version History
 
-**Development**
+**Development** See [github issues](https://github.com/jminnier/STARTapp/issues). App site: [kcvi.shinyapps.io/START_devel/](https://kcvi.shinyapps.io/START_devel/)
 
-- PCA Plots: add selection of principal components, allow selection of samples
-- Analyzed Data upload: allow upload of adjusted p-values (FDR) and unadjusted p-values, now volcano plot shows both
-- Scatterplots: color by fold change or p-value from results; *need to* add ability to choose color or color by log-p-value.
-- Scatterplots and volcano plots: highlight selected genes
-
-
+**Version 1.1.0** *August 15, 2018.* Buf fixes. Addition of edgeR and limma analysis functions. Improved visualizations. App site: [kcvi.shinyapps.io/STARTapp_2018/](https://kcvi.shinyapps.io/STARTapp_2018/)
 
 **Version 1.0.0.** *September 23, 2016.* START is published and the first publically released version is online.
 
@@ -29,3 +24,5 @@
 A development version of this app can be found at [https://kcvi.shinyapps.io/START_devel/](https://kcvi.shinyapps.io/START_devel/).
 
 The code for this development app is in the `devel` branch of the [github](https://github.com/jminnier/STARTapp) repository.
+
+
