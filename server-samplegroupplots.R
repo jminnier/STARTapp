@@ -55,69 +55,75 @@ observe({
                        choices=tmpsamples, selected=tmpsamples)
 })
 
-observe({
+
+fun_gene_pheatmap <- reactive({
+  print("render gene_pheatmap")
+  data_analyzed = analyzeDataReactive()
+  data_results = data_analyzed$results
+  geneids = data_analyzed$geneids
+  sampledata = data_analyzed$sampledata
   
-  output$gene_pheatmap <- renderPlot({
-    print("render gene_pheatmap")
-    data_analyzed = analyzeDataReactive()
-    data_results = data_analyzed$results
-    geneids = data_analyzed$geneids
-    sampledata = data_analyzed$sampledata
-    
-    tmpgroups = input$sampleres_groups
-    tmpsamples = input$sampleres_samples
-    
-    tmplong = data_analyzed$data_long
-    tmplong = tmplong%>%filter(sampleid%in%tmpsamples,group%in%tmpgroups)
-    
-    validate(need(nrow(tmplong)>1,message = "Need more samples to plot."))
-    
-    tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
-    
-    gene_pheatmap(data_long=tmplong,valuename=input$groupplot_valuename,
-                  sampleid=sampledata$sampleid[tmpkeep],annotation_row = sampledata[tmpkeep,"group",drop=FALSE])
-    
-  })
+  tmpgroups = input$sampleres_groups
+  tmpsamples = input$sampleres_samples
   
-  output$pca_plot <- renderPlot({
-    print("render PCA plot")
-    
-    data_analyzed = analyzeDataReactive()
-    data_results = data_analyzed$results
-    geneids = data_analyzed$geneids
-    sampledata = data_analyzed$sampledata
-    
-    
-    tmpgroups = input$sampleres_groups
-    tmpsamples = input$sampleres_samples
-    
-    tmplong = data_analyzed$data_long
-    tmplong = tmplong%>%filter(sampleid%in%tmpsamples,group%in%tmpgroups)
-    
-    tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
-    
-    validate(need(nrow(tmplong)>1,message = "Need more samples to plot."))
-    validate(need(length(input$pcnum)==2,message = "Select 2 Prinical Components."))
-    
-    gene_pcaplot(data_long=tmplong,
-                 valuename=input$groupplot_valuename,
-                 sampleid= sampledata$sampleid[tmpkeep],
-                 groupdat= sampledata[tmpkeep,"group",drop=FALSE],
-                 pcnum = as.numeric(input$pcnum),
-                 colorfactor="group")
-    
-    
-    
-  })
+  tmplong = data_analyzed$data_long
+  tmplong = tmplong%>%filter(sampleid%in%tmpsamples,group%in%tmpgroups)
+  
+  validate(need(nrow(tmplong)>1,message = "Need more samples to plot."))
+  
+  tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
+  
+  gene_pheatmap(data_long=tmplong,valuename=input$groupplot_valuename,
+                sampleid=sampledata$sampleid[tmpkeep],annotation_row = sampledata[tmpkeep,"group",drop=FALSE])
+  
+})
+
+fun_pca_plot <- reactive({
+  print("render PCA plot")
+  
+  data_analyzed = analyzeDataReactive()
+  data_results = data_analyzed$results
+  geneids = data_analyzed$geneids
+  sampledata = data_analyzed$sampledata
   
   
+  tmpgroups = input$sampleres_groups
+  tmpsamples = input$sampleres_samples
   
+  tmplong = data_analyzed$data_long
+  tmplong = tmplong%>%filter(sampleid%in%tmpsamples,group%in%tmpgroups)
   
-  # rna_volcanoplot(data_results = data_results,
-  #                 group_sel = input$analysisres_groups,
-  #                 absFCcut = input$analysisres_fold_change_cut,
-  #                 fdrcut = input$analysisres_fdrcut)%>%
-  #   bind_shiny("volcanoplot_2groups_ggvis","volcanoplot_2groups_ggvisUI")
+  tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
+  
+  validate(need(nrow(tmplong)>1,message = "Need more samples to plot."))
+  validate(need(length(input$pcnum)==2,message = "Select 2 Prinical Components."))
+  
+  gene_pcaplot(data_long=tmplong,
+               valuename=input$groupplot_valuename,
+               sampleid= sampledata$sampleid[tmpkeep],
+               groupdat= sampledata[tmpkeep,"group",drop=FALSE],
+               pcnum = as.numeric(input$pcnum),
+               colorfactor="group")
+  
   
   
 })
+  
+output$pca_plot <- renderPlot({fun_pca_plot()})
+
+output$download_pca_plot <- downloadHandler(
+  filename = "pcaplot.png",
+  content = function(file) {
+    ggplot2::ggsave(filename = file, plot = fun_pca_plot(), device = "png", dpi = "retina")
+  }
+)
+
+
+output$gene_pheatmap <- renderPlot({fun_gene_pheatmap()})
+
+output$download_gene_pheatmap <- downloadHandler(
+  filename = "sample_heatmap.png",
+  content = function(file) {
+    ggplot2::ggsave(filename = file, plot = fun_gene_pheatmap(), device = "png", dpi = "retina")
+  }
+)

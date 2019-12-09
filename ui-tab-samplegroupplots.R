@@ -47,9 +47,11 @@ tabPanel("Group Plots",
          column(8,
            tabsetPanel(id="groupplot_tabset",
              tabPanel(title="PCA Plot",
+                      downloadButton(outputId = "download_pca_plot", label = "Download the PCA plot .png"),
                       plotOutput("pca_plot")
              ),#tabPanel
              tabPanel(title="Sample Distance Heatmap",
+                      downloadButton(outputId = "download_gene_pheatmap", label = "Download the Heatmap .png"),
                       plotOutput("gene_pheatmap") 
              )#tabPanel
            )#tabsetPanel
