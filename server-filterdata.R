@@ -80,6 +80,7 @@ observe({
   if(input$datafilter_selectexpr%in%tmpynames) {
     exprname = input$datafilter_selectexpr
     #calculate miin and max
+    tmpdat = data_analyzed$data_long
     tmpmin = min(tmpdat[,colnames(tmpdat)==exprname],na.rm=T)
     tmpmax = max(tmpdat[,colnames(tmpdat)==exprname],na.rm=T)
     
