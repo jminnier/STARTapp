@@ -7,6 +7,7 @@ output: html_document
 - *Explore* the app's features with the example data set pre-loaded by clicking on the tabs above.
 - *Upload* your data in the "Input Data" tab.
 
+*Note, this is version 1.1.1, published on 12/9/19. If you need the previous version, it is hosted here: [kcvi.shinyapps.io/STARTapp_2018/](https://kcvi.shinyapps.io/STARTapp_2018/)*
 
 #### <a name="features"></a> Features
 

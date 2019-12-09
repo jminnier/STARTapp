@@ -13,7 +13,11 @@ output:
 
 The app is hosted on the website: https://kcvi.shinyapps.io/START/ 
 
+*Note, this is version 1.1.1, published on 12/9/19. If you need the previous version, it is hosted here: [kcvi.shinyapps.io/STARTapp_2018/](https://kcvi.shinyapps.io/STARTapp_2018/)*
+
 Code can be found on github: https://github.com/jminnier/STARTapp
+
+Please post [issues on github](https://github.com/jminnier/STARTapp/issues/), and feel free to contribute by forking and submitting development branches.
 
 To run this app locally on your machine, download R or RStudio and run the following commands once to set up the environment:
 
