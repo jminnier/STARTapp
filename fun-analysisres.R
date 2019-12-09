@@ -34,6 +34,16 @@
 #   rna_volcanoplot(results,test_sel="group1/group2",absFCcut=0,pvalcut=0.05,fdrcut=0.05)
 #   )
 
+if(FALSE) {
+  data_results= results
+  geneids = NULL
+  test_sel="group1/group2"
+  absFCcut=0
+  pvalcut=0.05
+  fdrcut=0.05
+  sel_genes=NULL
+}
+
 rna_volcanoplot <- function(data_results, geneids=NULL, 
                             test_sel=NULL,absFCcut=0,pvalcut=0.05,fdrcut=0.05,
                             sel_genes=NULL) {
@@ -114,24 +124,23 @@ rna_volcanoplot <- function(data_results, geneids=NULL,
   
   p <- p + theme_base() + theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
-  g <- plotly_build(p)
-  
+  gg <- plotly_build(p)
   
   #Match order of text to proper gene order
-  newtext =  paste("Gene ID:",res$unique_id,"<br>",
-                   "Comparison",res$test,"<br>",
-                   "logFC",signif(res$logFC,3),"<br>",
-                   "P.Value",signif(res$P.Value,3),"<br>",
+  newtext =  paste("Gene ID:",res$unique_id,"<br />",
+                   "Comparison",res$test,"<br />",
+                   "logFC",signif(res$logFC,3),"<br />",
+                   "P.Value",signif(res$P.Value,3),"<br />",
                    "adj.P.Val",signif(res$adj.P.Val,3))
+  print(length(gg$x$data))
   
-  for(ii in 1:length(g$x$data)) {
-    tmpid = do.call(rbind,strsplit(g$x$data[[ii]]$text,"<br />"))[,4]
-    g$x$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
+  for(ii in 1:length(gg$x$data)) {
+    tmpid = do.call(rbind,strsplit(gg$x$data[[ii]]$text,"<br />"))[,4]
+    gg$x$data[[ii]]$text <- newtext[match(tmpid,res$unique_id)]
   }
   
-  g
-  
-}
+  gg
+  }
 
 # switched from ggvis to plotly, this function is not currently used
 rna_volcanoplot_ggvis <- function(data_results, geneids=NULL, 
@@ -313,7 +322,7 @@ rna_scatterplot <- function(data_long, results,
   p <- p + theme_base() + #ggtitle(paste0("Number of genes: ",nrow(pp_wide))) + 
     theme(plot.margin = unit(c(2,2,2,2), "cm"))
   
-  g <- plotly_build(p)
+  gg <- plotly_build(p)
   
   # just in case we don't have adj.p.val, don't error newtext
   if(is.null(pp_wide$adj.P.Val)) pp_wide$adj.P.Val = NA
@@ -330,14 +339,14 @@ rna_scatterplot <- function(data_long, results,
   
   
   
-  for(ii in 1:length(g$x$data)) {
-    if(!is.null(g$x$data[[ii]]$text)) {
-      tmpid = stringr::str_split(g$x$data[[ii]]$text,"<br />",simplify=TRUE)[,4]
-      g$x$data[[ii]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
+  for(ii in 1:length(gg$x$data)) {
+    if(!is.null(gg$x$data[[ii]]$text)) {
+      tmpid = stringr::str_split(gg$x$data[[ii]]$text,"<br />",simplify=TRUE)[,4]
+      gg$x$data[[ii]]$text <- newtext[match(tmpid,pp_wide$unique_id)]
     }
   }
   
-  g
+  gg
   
 }
 

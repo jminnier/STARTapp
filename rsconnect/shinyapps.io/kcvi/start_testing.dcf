@@ -1,0 +1,9 @@
+name: start_testing
+account: kcvi
+server: shinyapps.io
+appId: 133127
+bundleId: 598627
+url: https://kcvi.shinyapps.io/start_testing/
+when: 1477591332.16635
+asMultiple: FALSE
+asStatic: FALSE

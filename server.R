@@ -20,6 +20,7 @@
 
 
 options(shiny.maxRequestSize = 100*1024^2)
+options(repos = BiocInstaller::biocinstallRepos())
 
 source("helpers.R")
 print(sessionInfo())

@@ -38,10 +38,14 @@ observe({
   updateSelectizeInput(session,"datafilter_gene_select",
                        choices=data_analyzedgenes,server=TRUE)
   
-  updateSelectizeInput(session,"datafilter_selecttest",choices=tmptests)
+  updateSelectizeInput(session,"datafilter_selecttest",
+                       choices=tmptests,
+                       selected = tmptests[1]
+                       )
   
   updateRadioButtons(session,'datafilter_selectexpr',
-                     choices=sort(tmpynames,decreasing = TRUE))
+                     choices=sort(tmpynames,decreasing = TRUE),
+                     selected= sort(tmpynames,decreasing = TRUE)[1])
   
 }, priority=1)
 
@@ -76,7 +80,6 @@ observe({
   if(input$datafilter_selectexpr%in%tmpynames) {
     exprname = input$datafilter_selectexpr
     #calculate miin and max
-    tmpdat = data_analyzed$data_long # add filter by group and sample id
     tmpmin = min(tmpdat[,colnames(tmpdat)==exprname],na.rm=T)
     tmpmax = max(tmpdat[,colnames(tmpdat)==exprname],na.rm=T)
     
@@ -86,6 +89,44 @@ observe({
                        min=floor(tmpmin),max= ceiling(tmpmax),value=ceiling(tmpmax))
   }
 }, priority = 2)
+
+# after selecting test
+
+# observe({
+#   print("server-datafilter-update-tests")
+#   data_analyzed = analyzeDataReactive()
+#   if(!(input$datafilter_selecttest=="")) {
+#     tmptest = input$datafilter_selecttest
+#     # get max abs fold change for this test
+#     tmpdat = data_analyzed$results
+#     tmpdat = tmpdat%>%filter(test==tmptest)
+#     tmpfc = abs(tmpdat$logFC)
+#     tmpfc = tmpfc[tmpfc<Inf]
+#     tmpmax = max(tmpfc,na.rm=T)
+#     if(tmpmax==Inf)
+#       
+#       updateNumericInput(session,"datafilter_fccut",
+#                          min=0,max= ceiling(tmpmax),value=0)
+#   }
+# })
+
+# after selecting expression value
+# observe({
+#   print("server-datafilter-update-expr")
+#   data_analyzed = analyzeDataReactive()
+#   if(!(input$datafilter_selectexpr=="")) {
+#     exprname = input$datafilter_selectexpr
+#     #calculate miin and max
+#     tmpdat = data_analyzed$data_long # add filter by group and sample id
+#     tmpmin = min(tmpdat[,colnames(tmpdat)==exprname],na.rm=T)
+#     tmpmax = max(tmpdat[,colnames(tmpdat)==exprname],na.rm=T)
+#     
+#     updateNumericInput(session,"datafilter_exprmin",
+#                        min=floor(tmpmin),max= ceiling(tmpmax),value=floor(tmpmin))
+#     updateNumericInput(session,"datafilter_exprmax",
+#                        min=floor(tmpmin),max= ceiling(tmpmax),value=ceiling(tmpmax))
+#   }
+# })
 
 
 
