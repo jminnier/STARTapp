@@ -145,18 +145,7 @@ analyzeDataReactive <-
                       alldata <- inputDataReactive()$data
                       # remove empty columns
                       alldata = alldata %>% remove_empty(which=c("rows","cols"))
-                    validate(not_numeric(alldata))
-                    
-                    }
-                      }
-                        NULL
-                      } else {
-                        FALSE
-                      } else if (input == "") { 
-                        Please check your input file."
-                        "Your data does not appear to be formatted correctly (no numeric columns). 
-                      if(sum(unlist(lapply(input,function(k) class(k)%in%c("numeric","integer"))))==0) {
-                    not_numeric <- function(input) {
+
                     # Check for numeric columns
                       
                       ## ==================================================================================== ##
