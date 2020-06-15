@@ -76,7 +76,7 @@ inputDataReactive <- reactive({
   }else if(input$data_file_type=="previousrdata"){
     if (!is.null(inRFile)) {
       load(inRFile$datapath,envir=environment())
-      return(list("data"=data_results_table)) # this is so something shows in data upload window
+      return(list("data"=start_list$data_results_table)) # this is so something shows in data upload window
     }else{return(NULL)}
   }else { # if uploading data
     if (!is.null(inFile)) {
