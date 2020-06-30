@@ -65,7 +65,6 @@ gene_pcaplot <- function(data_long,valuename,sampleid,groupdat=NULL,colorfactor=
     colnames(d)[which(colnames(d)==shapefactor)] <- "shape"
   }
   if(identical(shapefactor,colorfactor)) {d$shape = d$color}
-  print(d)
   p <- ggplot(d, aes(PC1, PC2, color=color, shape=shape, size=3)) 
   if(plot_sampleids) {
     p <- p + geom_text(aes(label=name,size=10))
