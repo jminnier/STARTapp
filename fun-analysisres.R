@@ -214,7 +214,7 @@ rna_scatterplot <- function(data_long, results,
                             sel_genes=NULL) {
   group1 = group_sel[1]; group2 = group_sel[2]
   
-  data_long$value = data_long[,valuename]
+  data_long <- data_long %>% rename(value = valuename)
   
   # remove this, takes too long, do up front
   pp = data_long%>%filter(group%in%group_sel)
