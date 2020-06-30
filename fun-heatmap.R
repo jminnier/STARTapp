@@ -33,6 +33,7 @@ heatmap_subdat <- function(data_analyzed,
                            subsetids=NULL,
                            FDRcut=0.05,maxgenes=NULL,
                            view_group=NULL,
+                           view_samples=NULL,
                            sel_test=NULL,
                            filter_by_go=FALSE,
                            filter_fdr=FALSE,
@@ -49,6 +50,7 @@ heatmap_subdat <- function(data_analyzed,
   data_results$unique_id = as.character(data_results$unique_id)
   
   if(is.null(view_group)) view_group=data_analyzed$group_names
+  if(is.null(view_samples)) view_samples=as.character(data_analyzed$sampledata$sampleid)
   
   if((usesubset)&(!is.null(subsetids))) {thesegenes = subsetids}else{
     
@@ -109,7 +111,7 @@ heatmap_subdat <- function(data_analyzed,
       
       #filter by standard deviation (SD of log2cpm is coefficient of variation of unlogged data)
       tmpdat = data_analyzed$data_long
-      tmpdat = tmpdat%>%filter(group%in%view_group)
+      tmpdat = tmpdat%>%filter(group%in%view_group, sampleid%in%view_samples)
       tmpdat = reshape2::dcast(tmpdat,unique_id~sampleid,value.var=yname)
       tmpsd = apply(tmpdat[,-1],1,sd)
       
@@ -142,7 +144,7 @@ heatmap_subdat <- function(data_analyzed,
   
   if(length(thesegenes)==0) {return(NULL)}
   
-  subdat = filter(data_analyzed$data_long,unique_id%in%thesegenes,group%in%view_group)
+  subdat = filter(data_analyzed$data_long,unique_id%in%thesegenes, group%in%view_group, sampleid%in%view_samples)
   data = reshape2::dcast(subdat,unique_id~sampleid,value.var=yname)
   data_unique_id = data[,1]
   data_geneids = data_analyzed$geneids[match(data_unique_id,data_analyzed$geneids$unique_id),]

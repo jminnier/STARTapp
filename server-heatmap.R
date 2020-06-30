@@ -30,6 +30,7 @@ observe({
   # browser()
   data_analyzed = analyzeDataReactive()
   tmpgroups = data_analyzed$group_names
+  tmpsamples = as.character(data_analyzed$sampledata$sampleid)
   tmpdat = data_analyzed$results
   tmptests = unique(as.character(tmpdat$test))
   tmpdatlong = data_analyzed$data_long
@@ -37,14 +38,37 @@ observe({
   if("count"%in%tmpynames) tmpynames = tmpynames[-match("count",tmpynames)]
   
   updateRadioButtons(session,'heatmapvaluename', choices=sort(tmpynames,decreasing = TRUE))
-  updateCheckboxGroupInput(session,'view_group_heatmap',
-                           choices=tmpgroups, selected=tmpgroups)
+  updateSelectizeInput(session,"view_group_heatmap", 
+                       choices=tmpgroups,selected=tmpgroups)
+  updateSelectizeInput(session,"view_samples_heatmap", 
+                       choices=tmpsamples,selected=tmpsamples)
+  
   updateSelectizeInput(session,'sel_test_heatmap',
                        choices=tmptests, selected=NULL)
   updateSelectizeInput(session,"fold_change_groups",
                        choices=tmpgroups)
   
 })
+
+# after selecting group
+observe({
+  print("server-heatmap-update-samples")
+  data_analyzed = analyzeDataReactive()
+  tmpselected = input$view_group_heatmap
+  print(tmpselected)
+  if(!is.null(tmpselected)) {
+    if(!(tmpselected[1]=="")) {
+      tmpsampledata = data_analyzed$sampledata
+      tmpsampledata = tmpsampledata %>% filter(group%in%tmpselected)
+      tmpsamples = as.character(tmpsampledata$sampleid)
+      print(tmpsamples)
+      
+      updateSelectizeInput(session,"view_samples_heatmap", 
+                           choices=tmpsamples,
+                           selected=tmpsamples)
+    }
+  }
+}, priority = 2)
 
 
 inputHeatmapSubsetReactive <- reactive({
@@ -126,6 +150,7 @@ output$heatmap_rna <- renderPlot({
         FDRcut=input$FDRcut,
         maxgenes=input$maxgenes,
         view_group=input$view_group_heatmap,
+        view_samples=input$view_samples_heatmap,
         sel_test=input$sel_test_heatmap,
         filter_fdr=input$filter_fdr,
         filter_maxgene=input$filter_maxgene,

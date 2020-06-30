@@ -28,12 +28,12 @@ tabPanel("Heatmaps",
            actionButton("action_heatmaps","Generate Heatmaps"),  
            h6(textOutput("numheat")),
            radioButtons("heatmapvaluename",label="Select Value to Plot in Heatmap",choices=""),
-           checkboxGroupInput("view_group_heatmap",
-                              label=h5("Select Groups to View"),
-                              choices="",
-                              selected=""
-           ),
-           
+           selectizeInput("view_group_heatmap", label="Select Groups to View",
+                          choices=NULL,
+                          multiple=TRUE),
+           selectizeInput("view_samples_heatmap", label="Select Samples to View",
+                          choices=NULL,
+                          multiple=TRUE),
            radioButtons("heatmap_subset",label="Use all genes or upload your own subset?",
                         choices=c("all","subset"),selected="all"),
            
