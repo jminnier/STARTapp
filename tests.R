@@ -55,6 +55,22 @@ rna_scatterplot(data_long = tmp4$data_long,
                 color_hi = "orange",
                 sel_genes = NULL
 )
+png("tmp.png") # can't render in rstudio at the moment
+heatmap_render(
+  data_analyzed=tmp4,
+  yname = "log2cpm",
+  usesubset = FALSE,
+  rowcenter=TRUE,
+  subsetids = NULL,
+  orderby = "variation",
+  FDRcut=0.05,
+  maxgenes=50,
+  view_group=c("group1", "group2"),
+  view_samples=c("group1_1", "group1_2", "group2_1","group2_2"),
+  sel_test=unique(as.character(tmp4$results$test))[1],
+  heatmap_rowlabels=TRUE)
+dev.off()
+fs::file_delete("tmp.png")
 
 # One replication
 testdata  <- read_csv("data/testdata_counts_onerep.csv")
