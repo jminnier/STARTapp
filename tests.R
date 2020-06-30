@@ -45,7 +45,16 @@ gene_pcaplot(data_long= tmp4$data_long,
              groupdat= tmp4$sampledata[,"group",drop=FALSE],
              pcnum = 1:2,
              colorfactor="group")
-
+rna_scatterplot(data_long = tmp4$data_long,
+                results = tmp4$results,
+                group_sel = tmp4$group_names,
+                valuename="log2cpm",
+                color_result_name = "Sign of FC",
+                results_test_name = unique(as.character(tmp4$results$test))[1],
+                color_low = "blue",
+                color_hi = "orange",
+                sel_genes = NULL
+)
 
 # One replication
 testdata  <- read_csv("data/testdata_counts_onerep.csv")
