@@ -29,16 +29,32 @@ tmp3 <- analyze_expression_data(testdata, analysis_method="linear_model", numgen
 glimpse(tmp3$data_long)
 glimpse(tmp3$results)
 
+# non-counts
+testdata  <- read_csv("data/testdata_noncounts.csv")
+tmp4 <- analyze_expression_data(testdata, analysis_method="edgeR", numgeneids = 2)
+head(tmp4$results)
+dotplot_fun(data_long = tmp4$data_long,
+            geneids = tmp4$geneids,
+            genelabel="unique_id",
+            sel_group=tmp4$group_names,
+            sel_gene=tmp4$geneids$unique_id[1:2],
+            ytype="log2cpm")
+gene_pcaplot(data_long= tmp4$data_long,
+             valuename= "log2cpm",
+             sampleid= tmp4$sampledata$sampleid,
+             groupdat= tmp4$sampledata[,"group",drop=FALSE],
+             pcnum = 1:2,
+             colorfactor="group")
 
 
-
+# One replication
 testdata  <- read_csv("data/testdata_counts_onerep.csv")
 tmp3 <- analyze_expression_data(testdata, analysis_method="edgeR", numgeneids = 2)
 # need to add option for this somehow
 
-alldata <- read_csv("~/Downloads/joe515.csv")
-tmp = extract_count_data(alldata)
-tmp3 <- analyze_expression_data(alldata, analysis_method="edgeR")
+# alldata <- read_csv("~/Downloads/joe515.csv")
+# tmp = extract_count_data(alldata)
+# tmp3 <- analyze_expression_data(alldata, analysis_method="edgeR")
 
 # analyzed data not working
 # sample heatmaps not working
@@ -53,3 +69,10 @@ tmpdatlong = data_analyzed$data_long
 (tmpsamples = as.character(data_analyzed$sampledata$sampleid))
 tmpdat = data_analyzed$results
 (tmptests = unique(as.character(tmpdat$test)))
+
+# Uploaded data
+testdata <- load("data/testdata_counts_prot_uploaded.RData") # start_list
+testdata <- load_existing_rdata("data/testdata_counts_prot_uploaded.RData")
+
+rdata_filepath <- "data/mousecounts_example.RData"
+testdata <- load_existing_rdata(rdata_filepath)
