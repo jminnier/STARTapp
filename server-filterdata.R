@@ -91,6 +91,29 @@ observe({
   }
 }, priority = 2)
 
+# after selecting group
+observe({
+  print("server-datafilter-update-samples")
+  data_analyzed = analyzeDataReactive()
+  tmpselected = input$datafilter_groups
+  print(tmpselected)
+  if(!is.null(tmpselected)) {
+    if(!(tmpselected[1]=="")) {
+      tmpselected = input$datafilter_groups
+      tmpsampledata = data_analyzed$sampledata
+      tmpsampledata = tmpsampledata %>% filter(group%in%tmpselected)
+      tmpsamples = as.character(tmpsampledata$sampleid)
+      print(tmpsamples)
+      
+      updateSelectizeInput(session,"datafilter_samples", 
+                           choices=tmpsamples,
+                           selected=tmpsamples)
+    }
+  }
+}, priority = 2)
+
+
+
 # after selecting test
 
 # observe({
