@@ -163,7 +163,7 @@ analyze_expression_data <- function(alldata, analysis_method = "edgeR", numgenei
     lmobj_res$numer_group = group_names[1]
     lmobj_res$test = "None"
   }else{
-    tmpgroup = sampledata$group
+    tmpgroup = factor(sampledata$group)
     lmobj_res = list()
     for(ii in 1:length(group_names)) {
       grp     <-    relevel(tmpgroup, ref= group_names[ii])
