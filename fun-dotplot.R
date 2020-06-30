@@ -43,7 +43,7 @@ dotplot_dat <- function(data_long,
   subdat_rna = filter(data_long,unique_id%in%tmpids$unique_id,group%in%sel_group)
   geneids_tmp = filter(geneids,unique_id%in%tmpids$unique_id)
   
-  subdat_rna$y = subdat_rna[,ytype]
+  subdat_rna = subdat_rna %>% rename(y=ytype)
   
   subdat_rna$group = factor(subdat_rna$group)
   subdat_rna = subdat_rna%>%filter(!is.na(y))
@@ -84,7 +84,7 @@ dotplot_fun <- function(data_long,
     p <- ggplot(subdat_all,aes(x=group,y=y,fill=group)) +geom_boxplot()
     p <- p + facet_grid(.~ labelgeneid,scales = "free_y")+
       geom_point(size=3,aes(text = paste("sampleid:", sampleid))) + 
-      stat_summary(fun.y=mean,geom="point",shape=5,size=3,fill=1)
+      stat_summary(fun=mean,geom="point",shape=5,size=3,fill=1)
     p <- p + scale_fill_discrete(name="group",breaks=sel_group,
                                  labels=sel_group,
                                  guide=guide_legend(keyheight=4,keywidth=2))

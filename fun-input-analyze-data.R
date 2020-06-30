@@ -193,11 +193,14 @@ analyze_expression_data <- function(alldata, analysis_method = "edgeR", numgenei
       
       colnames(beta) = colnames(pval) = colnames(pval.adj) = 
         gsub("grp","",colnames(beta))
+      rownames(pval) = rownames(pval.adj) = rownames(beta)
       
-      tmpout = cbind(melt(beta), # uses rownames of beta for id
-                     melt(pval)$value,
-                     melt(pval.adj)$value)
-      colnames(tmpout) = c("unique_id","numer_group","logFC","P.Value","adj.P.Val")
+      tmpout = bind_rows(as_tibble(beta, rownames="unique_id") %>% tibble::add_column(type = "logFC"),
+                     as_tibble(pval, rownames="unique_id") %>% tibble::add_column(type = "P.Value"),
+                     as_tibble(pval.adj, rownames="unique_id") %>% tibble::add_column(type = "adj.P.Val"))
+      tmpout = tmpout %>% select(unique_id, type, everything()) %>%
+        pivot_longer(cols= -(unique_id:type), names_to = "numer_group")
+      tmpout = tmpout %>% pivot_wider(names_from = "type", values_from = "value")
       tmpout$denom_group = group_names[ii]
       tmpout$test = with(tmpout, paste(numer_group,denom_group,sep="/"))
       tmpout = tmpout[,c("unique_id","test","denom_group","numer_group",
@@ -222,14 +225,12 @@ analyze_expression_data <- function(alldata, analysis_method = "edgeR", numgenei
     
     tmpexprdata = data.frame("unique_id" =geneids$unique_id,expr_data)
     tmpcountdata = data.frame("unique_id"=geneids$unique_id,countdata)
-    
     tmplog2cpm = data.frame("unique_id"=geneids$unique_id,log2cpm)
-    log2cpm_long = melt(tmplog2cpm,variable.name = "sampleid",value.name="log2cpm")
     
-    countdata_long = melt(tmpcountdata,variable.name = "sampleid",value.name="count")
+    log2cpm_long = tmplog2cpm %>% pivot_longer(-unique_id, names_to = "sampleid", values_to = "log2cpm")
+    countdata_long = tmpcountdata %>% pivot_longer(-unique_id, names_to = "sampleid", values_to = "count")
     #countdata_long$log2count = log2(countdata_long$count+.25)
-    
-    exprdata_long = melt(tmpexprdata,variable.name = "sampleid",value.name=expr_data_name)
+    exprdata_long = tmpexprdata %>% pivot_longer(-unique_id, names_to = "sampleid", values_to = expr_data_name)
     
     data_long = countdata_long
     if(analysis_method!="linear_model") {data_long = left_join(data_long,log2cpm_long)}
