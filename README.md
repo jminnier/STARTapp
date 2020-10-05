@@ -14,8 +14,9 @@ install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tid
                    "RColorBrewer","pheatmap","shinyBS","plotly",
                    "markdown","NMF","scales","heatmaply"))
 ## try http:// if https:// URLs are not supported
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("limma","edgeR"))
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install(c("limma","edgeR"))
 
 ```
 
