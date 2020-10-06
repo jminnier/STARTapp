@@ -10,7 +10,7 @@ The app is hosted on Shinyapps.io here:
 To run this app locally on your machine, download R or RStudio and run the following commands once to set up the environment:
 ```
 
-install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT",
+install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT", "readr",
                    "RColorBrewer","pheatmap","shinyBS","plotly",
                    "markdown","NMF","scales","heatmaply"))
 ## try http:// if https:// URLs are not supported
