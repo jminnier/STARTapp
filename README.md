@@ -11,7 +11,7 @@ To run this app locally on your machine, download R or RStudio and run the follo
 ```
 
 install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT", "readr",
-                   "RColorBrewer","pheatmap","shinyBS","plotly",
+                   "RColorBrewer","pheatmap","shinyBS","plotly","janitor",
                    "markdown","NMF","scales","heatmaply"))
 ## try http:// if https:// URLs are not supported
 if (!requireNamespace("BiocManager", quietly = TRUE))
