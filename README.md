@@ -10,12 +10,13 @@ The app is hosted on Shinyapps.io here:
 To run this app locally on your machine, download R or RStudio and run the following commands once to set up the environment:
 ```
 
-install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT",
-                   "RColorBrewer","pheatmap","shinyBS","plotly",
+install.packages(c("reshape2","ggplot2","ggthemes","gplots","ggvis","dplyr","tidyr","DT", "readr",
+                   "RColorBrewer","pheatmap","shinyBS","plotly","janitor",
                    "markdown","NMF","scales","heatmaply"))
 ## try http:// if https:// URLs are not supported
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("limma","edgeR"))
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install(c("limma","edgeR"))
 
 ```
 
