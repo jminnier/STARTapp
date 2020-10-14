@@ -19,7 +19,7 @@
 ## ==================================================================================== ##
 ## 
 gene_pheatmap <- function(data_long,valuename,sampleid,annotation_row=NULL) {
-  data_long$value = data_long[,valuename]
+  data_long <- data_long %>% mutate(value=unlist(data_long[,valuename]))
   exprdat = data_long%>%select(unique_id,sampleid,value)%>%spread(sampleid,value)
   exprdat = as.matrix(exprdat[,-1])
   

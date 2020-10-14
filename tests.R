@@ -28,6 +28,9 @@ glimpse(tmp3$results)
 tmp3 <- analyze_expression_data(testdata, analysis_method="linear_model", numgeneids = 2)
 glimpse(tmp3$data_long)
 glimpse(tmp3$results)
+gene_pheatmap(data_long = tmp3$data_long,
+              sampleid = tmp3$sampledata$sampleid,
+              valuename = "log2cpm")
 
 # non-counts
 testdata  <- read_csv("data/testdata_noncounts.csv")
@@ -55,6 +58,11 @@ rna_scatterplot(data_long = tmp4$data_long,
                 color_hi = "orange",
                 sel_genes = NULL
 )
+gene_pheatmap(data_long = tmp4$data_long,
+              sampleid = tmp4$sampledata$sampleid,
+              valuename = "log2cpm")
+
+
 png("tmp.png") # can't render in rstudio at the moment
 heatmap_render(
   data_analyzed=tmp4,
