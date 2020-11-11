@@ -22,6 +22,7 @@ gene_pheatmap <- function(data_long,valuename,sampleid,annotation_row=NULL) {
   data_long <- data_long %>% mutate(value=unlist(data_long[,valuename]))
   exprdat = data_long%>%select(unique_id,sampleid,value)%>%spread(sampleid,value)
   exprdat = as.matrix(exprdat[,-1])
+  exprdat = exprdat[, match(sampleid, colnames(exprdat))]
   
   sampleDists <- dist(t(exprdat))
   sampleDistMatrix <- as.matrix(sampleDists)
@@ -42,6 +43,7 @@ gene_pcaplot <- function(data_long,valuename,sampleid,groupdat=NULL,colorfactor=
   data_long = data_long %>% rename(value = valuename)
   exprdat = data_long%>%select(unique_id,sampleid,value)%>%spread(sampleid,value)
   exprdat = as.matrix(exprdat[,-1])
+  exprdat = exprdat[,match(groupdat$sampleid, colnames(exprdat))]
   
   #adapted from DESeq2:::plotPCA.DESeqTransform
   pca <- prcomp(t(exprdat))

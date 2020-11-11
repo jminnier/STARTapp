@@ -74,7 +74,8 @@ fun_gene_pheatmap <- reactive({
   tmpkeep = which((sampledata$group%in%tmpgroups)&(sampledata$sampleid%in%tmpsamples))
   
   gene_pheatmap(data_long=tmplong,valuename=input$groupplot_valuename,
-                sampleid=sampledata$sampleid[tmpkeep],annotation_row = sampledata[tmpkeep,"group",drop=FALSE])
+                sampleid=sampledata$sampleid[tmpkeep],
+                annotation_row = sampledata[tmpkeep,c("group"),drop=FALSE])
   
 })
 
@@ -101,7 +102,7 @@ fun_pca_plot <- reactive({
   gene_pcaplot(data_long=tmplong,
                valuename=input$groupplot_valuename,
                sampleid= sampledata$sampleid[tmpkeep],
-               groupdat= sampledata[tmpkeep,"group",drop=FALSE],
+               groupdat= sampledata[tmpkeep,c("sampleid","group")],
                pcnum = as.numeric(input$pcnum),
                colorfactor="group")
   

@@ -30,7 +30,15 @@ glimpse(tmp3$data_long)
 glimpse(tmp3$results)
 gene_pheatmap(data_long = tmp3$data_long,
               sampleid = tmp3$sampledata$sampleid,
-              valuename = "log2cpm")
+              valuename = "count",
+              annotation_row = tmp3$sampledata[,c("sampleid","group")])
+gene_pcaplot(data_long= tmp3$data_long,
+             valuename= "count",
+             sampleid= tmp3$sampledata$sampleid,
+             groupdat= tmp3$sampledata[,c("sampleid","group")],
+             pcnum = 1:2,
+             colorfactor="group")
+
 
 # non-counts
 testdata  <- read_csv("data/testdata_noncounts.csv")
@@ -45,7 +53,7 @@ dotplot_fun(data_long = tmp4$data_long,
 gene_pcaplot(data_long= tmp4$data_long,
              valuename= "log2cpm",
              sampleid= tmp4$sampledata$sampleid,
-             groupdat= tmp4$sampledata[,"group",drop=FALSE],
+             groupdat= tmp4$sampledata[,c("sampleid","group")],
              pcnum = 1:2,
              colorfactor="group")
 rna_scatterplot(data_long = tmp4$data_long,
